@@ -1,0 +1,99 @@
+{
+  "info": {
+    "name": "Proxy Parámetros - Backoffice",
+    "description": "Proxy del micro comedica-bel-msvc-params. Request: BaseRequestDto (uuid, channel, pageId, request). Response: ApiResponseDto.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://bo-comedica-service-dev.echotechs.net/api"
+    }
+  ],
+  "item": [
+    {
+      "name": "POST get-params",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"name\": null,\n    \"value\": null,\n    \"description\": null,\n    \"status\": null\n  }\n}"
+        },
+        "url": "{{baseUrl}}/params/get-params",
+        "description": "Todos los params: request.name null. Filtrar por nombre: request.name = \"NOMBRE_PARAM\"."
+      },
+      "response": [
+        {
+          "name": "Éxito",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Consulta realizada con éxito\" },\n  \"correlative\": \"a1b2c3\",\n  \"metadata\": { \"totalCount\": 2, \"filteredCount\": 2, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-1\" },\n  \"data\": [ { \"name\": \"MAX_LOGIN_ATTEMPTS\", \"value\": \"5\" }, { \"name\": \"SESSION_TIMEOUT\", \"value\": \"30\" } ],\n  \"errors\": null,\n  \"version\": 1\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST save",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"name\": \"NOMBRE_PARAM\",\n    \"value\": \"valor_ejemplo\",\n    \"description\": \"Descripción del parámetro\",\n    \"status\": 1\n  }\n}"
+        },
+        "url": "{{baseUrl}}/params/save",
+        "description": "Crea/guarda un parámetro. request: name, value, description, status."
+      },
+      "response": [
+        {
+          "name": "Éxito",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Parámetro guardado\" },\n  \"correlative\": \"b2c3d4\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-2\" },\n  \"data\": { \"name\": \"NOMBRE_PARAM\", \"value\": \"valor_ejemplo\" },\n  \"errors\": null,\n  \"version\": 1\n}"
+        }
+      ]
+    },
+    {
+      "name": "PUT edit",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"name\": \"NOMBRE_PARAM\",\n    \"value\": \"valor_actualizado\",\n    \"description\": \"Descripción actualizada\",\n    \"status\": 1\n  }\n}"
+        },
+        "url": "{{baseUrl}}/params/edit",
+        "description": "Edita un parámetro. request: name, value, description, status."
+      },
+      "response": [
+        {
+          "name": "Éxito",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Parámetro actualizado\" },\n  \"correlative\": \"c3d4e5\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-3\" },\n  \"data\": { \"name\": \"NOMBRE_PARAM\", \"value\": \"valor_actualizado\" },\n  \"errors\": null,\n  \"version\": 1\n}"
+        }
+      ]
+    }
+  ]
+}

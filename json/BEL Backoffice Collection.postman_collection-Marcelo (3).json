@@ -1,0 +1,3073 @@
+{
+  "info": {
+    "_postman_id": "7ffb6119-7adc-4677-bbc2-1be2f90a13c2",
+    "name": "BEL Backoffice Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "25073269"
+  },
+  "item": [
+    {
+      "name": "parameters",
+      "item": [
+        {
+          "name": "params/get-params",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "FEE_COMISSION_SIPA",
+                  "description": "Nombre de parametro a consultar. *Enviar vacío para obtener lista completa",
+                  "type": "text",
+                  "uuid": "7980aa34-6b04-4494-9893-0f9c937f8ad0"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/params/get-params",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "params",
+                "get-params"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "name",
+                      "value": "SESSION_IDDLE_TIME",
+                      "description": "Nombre de parametro a consultar. *Enviar vacío para obtener lista completa",
+                      "type": "text",
+                      "uuid": "7980aa34-6b04-4494-9893-0f9c937f8ad0"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{local}}/api/params/get-params",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "params",
+                    "get-params"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 26 Jan 2026 08:26:40 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Lista de parámetros obtenida con éxito\"\n    },\n    \"correlative\": \"833F1D2C54804B2794B7FA249EA8DAEE\",\n    \"metadata\": {\n        \"totalCount\": 9,\n        \"filteredCount\": 9,\n        \"timestamp\": \"2026-01-26T02:26:40.2969131\",\n        \"transactionId\": \"d658f2ba-9152-42ea-99e2-4269b0caab1d\"\n    },\n    \"data\": [\n        {\n            \"paramName\": \"WATCH_LIST_MINIMUM_MATCH_THRESHOLD\",\n            \"paramValue\": \"80\",\n            \"paramDescription\": \"Umbral mínimo de coincidencia para la lista de cautela\"\n        },\n        {\n            \"paramName\": \"WATCH_LIST_MATCH_NOTIFICATION_EMAIL\",\n            \"paramValue\": \"depto.oficialia_cumplimiento@comedica.com.sv\",\n            \"paramDescription\": \"Dirección de correo de notificación por coincidencia en lista de cautela\"\n        },\n        {\n            \"paramName\": \"SESSION_IDDLE_TIME\",\n            \"paramValue\": null,\n            \"paramDescription\": null\n        },\n        {\n            \"paramName\": \"SESSION_CONFIRMATION_TIMEOUT\",\n            \"paramValue\": null,\n            \"paramDescription\": null\n        },\n        {\n            \"paramName\": \"ALLOWED_PENDING_CONTRIBUTIONS\",\n            \"paramValue\": \"3\",\n            \"paramDescription\": \"Número de aportaciones pendientes aceptadas para considerar al día\"\n        },\n        {\n            \"paramName\": \"ACCEPTED_CREDIT_RISK_CATEGORY\",\n            \"paramValue\": \"B\",\n            \"paramDescription\": \"Categoría de riesgo en crédito aceptada para considerar al día\"\n        },\n        {\n            \"paramName\": \"ACCEPTED_CREDIT_CARD_RISK_CATEGORY\",\n            \"paramValue\": \"B\",\n            \"paramDescription\": \"Categoría de riesgo en tarjeta de crédito aceptada para considerar al día\"\n        },\n        {\n            \"paramName\": \"MAXIMO_POR_TRANSACCION\",\n            \"paramValue\": \"1000.00\",\n            \"paramDescription\": null\n        },\n        {\n            \"paramName\": \"FEE_COMISSION_SIPA\",\n            \"paramValue\": \"1\",\n            \"paramDescription\": \"Comisión por transacción de Transfer365 CA-RD Egreso\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "params/save",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"name\": \"TEST\",\r\n        \"value\": \"TEST\",\r\n        \"description\": \"\"\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/params/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "params",
+                "save"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\" : \"SESSION_IDDLE_TIME\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "localhost:8081/params/get-params",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8081",
+                  "path": [
+                    "params",
+                    "get-params"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 06 Oct 2025 17:54:15 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n    {\n        \"paramName\": \"SESSION_IDDLE_TIME\",\n        \"paramValue\": null,\n        \"paramDescription\": null\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "params/edit",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"name\": \"TEST\",\r\n        \"value\": \"TEST\",\r\n        \"description\": \"\",\r\n        \"status\" : 0\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/params/edit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "params",
+                "edit"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\" : \"SESSION_IDDLE_TIME\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "localhost:8081/params/get-params",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8081",
+                  "path": [
+                    "params",
+                    "get-params"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 06 Oct 2025 17:54:15 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n    {\n        \"paramName\": \"SESSION_IDDLE_TIME\",\n        \"paramValue\": null,\n        \"paramDescription\": null\n    }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gestiones",
+      "item": [
+        {
+          "name": "save-corresponsal",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"id\": 7,   //Requerido solo para modificacion de corresponsal\r\n        \"user\" : \"echo\",\r\n        \"internalCode\": \"01-1334\",\r\n        \"codeSsf\": \"A556\",\r\n        \"type\": \"J\",\r\n        \"name\": \"GMG COMERCIAL EL SALVADOR, S.A. DE C.V.\",\r\n        \"comercialName\": \"PRADO DARIO 34\",\r\n        \"assignmentDate\": \"2021-11-17T15:00:00\",\r\n        \"status\": \"A\",\r\n        \"terminationDate\": null,\r\n        \"terminationFlow\": null,\r\n        \"nit\": \"0614-100805-106-7\",\r\n        \"address\": \"Calle Ruben Dario # 518 edificio El Salvador, San Salvador\",\r\n        \"municipality\": \"SAN SALVADOR\",\r\n        \"department\": \"SAN SALVADOR\",\r\n        \"coordinates\": \"13.698656-89.197327, 0\",\r\n        \"schedule\": \"De lunes a sabado de 10a.m a 8p.m y domingo de 10a.m a 7p.m\",\r\n        \"districtCodePx\": 614,\r\n        \"districtCodeOr\": 102\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/correspondent/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "correspondent",
+                "save"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "dummy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{local}}/back/gestiones/",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "back",
+                    "gestiones",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 23:20:14 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Gestiones obtenidas con éxito\"\n    },\n    \"correlative\": \"55EB919655644A0EAB1BA4B2A3F0736C\",\n    \"metadata\": {\n        \"totalCount\": 2,\n        \"filteredCount\": 2,\n        \"timestamp\": \"2026-01-19T17:20:14.1368985\",\n        \"transactionId\": \"81c40e55-18f4-45f8-8922-13d1b8fdf564\"\n    },\n    \"data\": [\n        {\n            \"codigo\": \"CORR-001\",\n            \"numTC\": \"150\",\n            \"valorTC\": \"5000.00\",\n            \"numCA\": \"45\",\n            \"valorCA\": \"1250.50\",\n            \"numPR\": \"12\",\n            \"valorPR\": \"300\",\n            \"fechaPresenta\": \"01/01/2026\"\n        },\n        {\n            \"codigo\": \"CORR-002\",\n            \"numTC\": \"70\",\n            \"valorTC\": \"3000.00\",\n            \"numCA\": \"95\",\n            \"valorCA\": \"700.00\",\n            \"numPR\": \"50\",\n            \"valorPR\": \"250\",\n            \"fechaPresenta\": \"01/01/2026\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            },
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n        //\"id\": 1,   Requerido solo para modificacion de corresponsal\r\n        \"user\" : \"echo\",\r\n        \"internalCode\": \"01-1334\",\r\n        \"codeSsf\": \"A556\",\r\n        \"type\": \"J\",\r\n        \"name\": \"GMG COMERCIAL EL SALVADOR, S.A. DE C.V.\",\r\n        \"comercialName\": \"PRADO DARIO 34\",\r\n        \"assignmentDate\": \"2021-11-17T12:00:00\",\r\n        \"status\": \"A\",\r\n        \"terminationDate\": null,\r\n        \"terminationFlow\": null,\r\n        \"nit\": \"0614-100805-106-7\",\r\n        \"address\": \"Calle Ruben Dario # 518 edificio El Salvador, San Salvador\",\r\n        \"municipality\": \"SAN SALVADOR\",\r\n        \"department\": \"SAN SALVADOR\",\r\n        \"coordinates\": \"13.698656-89.197327, 0\",\r\n        \"schedule\": \"De lunes a sabado de 10a.m a 8p.m y domingo de 10a.m a 7p.m\",\r\n        \"districtCodePx\": 614,\r\n        \"districtCodeOr\": 102\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/gestiones/correspondent",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "gestiones",
+                    "correspondent"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 07 Feb 2026 21:42:40 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Guardado con éxito\"\n    },\n    \"correlative\": \"78038A4017184FF9BB9CC7742E07D26F\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-02-07T15:42:40.5285026\",\n        \"transactionId\": \"2599da56-c40a-4525-851e-e629a3a000ae\"\n    },\n    \"data\": {\n        \"id\": 7,\n        \"internalCode\": \"01-1334\",\n        \"codeSsf\": \"A556\",\n        \"type\": \"J\",\n        \"name\": \"GMG COMERCIAL EL SALVADOR, S.A. DE C.V.\",\n        \"comercialName\": \"PRADO DARIO 34\",\n        \"assignmentDate\": \"2021-11-17T12:00:00.000+00:00\",\n        \"status\": \"A\",\n        \"terminationDate\": null,\n        \"terminationFlow\": null,\n        \"nit\": \"0614-100805-106-7\",\n        \"address\": \"Calle Ruben Dario # 518 edificio El Salvador, San Salvador\",\n        \"municipality\": \"SAN SALVADOR\",\n        \"department\": \"SAN SALVADOR\",\n        \"coordinates\": \"13.698656-89.197327, 0\",\n        \"schedule\": \"De lunes a sabado de 10a.m a 8p.m y domingo de 10a.m a 7p.m\",\n        \"districtCodePx\": 614,\n        \"districtCodeOr\": 102\n    },\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "eliminar-corresponsal",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"id\": 7,\r\n        \"user\" : \"echo\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/correspondent/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "correspondent",
+                "delete"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n        \"id\": 7,\r\n        \"user\" : \"echo\",\r\n        \"status\": \"R\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/correspondent/delete",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "correspondent",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 08 Feb 2026 01:35:57 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Borrado con éxito\"\n    },\n    \"correlative\": \"A1A72CB8193C48D882FF01569193F82B\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-02-07T19:35:56.9643254\",\n        \"transactionId\": \"44b266f0-c5ed-48b7-834f-2357b0b127aa\"\n    },\n    \"data\": {\n        \"id\": 7,\n        \"internalCode\": \"01-1334\",\n        \"codeSsf\": \"A556\",\n        \"type\": \"J\",\n        \"name\": \"GMG COMERCIAL EL SALVADOR, S.A. DE C.V.\",\n        \"comercialName\": \"PRADO DARIO 34\",\n        \"assignmentDate\": \"2021-11-17T15:00:00.000+00:00\",\n        \"status\": \"R\",\n        \"terminationDate\": null,\n        \"terminationFlow\": null,\n        \"nit\": \"0614-100805-106-7\",\n        \"address\": \"Calle Ruben Dario # 518 edificio El Salvador, San Salvador\",\n        \"municipality\": \"SAN SALVADOR\",\n        \"department\": \"SAN SALVADOR\",\n        \"coordinates\": \"13.698656-89.197327, 0\",\n        \"schedule\": \"De lunes a sabado de 10a.m a 8p.m y domingo de 10a.m a 7p.m\",\n        \"districtCodePx\": 614,\n        \"districtCodeOr\": 102\n    },\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reportes",
+      "item": [
+        {
+          "name": "reporte-tc",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/tc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "tc"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "dummy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{local}}/back/reports/tc",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "back",
+                    "reports",
+                    "tc"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 21:58:32 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"571181091C2443AF88B075B79E069391\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-01-19T15:58:32.0625915\",\n        \"transactionId\": \"a4d2b70d-f709-474f-91af-606506c264fd\"\n    },\n    \"data\": [\n        {\n            \"fecha\": \"10/01/2026 17:41\",\n            \"cuentaOrigen\": \"1018759207\",\n            \"idOrigen\": \"85159\",\n            \"nombreOrigen\": \"Roberto Sánchez\",\n            \"tarjetaDestino\": \"4530 5533 1551 9105\",\n            \"idDestino\": \"68038\",\n            \"nombreDestino\": \"Juan Pérez\",\n            \"canal\": \"Banca Móvil\",\n            \"monto\": \"4751.92\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            },
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/reportes/tc",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reportes",
+                    "tc"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 06 Feb 2026 03:41:35 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"7094EC64D5354D55AAE6A9441DB6C4C4\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-02-05T21:41:35.1858524\",\n        \"transactionId\": \"a889f519-8781-40c7-8c3c-38325c31739b\"\n    },\n    \"data\": {\n        \"data\": [\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0003044941000011\",\n                \"idOrigen\": \"4494\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"tarjetaDestino\": \"5188450000011239\",\n                \"idDestino\": \"4494\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"canal\": \"Banca en línea\",\n                \"monto\": 0.1\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0003044941000011\",\n                \"idOrigen\": \"4494\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"tarjetaDestino\": \"5188450000011239\",\n                \"idDestino\": \"4494\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"canal\": \"Banca en línea\",\n                \"monto\": 0.1\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0003044941000011\",\n                \"idOrigen\": \"4494\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"tarjetaDestino\": \"5188450000011239\",\n                \"idDestino\": \"4494\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"canal\": \"Banca en línea\",\n                \"monto\": 0.1\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0006107451000013\",\n                \"idOrigen\": \"10745\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"tarjetaDestino\": \"5348810000069262\",\n                \"idDestino\": \"10745\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"canal\": \"Banca en línea\",\n                \"monto\": 0.87\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0001033031000013\",\n                \"idOrigen\": \"3303\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ DE GUTIERREZ\",\n                \"tarjetaDestino\": \"0007009930200016\",\n                \"idDestino\": \"3303\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ DE GUTIERREZ\",\n                \"canal\": \"Banca en línea\",\n                \"monto\": 15\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0001035801000011\",\n                \"idOrigen\": \"3580\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"tarjetaDestino\": \"0008026010200018\",\n                \"idDestino\": \"3580\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"canal\": \"Banca en línea\",\n                \"monto\": 18\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0001035801000011\",\n                \"idOrigen\": \"3580\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"tarjetaDestino\": \"0008026010200018\",\n                \"idDestino\": \"3580\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"canal\": \"Banca en línea\",\n                \"monto\": 18\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"010100007492\",\n                \"idOrigen\": \"99234\",\n                \"nombreOrigen\": \"BYRON WILFREDO MENJIVAR RAMIREZ \",\n                \"tarjetaDestino\": \"5184770000191598\",\n                \"idDestino\": \"99234\",\n                \"nombreDestino\": \"BYRON WILFREDO MENJIVAR RAMIREZ \",\n                \"canal\": \"Banca Móvil\",\n                \"monto\": 2\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"010100007492\",\n                \"idOrigen\": \"99234\",\n                \"nombreOrigen\": \"BYRON WILFREDO MENJIVAR RAMIREZ \",\n                \"tarjetaDestino\": \"5184770000191598\",\n                \"idDestino\": \"99234\",\n                \"nombreDestino\": \"BYRON WILFREDO MENJIVAR RAMIREZ \",\n                \"canal\": \"Banca Móvil\",\n                \"monto\": 2\n            },\n            {\n                \"fecha\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"020120000725\",\n                \"idOrigen\": \"12732\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"tarjetaDestino\": \"5348810000076580\",\n                \"idDestino\": \"12732\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"canal\": \"Banca en línea\",\n                \"monto\": 12\n            }\n        ],\n        \"pagination\": {\n            \"page\": 1,\n            \"size\": 10,\n            \"sortBy\": null,\n            \"sortDirection\": \"ASC\"\n        },\n        \"totalElements\": 120,\n        \"totalPages\": 12,\n        \"currentPage\": 1,\n        \"pageSize\": 10\n    },\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reporte-correponsales",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/correspondent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "correspondent"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/reportes/correspondent",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reportes",
+                    "correspondent"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 02 Feb 2026 03:30:22 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"00EAF2658702441A8BCB2895B725D9C0\",\n    \"metadata\": {\n        \"totalCount\": 10,\n        \"filteredCount\": 10,\n        \"timestamp\": \"2026-02-01T21:30:21.9109469\",\n        \"transactionId\": \"f2089953-5096-4c26-99e0-73a96d29c763\"\n    },\n    \"data\": [\n        {\n            \"fecha\": \"2022-03-08T06:00:00.000+00:00\",\n            \"numAsociado\": \"14104\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 160,\n            \"cuenta\": \"5184770000190855\",\n            \"referencia\": \"2527\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-10T06:00:00.000+00:00\",\n            \"numAsociado\": \"22780\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 60,\n            \"cuenta\": \"5471810000002668\",\n            \"referencia\": \"4699\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-10T06:00:00.000+00:00\",\n            \"numAsociado\": \"20164\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 241.68,\n            \"cuenta\": \"5184770000054853\",\n            \"referencia\": \"5393\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-09T06:00:00.000+00:00\",\n            \"numAsociado\": \"14008\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 100,\n            \"cuenta\": \"5184770000099072\",\n            \"referencia\": \"4199\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-10T06:00:00.000+00:00\",\n            \"numAsociado\": \"18966\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 300,\n            \"cuenta\": \"5184770000091962\",\n            \"referencia\": \"4859\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-10T06:00:00.000+00:00\",\n            \"numAsociado\": \"2817\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 20,\n            \"cuenta\": \"5471810084420000\",\n            \"referencia\": \"5022\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-10T06:00:00.000+00:00\",\n            \"numAsociado\": \"15244\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 21,\n            \"cuenta\": \"5184770013748004\",\n            \"referencia\": \"5407\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-12T06:00:00.000+00:00\",\n            \"numAsociado\": \"8288\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 200,\n            \"cuenta\": \"5184770013419028\",\n            \"referencia\": \"8926\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-12T06:00:00.000+00:00\",\n            \"numAsociado\": \"8288\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 200,\n            \"cuenta\": \"5184770013419028\",\n            \"referencia\": \"8926\",\n            \"tipo\": \"TC\"\n        },\n        {\n            \"fecha\": \"2022-03-12T06:00:00.000+00:00\",\n            \"numAsociado\": \"17229\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ\",\n            \"monto\": 20,\n            \"cuenta\": \"5184770019970016\",\n            \"referencia\": \"9282\",\n            \"tipo\": \"TC\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reporte-recurrentes",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/recurrent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "recurrent"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "dummy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{local}}/back/reports/recu",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "back",
+                    "reports",
+                    "recu"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 22:47:05 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"D9C995B2C4134ED69B69737A08FD47EE\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-01-19T16:47:05.2427615\",\n        \"transactionId\": \"195daf0b-66a9-4b94-b350-7f620afdf230\"\n    },\n    \"data\": [\n        {\n            \"tipo\": \"Transfer 365 CA-RD\",\n            \"numeroSolicitud\": \"298\",\n            \"fechaCreacion\": \"01/12/2025\",\n            \"fechaModificacion\": \"01/01/2026\",\n            \"numeroAsociado\": \"1148\",\n            \"refCargo\": \"7176135057573794\",\n            \"refAbono\": \"24014716798509\",\n            \"beneficiario\": \"Distribuidora El Sol\",\n            \"tipoBeneficiario\": \"Juridica\",\n            \"valor\": \"1795.85\",\n            \"bancoDestino\": \"Banco Agrícola\",\n            \"fechaInicio\": \"02/12/2025\",\n            \"frecuencia\": \"Mensual\",\n            \"estado\": \"Activo\",\n            \"finalizado\": \"No\",\n            \"canal\": \"Banca en Línea\",\n            \"oficina\": null\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            },
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/reportes/recurrent",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reportes",
+                    "recurrent"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 06 Feb 2026 07:30:31 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"FF717FA9CAD14A228D7ED442C0361DDC\",\n    \"metadata\": {\n        \"totalCount\": 7,\n        \"filteredCount\": 7,\n        \"timestamp\": \"2026-02-06T01:30:30.9903156\",\n        \"transactionId\": \"7ebeb789-c359-4375-866b-62b4f67b0921\"\n    },\n    \"data\": [\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"236\",\n            \"fechaCreacion\": \"2025-11-17 20:12:17.0\",\n            \"fechaModificacion\": \"2025-11-20 06:05:05.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"CARLOS GÓMEZ2\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-18 00:00:00.0\",\n            \"frecuencia\": \"DIARIA\",\n            \"valor\": 5,\n            \"bancoDestino\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": null,\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"235\",\n            \"fechaCreacion\": \"2025-11-17 19:54:37.0\",\n            \"fechaModificacion\": null,\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"CARLOS GÓMEZ\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-19 00:00:00.0\",\n            \"frecuencia\": \"DIARIA\",\n            \"valor\": 50.75,\n            \"bancoDestino\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"estado\": \"ACTIVO\",\n            \"finalizado\": \"NO\",\n            \"canal\": null,\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"233\",\n            \"fechaCreacion\": \"2025-11-17 19:41:51.0\",\n            \"fechaModificacion\": \"2025-11-20 06:05:05.0\",\n            \"numeroAsociado\": \"12732\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"CARLOS GÓMEZ\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-18 00:00:00.0\",\n            \"frecuencia\": \"DIARIA\",\n            \"valor\": 50.75,\n            \"bancoDestino\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": \"Banca Móvil\",\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"232\",\n            \"fechaCreacion\": \"2025-11-17 19:34:29.0\",\n            \"fechaModificacion\": \"2025-11-20 06:05:05.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"Andrea Alfaro\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-18 00:00:00.0\",\n            \"frecuencia\": \"DIARIA\",\n            \"valor\": 1,\n            \"bancoDestino\": \"BANCO DAVIVIENDA, S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": \"Banca Móvil\",\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Pago Crédito Transfer365\",\n            \"numeroSolicitud\": \"231\",\n            \"fechaCreacion\": \"2025-11-17 15:29:37.0\",\n            \"fechaModificacion\": \"2025-11-20 20:05:03.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"prueba Menjivar\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-17 00:00:00.0\",\n            \"frecuencia\": \"SEMANAL\",\n            \"valor\": 1,\n            \"bancoDestino\": \"IBM MAKER\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": \"Banca Móvil\",\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"230\",\n            \"fechaCreacion\": \"2025-11-17 10:22:19.0\",\n            \"fechaModificacion\": \"2025-11-17 13:08:18.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"Byron Figeroa\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-18 00:00:00.0\",\n            \"frecuencia\": \"SEMANAL\",\n            \"valor\": 1.1,\n            \"bancoDestino\": \"ABANK, S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"NO\",\n            \"canal\": \"Banca Móvil\",\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Pago Crédito Transfer365\",\n            \"numeroSolicitud\": \"228\",\n            \"fechaCreacion\": \"2025-11-14 14:16:53.0\",\n            \"fechaModificacion\": \"2025-11-14 18:05:21.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"carlos \",\n            \"tipoBeneficiario\": \"JURÍDICA\",\n            \"fechaInicio\": \"2025-11-14 00:00:00.0\",\n            \"frecuencia\": \"FECHA FUTURA\",\n            \"valor\": 1,\n            \"bancoDestino\": \"BANCO HIPOTECARIO S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": \"Banca Electronica\",\n            \"oficina\": null\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reporte-recurrentes-ejecutadas",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/recurrent-ex",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "recurrent-ex"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/reportes/recurrent-ex",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reportes",
+                    "recurrent-ex"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 19:35:31 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"97F59AF8258F453AB43810EEC61FA142\",\n    \"metadata\": {\n        \"totalCount\": 7,\n        \"filteredCount\": 7,\n        \"timestamp\": \"2026-02-09T13:35:31.9708913\",\n        \"transactionId\": \"5672beb8-ab95-449c-9a52-591785502e07\"\n    },\n    \"data\": [\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"236\",\n            \"fechaCreacion\": \"2025-11-17 20:12:17.0\",\n            \"fechaModificacion\": \"2025-11-20 06:05:05.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"CARLOS GÓMEZ2\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-18 00:00:00.0\",\n            \"frecuencia\": \"DIARIA\",\n            \"valor\": 5,\n            \"bancoDestino\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": null,\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"235\",\n            \"fechaCreacion\": \"2025-11-17 19:54:37.0\",\n            \"fechaModificacion\": null,\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"CARLOS GÓMEZ\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-19 00:00:00.0\",\n            \"frecuencia\": \"DIARIA\",\n            \"valor\": 50.75,\n            \"bancoDestino\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"estado\": \"ACTIVO\",\n            \"finalizado\": \"NO\",\n            \"canal\": null,\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"233\",\n            \"fechaCreacion\": \"2025-11-17 19:41:51.0\",\n            \"fechaModificacion\": \"2025-11-20 06:05:05.0\",\n            \"numeroAsociado\": \"12732\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"CARLOS GÓMEZ\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-18 00:00:00.0\",\n            \"frecuencia\": \"DIARIA\",\n            \"valor\": 50.75,\n            \"bancoDestino\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": \"Banca Móvil\",\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"232\",\n            \"fechaCreacion\": \"2025-11-17 19:34:29.0\",\n            \"fechaModificacion\": \"2025-11-20 06:05:05.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"Andrea Alfaro\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-18 00:00:00.0\",\n            \"frecuencia\": \"DIARIA\",\n            \"valor\": 1,\n            \"bancoDestino\": \"BANCO DAVIVIENDA, S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": \"Banca Móvil\",\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Pago Crédito Transfer365\",\n            \"numeroSolicitud\": \"231\",\n            \"fechaCreacion\": \"2025-11-17 15:29:37.0\",\n            \"fechaModificacion\": \"2025-11-20 20:05:03.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"prueba Menjivar\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-17 00:00:00.0\",\n            \"frecuencia\": \"SEMANAL\",\n            \"valor\": 1,\n            \"bancoDestino\": \"IBM MAKER\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": \"Banca Móvil\",\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Transferencia Transfer365\",\n            \"numeroSolicitud\": \"230\",\n            \"fechaCreacion\": \"2025-11-17 10:22:19.0\",\n            \"fechaModificacion\": \"2025-11-17 13:08:18.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"Byron Figeroa\",\n            \"tipoBeneficiario\": \"NATURAL\",\n            \"fechaInicio\": \"2025-11-18 00:00:00.0\",\n            \"frecuencia\": \"SEMANAL\",\n            \"valor\": 1.1,\n            \"bancoDestino\": \"ABANK, S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"NO\",\n            \"canal\": \"Banca Móvil\",\n            \"oficina\": null\n        },\n        {\n            \"tipo\": \"Pago Crédito Transfer365\",\n            \"numeroSolicitud\": \"228\",\n            \"fechaCreacion\": \"2025-11-14 14:16:53.0\",\n            \"fechaModificacion\": \"2025-11-14 18:05:21.0\",\n            \"numeroAsociado\": \"99234\",\n            \"refCargo\": \"3114990547\",\n            \"refAbono\": \"010100007492\",\n            \"beneficiario\": \"carlos \",\n            \"tipoBeneficiario\": \"JURÍDICA\",\n            \"fechaInicio\": \"2025-11-14 00:00:00.0\",\n            \"frecuencia\": \"FECHA FUTURA\",\n            \"valor\": 1,\n            \"bancoDestino\": \"BANCO HIPOTECARIO S.A.\",\n            \"estado\": \"INACTIVO\",\n            \"finalizado\": \"SI\",\n            \"canal\": \"Banca Electronica\",\n            \"oficina\": null\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reporte-transfer365",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/transfer365",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "transfer365"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "dummy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{local}}/back/reports/t365",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "back",
+                    "reports",
+                    "t365"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 21:58:02 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"7BBD2EAC279C4BB7B08DDBBE03E1E77E\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-01-19T15:58:02.7913263\",\n        \"transactionId\": \"84cd18c0-d491-4af3-81fc-4c1d2143cd5e\"\n    },\n    \"data\": [\n        {\n            \"fecha\": \"16/01/2026 23:26\",\n            \"tipoTransaccion\": \"Transfer 365\",\n            \"cuentaOrigen\": \"1077392952\",\n            \"bancoOrigen\": \"Banco Davivienda\",\n            \"nombreOrigen\": \"María García\",\n            \"idDestino\": \"60974\",\n            \"cuentaDestino\": \"203545825\",\n            \"bancoDestino\": \"COMEDICA DE R.L.\",\n            \"nombreDestino\": \"Juan Pérez\",\n            \"monto\": \"4092.72\",\n            \"codigo\": \"TIMEOUT\",\n            \"tipo\": \"Entrante\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reporte-transfer365-ca-rd",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/transfer365-ca-rd",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "transfer365-ca-rd"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "dummy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{local}}/back/reports/t365",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "back",
+                    "reports",
+                    "t365"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 21:58:02 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"7BBD2EAC279C4BB7B08DDBBE03E1E77E\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-01-19T15:58:02.7913263\",\n        \"transactionId\": \"84cd18c0-d491-4af3-81fc-4c1d2143cd5e\"\n    },\n    \"data\": [\n        {\n            \"fecha\": \"16/01/2026 23:26\",\n            \"tipoTransaccion\": \"Transfer 365\",\n            \"cuentaOrigen\": \"1077392952\",\n            \"bancoOrigen\": \"Banco Davivienda\",\n            \"nombreOrigen\": \"María García\",\n            \"idDestino\": \"60974\",\n            \"cuentaDestino\": \"203545825\",\n            \"bancoDestino\": \"COMEDICA DE R.L.\",\n            \"nombreDestino\": \"Juan Pérez\",\n            \"monto\": \"4092.72\",\n            \"codigo\": \"TIMEOUT\",\n            \"tipo\": \"Entrante\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reporte-creditos",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/credits",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "credits"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/reportes/credits",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reportes",
+                    "credits"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 06 Feb 2026 03:52:48 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"4C49361D5FB541D4BAD95F129CE427A4\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-02-05T21:52:48.4197159\",\n        \"transactionId\": \"0b14ba18-6437-455b-baef-7c0ec618a600\"\n    },\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"020120002242\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005031584310038\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 60,\n                \"canal\": \"Banca Móvil\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"3158\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0006107451000013\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0006350000000198\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 50,\n                \"canal\": \"Banca Móvil\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"10745\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"020120002242\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005031584310038\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 60,\n                \"canal\": \"Banca Móvil\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"3158\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"020120002242\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005031584310038\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 60,\n                \"canal\": \"Banca Móvil\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"3158\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"020120002242\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005031584310038\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 60,\n                \"canal\": \"Banca Móvil\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"3158\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"090100001339\",\n                \"nombreOrigen\": \"JEANS JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005082964310043\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 20,\n                \"canal\": \"Banca en línea\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"8296\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"090100001339\",\n                \"nombreOrigen\": \"JEANS JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005082964310043\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 20,\n                \"canal\": \"Banca en línea\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"8296\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"090100001339\",\n                \"nombreOrigen\": \"JEANS JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005082964310043\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 20,\n                \"canal\": \"Banca en línea\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"8296\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"090100001339\",\n                \"nombreOrigen\": \"JEANS JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005082964310043\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 20,\n                \"canal\": \"Banca en línea\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"8296\"\n            },\n            {\n                \"id\": null,\n                \"fechaHora\": \"2025-11-15 00:00:00.0\",\n                \"cuentaOrigen\": \"0010097391050012\",\n                \"nombreOrigen\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"creditoDestino\": \"0005031584310038\",\n                \"nombreDestino\": \"JUAN JOSE PEREZ RAMIREZ \",\n                \"monto\": 25,\n                \"canal\": \"Banca Móvil\",\n                \"codigoTransaccion\": null,\n                \"numeroAsociado\": \"3158\"\n            }\n        ],\n        \"pagination\": {\n            \"page\": 1,\n            \"size\": 10,\n            \"sortBy\": null,\n            \"sortDirection\": \"ASC\"\n        },\n        \"totalElements\": 35,\n        \"totalPages\": 4,\n        \"currentPage\": 1,\n        \"pageSize\": 10\n    },\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reporte-eventos",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/events-detailed",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "events-detailed"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/reportes/events-detailed",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reportes",
+                    "events-detailed"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 02 Feb 2026 06:36:42 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"146B31325EB34D2797513E9AFE75BEB4\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-02-02T00:36:42.9084884\",\n        \"transactionId\": \"b6017893-e9ec-498d-ae65-dabf09638418\"\n    },\n    \"data\": [\n        {\n            \"totalTransacciones\": 8,\n            \"montoTotal\": 64,\n            \"eventos\": [\n                {\n                    \"fecha\": \"2025-08-08 00:00:00.0\",\n                    \"numeroAsociado\": \"25129\",\n                    \"monto\": 7,\n                    \"codigoEvento\": \"95\",\n                    \"nombreEvento\": \"San Miguel Curso de Inteligencia Artificial\",\n                    \"nombreParticipante\": \"JONATHAN ALEXIS BERRIOS RAMIREZ \",\n                    \"numeroParticipante\": null\n                },\n                {\n                    \"fecha\": \"2025-08-08 00:00:00.0\",\n                    \"numeroAsociado\": \"25129\",\n                    \"monto\": 7,\n                    \"codigoEvento\": \"95\",\n                    \"nombreEvento\": \"San Miguel Curso de Inteligencia Artificial\",\n                    \"nombreParticipante\": \"JONATHAN ALEXIS BERRIOS RAMIREZ \",\n                    \"numeroParticipante\": null\n                },\n                {\n                    \"fecha\": \"2025-08-08 00:00:00.0\",\n                    \"numeroAsociado\": \"25129\",\n                    \"monto\": 7,\n                    \"codigoEvento\": \"95\",\n                    \"nombreEvento\": \"San Miguel Curso de Inteligencia Artificial\",\n                    \"nombreParticipante\": \"JONATHAN ALEXIS BERRIOS RAMIREZ \",\n                    \"numeroParticipante\": null\n                },\n                {\n                    \"fecha\": \"2025-08-08 00:00:00.0\",\n                    \"numeroAsociado\": \"25129\",\n                    \"monto\": 7,\n                    \"codigoEvento\": \"95\",\n                    \"nombreEvento\": \"San Miguel Curso de Inteligencia Artificial\",\n                    \"nombreParticipante\": \"JONATHAN ALEXIS BERRIOS RAMIREZ \",\n                    \"numeroParticipante\": null\n                },\n                {\n                    \"fecha\": \"2025-08-08 00:00:00.0\",\n                    \"numeroAsociado\": \"25129\",\n                    \"monto\": 7,\n                    \"codigoEvento\": \"95\",\n                    \"nombreEvento\": \"San Miguel Curso de Inteligencia Artificial\",\n                    \"nombreParticipante\": \"JONATHAN ALEXIS BERRIOS RAMIREZ \",\n                    \"numeroParticipante\": null\n                },\n                {\n                    \"fecha\": \"2025-11-15 00:00:00.0\",\n                    \"numeroAsociado\": \"24482\",\n                    \"monto\": 7,\n                    \"codigoEvento\": \"93\",\n                    \"nombreEvento\": \"San Salvador Curso de Inteligencia Artificial\",\n                    \"nombreParticipante\": \"JUAN JOSE PEREZ RAMIREZ \",\n                    \"numeroParticipante\": null\n                },\n                {\n                    \"fecha\": \"2025-11-15 00:00:00.0\",\n                    \"numeroAsociado\": \"24482\",\n                    \"monto\": 7,\n                    \"codigoEvento\": \"93\",\n                    \"nombreEvento\": \"San Salvador Curso de Inteligencia Artificial\",\n                    \"nombreParticipante\": \"JUAN JOSE PEREZ RAMIREZ \",\n                    \"numeroParticipante\": null\n                },\n                {\n                    \"fecha\": \"2025-11-15 00:00:00.0\",\n                    \"numeroAsociado\": \"4494\",\n                    \"monto\": 15,\n                    \"codigoEvento\": \"100\",\n                    \"nombreEvento\": \"EVENTO 2 PRUEBA ASOCIADOS\",\n                    \"nombreParticipante\": \"JUAN JOSE PEREZ RAMIREZ \",\n                    \"numeroParticipante\": null\n                }\n            ]\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reporte-servicios-px",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request\": {\r\n        \"fechaDesde\": \"2025-11-01\",\r\n        \"fechaHasta\": \"2025-11-30\"\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes/services",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "services"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"request\": {\r\n    },\r\n    \"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/reportes/services",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reportes",
+                    "services"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 02 Feb 2026 06:23:29 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Reportes obtenidos con éxito\"\n    },\n    \"correlative\": \"629C9C7244184D2D91A4305DA0C83C98\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-02-02T00:23:29.7122462\",\n        \"transactionId\": \"96c93cb6-c509-4361-9f18-ae60adb7f5ed\"\n    },\n    \"data\": [\n        {\n            \"fecha\": \"2025-11-15 00:00:00.0\",\n            \"numeroAsociado\": \"3886\",\n            \"nombre\": \"JUAN JOSE PEREZ RAMIREZ \",\n            \"monto\": 25.3,\n            \"colector\": \"DEUSEM - NUEVO SISTEMA\",\n            \"referencia\": \"010101003\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bancos-transfer365",
+      "item": [
+        {
+          "name": "t365/get-banks",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "cod",
+                  "value": "ABANSVS1",
+                  "description": "Codigo de banco a consultar. *Enviar vacío para obtener lista completa",
+                  "type": "text",
+                  "uuid": "51fc5d8c-ddee-46ae-a1f9-605c4e790138"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/t365/get-banks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "t365",
+                "get-banks"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "cod",
+                      "value": "",
+                      "type": "text",
+                      "uuid": "51fc5d8c-ddee-46ae-a1f9-605c4e790138"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{local}}/api/catalog/get-banks",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catalog",
+                    "get-banks"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 26 Jan 2026 00:28:50 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Lista de bancos obtenida con éxito\"\n    },\n    \"correlative\": \"36291F57C37B4B5EA036DB32EA60F3CA\",\n    \"metadata\": {\n        \"totalCount\": 34,\n        \"filteredCount\": 34,\n        \"timestamp\": \"2026-01-25T18:28:50.4247283\",\n        \"transactionId\": \"08031249-0449-4750-a384-60840584815f\"\n    },\n    \"data\": [\n        {\n            \"id\": 15,\n            \"descripcion\": \"FEDECREDITO\",\n            \"codcompensa\": \"34\",\n            \"nombrecorto\": \"FEDECREDITO\",\n            \"corriente\": \"1\",\n            \"nombre\": \"FEDERACION CAJAS DE CREDITO Y BCO. DE TRABAJADORES\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"FEDRSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 4,\n            \"descripcion\": \"BANCO AZUL\",\n            \"codcompensa\": \"35\",\n            \"nombrecorto\": \"AZUL\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO AZUL, S.A.\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"AZULSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 41,\n            \"descripcion\": \"BANCO APOYO INTEGRAL, S.A.\",\n            \"codcompensa\": \"39\",\n            \"nombrecorto\": \"BANCO APOYO INTEGRAL, S.A.\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO APOYO INTEGRAL, SOCIEDAD ANONIMA\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"SACISVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 63,\n            \"descripcion\": \"UNIDADES - BCR\",\n            \"codcompensa\": \"97\",\n            \"nombrecorto\": \"UNIDADES - BCR\",\n            \"corriente\": \"1\",\n            \"nombre\": \"UNIDADES - BCR\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"0\",\n            \"estado\": \"B\",\n            \"bic\": \"CENRSVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 82,\n            \"descripcion\": \"365 - BCR\",\n            \"codcompensa\": \"94\",\n            \"nombrecorto\": \"365 - BCR\",\n            \"corriente\": \"1\",\n            \"nombre\": \"365 - BCR\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"0\",\n            \"estado\": \"A\",\n            \"bic\": \"BCRESVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 62,\n            \"descripcion\": \"TIGO\",\n            \"codcompensa\": \"98\",\n            \"nombrecorto\": \"TIGO\",\n            \"corriente\": \"0\",\n            \"nombre\": \"MOBILE CASH, S.A. DE C.V.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"TIGOSVS1\",\n            \"ahorro\": \"0\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 63,\n            \"descripcion\": \"UNIDADES - BCR\",\n            \"codcompensa\": \"97\",\n            \"nombrecorto\": \"UNIDADES - BCR\",\n            \"corriente\": \"1\",\n            \"nombre\": \"UNIDADES - BCR\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"0\",\n            \"estado\": \"B\",\n            \"bic\": \"CENRSVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 64,\n            \"descripcion\": \"ONEC-BCR\",\n            \"codcompensa\": \"95\",\n            \"nombrecorto\": \"ONEC-BCR\",\n            \"corriente\": \"1\",\n            \"nombre\": \"SOLVENCIA ONEC Y FIRMA ELECTRONICA BCR\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"0\",\n            \"estado\": \"B\",\n            \"bic\": \"ONECSVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 21,\n            \"descripcion\": \"SOCIEDAD DE AHORRO Y CREDITO MULTIMONEY, S.A.\",\n            \"codcompensa\": \"36\",\n            \"nombrecorto\": \"MULTIMONEY\",\n            \"corriente\": \"1\",\n            \"nombre\": \"SOCIEDAD DE AHORRO Y CREDITO MULTIMONEY, S.A.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"SADISVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 61,\n            \"descripcion\": \"PRIMER BANCO DE LOS TRABAJADORES\",\n            \"codcompensa\": \"96\",\n            \"nombrecorto\": \"PRIMER BANCO\",\n            \"corriente\": \"0\",\n            \"nombre\": \"PRIMER BANCO DE LOS TRABAJADORES\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"0\",\n            \"estado\": \"A\",\n            \"bic\": \"PRBTSVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 14,\n            \"descripcion\": \"CITIBANK, N.A. SUCURSAL EL SALVADOR\",\n            \"codcompensa\": \"37\",\n            \"nombrecorto\": \"CITIBANK N.A.\",\n            \"corriente\": \"1\",\n            \"nombre\": \"CITIBANK N.A. SUC. EL SALVADOR\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"0\",\n            \"estado\": \"A\",\n            \"bic\": \"CITIUS33\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 17,\n            \"descripcion\": \"S.A.C. CREDICOMER\",\n            \"codcompensa\": \"38\",\n            \"nombrecorto\": \"CREDICOMER\",\n            \"corriente\": \"1\",\n            \"nombre\": \"SOCIEDAD DE AHORRO Y CREDITO CREDICOMER\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"SHCRSVS2\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 5,\n            \"descripcion\": \"BANCOVI DE R.L.\",\n            \"codcompensa\": \"40\",\n            \"nombrecorto\": \"BANCOVI, R.L.\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO COOPERATIVO VISIONARIO, S.A.\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"BANCSVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 18,\n            \"descripcion\": \"COMEDICA DE R. L.\",\n            \"codcompensa\": \"41\",\n            \"nombrecorto\": \"COMEDICA R.L.\",\n            \"corriente\": \"1\",\n            \"nombre\": \"ASOCIACION COOP. DE AHORRO Y CREDITO COMEDICA R.L.\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"B\",\n            \"bic\": \"ACATSVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 2,\n            \"descripcion\": \"BANCO AGRICOLA, S.A.\",\n            \"codcompensa\": \"01\",\n            \"nombrecorto\": \"AGRICOLA\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO AGRICOLA, S.A.\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"CAGRSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 7,\n            \"descripcion\": \"BANCO DAVIVIENDA SALVADOREÑO, S.A.\",\n            \"codcompensa\": \"05\",\n            \"nombrecorto\": \"DAVIVIENDA\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO DAVIVIENDA, S.A.\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"BSALSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 11,\n            \"descripcion\": \"BANCO HIPOTECARIO DE EL SALVADOR, S.A.\",\n            \"codcompensa\": \"06\",\n            \"nombrecorto\": \"HIPOTECARIO\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO HIPOTECARIO S.A.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"BHSASVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 6,\n            \"descripcion\": \"BANCO CUSCATLAN DE EL SALVADOR, S.A.\",\n            \"codcompensa\": \"09\",\n            \"nombrecorto\": \"CUSCATLAN\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO CUSCATLAN, S.A.\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"BACUSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 9,\n            \"descripcion\": \"BANCO DE FOMENTO AGROPECUARIO\",\n            \"codcompensa\": \"10\",\n            \"nombrecorto\": \"BFA\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO DE FOMENTO AGROPECUARIO\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"FOAGSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 13,\n            \"descripcion\": \"BANCO PROMERICA, S.A\",\n            \"codcompensa\": \"18\",\n            \"nombrecorto\": \"PROMERICA\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO PROMERICA, S.A.\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"BPRASVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 8,\n            \"descripcion\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"codcompensa\": \"25\",\n            \"nombrecorto\": \"AMERICA CENTRAL\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"BAMCSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 3,\n            \"descripcion\": \"BANCO ATLANTIDA, S.A.\",\n            \"codcompensa\": \"29\",\n            \"nombrecorto\": \"ATLANTIDA\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO ATLANTIDA, S.A.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"0\",\n            \"estado\": \"A\",\n            \"bic\": \"PRCBSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 1,\n            \"descripcion\": \"BANCO AZTECA, EL SALVADOR, S.A.\",\n            \"codcompensa\": \"31\",\n            \"nombrecorto\": \"ABANK\",\n            \"corriente\": \"1\",\n            \"nombre\": \"ABANK, S.A.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"ABANSVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 12,\n            \"descripcion\": \"BANCO INDUSTRIAL EL SALVADOR, S.A.\",\n            \"codcompensa\": \"32\",\n            \"nombrecorto\": \"INDUSTRIAL\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO INDUSTRIAL, S.A.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"INDLSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 16,\n            \"descripcion\": \"S.A.C. CONSTELACION S.A.\",\n            \"codcompensa\": \"33\",\n            \"nombrecorto\": \"CONSTELACION\",\n            \"corriente\": \"1\",\n            \"nombre\": \"SOCIEDAD DE AHORRO Y CREDITO CONSTELACION\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"SADTSV21\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 103,\n            \"descripcion\": \"INSTITUTO DE GARANTÍA DE DEPÓSITOS\",\n            \"codcompensa\": \"84\",\n            \"nombrecorto\": \"IGD\",\n            \"corriente\": \"1\",\n            \"nombre\": \"INSTITUTO DE GARANTÍA DE DEPÓSITOS\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"IGDEVSS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 123,\n            \"descripcion\": \"IBM MAKER\",\n            \"codcompensa\": \"600491\",\n            \"nombrecorto\": \"IBM MAKER\",\n            \"corriente\": \"1\",\n            \"nombre\": \"IBM MAKER\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"IBMMSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 143,\n            \"descripcion\": \"SAC OPTIMA\",\n            \"codcompensa\": \"89\",\n            \"nombrecorto\": \"SAC OPTIMA\",\n            \"corriente\": \"0\",\n            \"nombre\": \"SAC OPTIMA\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"SHROSVS2\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 163,\n            \"descripcion\": \"KOIPAY\",\n            \"codcompensa\": \"24\",\n            \"nombrecorto\": \"KOIPAY\",\n            \"corriente\": \"1\",\n            \"nombre\": \"KOIPAY\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"KOIPSVSS\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 83,\n            \"descripcion\": \"PRUEBA\",\n            \"codcompensa\": \"215\",\n            \"nombrecorto\": \"COME\",\n            \"corriente\": \"1\",\n            \"nombre\": \"PRUEAS\",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"PRUEBA\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 84,\n            \"descripcion\": \"FONDO SOCIAL PARA LA VIVIENDA \",\n            \"codcompensa\": \"85\",\n            \"nombrecorto\": \"FSV\",\n            \"corriente\": \"1\",\n            \"nombre\": \"FONDO SOCIAL PARA LA VIVIENDA \",\n            \"tarjeta\": \"1\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"FSVISVS1\",\n            \"ahorro\": \"1\",\n            \"credito\": \"1\"\n        },\n        {\n            \"id\": 183,\n            \"descripcion\": \"BANCO DE PRUEBA 365 S.A.\",\n            \"codcompensa\": \"100\",\n            \"nombrecorto\": \"BANCO 365 S.A.\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO DE PRUEBA 365 S.A.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"PRUE365\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 184,\n            \"descripcion\": \"BANCO DE PRUEBA 365 S.A.\",\n            \"codcompensa\": \"100\",\n            \"nombrecorto\": \"BANCO 365 S.A.\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO DE PRUEBA 365 S.A.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"PRUE3651\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        },\n        {\n            \"id\": 185,\n            \"descripcion\": \"BANCO DE PRUEBA 365 S.A.\",\n            \"codcompensa\": \"100\",\n            \"nombrecorto\": \"BANCO 365 S.A.\",\n            \"corriente\": \"1\",\n            \"nombre\": \"BANCO DE PRUEBA 365 S.A.\",\n            \"tarjeta\": \"0\",\n            \"movil\": \"1\",\n            \"estado\": \"A\",\n            \"bic\": \"PRUE3652\",\n            \"ahorro\": \"1\",\n            \"credito\": \"0\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "t365/create",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"codeBic\": \"ABANSVS1TEST3\",\r\n        \"compensate\": \"31\",\r\n        \"name\": \"ABANK, S.A.\",\r\n        \"shortName\": \"ABANK\",\r\n        \"saving\": \"1\",\r\n        \"current\": \"1\",\r\n        \"credit\": \"1\",\r\n        \"card\": \"0\",\r\n        \"mobile\": \"1\",\r\n        \"user\": \"PEREZV01\",\r\n        \"description\": \"BANCO ABANK DE S.A.\"\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/t365/bank-create",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "t365",
+                "bank-create"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"codeBic\": \"ABANSVS1TEST3\",\r\n        \"compensate\": \"31\",\r\n        \"name\": \"ABANK, S.A.\",\r\n        \"shortName\": \"ABANK\",\r\n        \"saving\": \"1\",\r\n        \"current\": \"1\",\r\n        \"credit\": \"1\",\r\n        \"card\": \"0\",\r\n        \"mobile\": \"1\",\r\n        \"user\": \"PEREZV01\",\r\n        \"description\": \"BANCO ABANK DE S.A.\"\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/t365/create",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "t365",
+                    "create"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 26 Jan 2026 07:05:04 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Exito\"\n    },\n    \"correlative\": \"6C320B075DE54A84A83E372C1AB5C266\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-01-26T01:05:04.7344578\",\n        \"transactionId\": \"c3564578-0198-4cca-9849-85d73a92e96d\"\n    },\n    \"data\": {\n        \"id\": 206,\n        \"nombre\": \"ABANK, S.A.\",\n        \"bic\": \"ABANSVS1TEST3\",\n        \"ahorro\": \"1\",\n        \"movil\": \"1\",\n        \"credito\": \"1\",\n        \"tarjeta\": \"0\",\n        \"estado\": \"A\",\n        \"corriente\": \"1\",\n        \"descripcion\": \"BANCO ABANK DE S.A.\",\n        \"cod_COMPENSA\": \"31\",\n        \"nombre_CORTO\": \"ABANK\"\n    },\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "t365/modify",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"id\" : 0,\r\n        \"codeBic\": \"ABANSVS1TEST3\",\r\n        \"compensate\": \"31\",\r\n        \"name\": \"ABANK, S.A.\",\r\n        \"shortName\": \"ABANK\",\r\n        \"saving\": \"1\",\r\n        \"current\": \"1\",\r\n        \"credit\": \"1\",\r\n        \"card\": \"0\",\r\n        \"mobile\": \"1\",\r\n        \"user\": \"PEREZV01\",\r\n        \"description\": \"BANCO ABANK DE S.A.\",\r\n        \"status\" : \"A\"\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/t365/bank-modify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "t365",
+                "bank-modify"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"codeBic\": \"ABANSVS1TEST3\",\r\n        \"compensate\": \"31\",\r\n        \"name\": \"ABANK, S.A.\",\r\n        \"shortName\": \"ABANK\",\r\n        \"saving\": \"1\",\r\n        \"current\": \"1\",\r\n        \"credit\": \"1\",\r\n        \"card\": \"0\",\r\n        \"mobile\": \"1\",\r\n        \"user\": \"PEREZV01\",\r\n        \"description\": \"BANCO ABANK DE S.A.\"\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/t365/create",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "t365",
+                    "create"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 26 Jan 2026 07:05:04 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Exito\"\n    },\n    \"correlative\": \"6C320B075DE54A84A83E372C1AB5C266\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-01-26T01:05:04.7344578\",\n        \"transactionId\": \"c3564578-0198-4cca-9849-85d73a92e96d\"\n    },\n    \"data\": {\n        \"id\": 206,\n        \"nombre\": \"ABANK, S.A.\",\n        \"bic\": \"ABANSVS1TEST3\",\n        \"ahorro\": \"1\",\n        \"movil\": \"1\",\n        \"credito\": \"1\",\n        \"tarjeta\": \"0\",\n        \"estado\": \"A\",\n        \"corriente\": \"1\",\n        \"descripcion\": \"BANCO ABANK DE S.A.\",\n        \"cod_COMPENSA\": \"31\",\n        \"nombre_CORTO\": \"ABANK\"\n    },\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "t365/get-banks-CARD",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "cod",
+                  "value": "",
+                  "description": "Codigo de banco a consultar. *Enviar vacío para obtener lista completa",
+                  "type": "text",
+                  "uuid": "51fc5d8c-ddee-46ae-a1f9-605c4e790138"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/t365/get-banks-CARD",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "t365",
+                "get-banks-CARD"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "cod",
+                      "value": "",
+                      "description": "Codigo de banco a consultar. *Enviar vacío para obtener lista completa",
+                      "type": "text",
+                      "uuid": "51fc5d8c-ddee-46ae-a1f9-605c4e790138"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{local}}/api/t365/get-banks-CARD",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "t365",
+                    "get-banks-CARD"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 26 Jan 2026 07:53:20 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Lista de bancos obtenida con éxito\"\n    },\n    \"correlative\": \"F13ED949963A4C3490483A358FE0E571\",\n    \"metadata\": {\n        \"totalCount\": 57,\n        \"filteredCount\": 57,\n        \"timestamp\": \"2026-01-26T01:53:20.2987507\",\n        \"transactionId\": \"50caea3a-1df6-4987-9078-c15debd184a0\"\n    },\n    \"data\": [\n        {\n            \"id\": 13,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"VIVIBANCO, S.A.\",\n            \"bic_NOMBRE\": \"VIVBGTGT\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"VIVIBANCO, S.A.\",\n            \"bic\": \"VIVBGTGT\"\n        },\n        {\n            \"id\": 14,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"AGROMERCANTIL S.A.\",\n            \"bic_NOMBRE\": \"AGROGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"AGROMERCANTIL S.A.\",\n            \"bic\": \"AGROGTGC\"\n        },\n        {\n            \"id\": 15,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO FICOHSA, S.A.\",\n            \"bic_NOMBRE\": \"FCOHGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO FICOHSA, S.A.\",\n            \"bic\": \"FCOHGTGC\"\n        },\n        {\n            \"id\": 16,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO AZTECA, S.A. \",\n            \"bic_NOMBRE\": \"AZTKGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO AZTECA, S.A. \",\n            \"bic\": \"AZTKGTGC\"\n        },\n        {\n            \"id\": 18,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"bic_NOMBRE\": \"AMCNGTGT\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO DE AMERICA CENTRAL, S.A.\",\n            \"bic\": \"AMCNGTGT\"\n        },\n        {\n            \"id\": 19,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO DE ANTIGUA, S.A.\",\n            \"bic_NOMBRE\": \"ANTGGTG1\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO DE ANTIGUA, S.A.\",\n            \"bic\": \"ANTGGTG1\"\n        },\n        {\n            \"id\": 20,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO DE DESARROLLO RURAL, S.A.\",\n            \"bic_NOMBRE\": \"BRRLGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO DE DESARROLLO RURAL, S.A.\",\n            \"bic\": \"BRRLGTGC\"\n        },\n        {\n            \"id\": 21,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO DE LOS TRABAJADORES\",\n            \"bic_NOMBRE\": \"TRAJGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO DE LOS TRABAJADORES\",\n            \"bic\": \"TRAJGTGC\"\n        },\n        {\n            \"id\": 22,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO G Y T CONTINENTAL, S.A.\",\n            \"bic_NOMBRE\": \"GTCOGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO G Y T CONTINENTAL, S.A.\",\n            \"bic\": \"GTCOGTGC\"\n        },\n        {\n            \"id\": 23,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO INDUSTRIAL, S.A.\",\n            \"bic_NOMBRE\": \"INDLGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO INDUSTRIAL, S.A.\",\n            \"bic\": \"INDLGTGC\"\n        },\n        {\n            \"id\": 24,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO INMOBILIARIO, S.A.\",\n            \"bic_NOMBRE\": \"BINMGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO INMOBILIARIO, S.A.\",\n            \"bic\": \"BINMGTGC\"\n        },\n        {\n            \"id\": 25,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO INTERNACIONAL, S.A.\",\n            \"bic_NOMBRE\": \"DIBIGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO INTERNACIONAL, S.A.\",\n            \"bic\": \"DIBIGTGC\"\n        },\n        {\n            \"id\": 26,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO PROMERICA, S.A.\",\n            \"bic_NOMBRE\": \"BPRCGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO PROMERICA, S.A.\",\n            \"bic\": \"BPRCGTGC\"\n        },\n        {\n            \"id\": 27,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"EL CREDITO HIPOTECARIO NACIONAL\",\n            \"bic_NOMBRE\": \"CHNAGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"EL CREDITO HIPOTECARIO NACIONAL\",\n            \"bic\": \"CHNAGTGC\"\n        },\n        {\n            \"id\": 28,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"FINANCIERA SUMMA, S.A.\",\n            \"bic_NOMBRE\": \"FSCGGTG1\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"FINANCIERA SUMMA, S.A.\",\n            \"bic\": \"FSCGGTG1\"\n        },\n        {\n            \"id\": 29,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO INV, S.A.\",\n            \"bic_NOMBRE\": \"FIVNGTG1\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO INV, S.A.\",\n            \"bic\": \"FIVNGTG1\"\n        },\n        {\n            \"id\": 30,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"FINANCIERA CONSOLIDADA, S.A.\",\n            \"bic_NOMBRE\": \"FCOOGTGC\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"FINANCIERA CONSOLIDADA, S.A.\",\n            \"bic\": \"FCOOGTGC\"\n        },\n        {\n            \"id\": 31,\n            \"pais_SIG\": \"GT\",\n            \"pais_NOMBRE\": \"GUATEMALA\",\n            \"nombre_BANCO\": \"BANCO CREDICORP, S.A.\",\n            \"bic_NOMBRE\": \"CDSOGTG2\",\n            \"estado\": \"A\",\n            \"pais\": \"GT\",\n            \"nombrePais\": \"GUATEMALA\",\n            \"banco\": \"BANCO CREDICORP, S.A.\",\n            \"bic\": \"CDSOGTG2\"\n        },\n        {\n            \"id\": 32,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"HONDURAS\",\n            \"nombre_BANCO\": \"BANCO ATLANTIDA, S.A.\",\n            \"bic_NOMBRE\": \"ATTDHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"HONDURAS\",\n            \"banco\": \"BANCO ATLANTIDA, S.A.\",\n            \"bic\": \"ATTDHNTE\"\n        },\n        {\n            \"id\": 33,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"HONDURAS\",\n            \"nombre_BANCO\": \"BANCO DEL PAIS, S.A.\",\n            \"bic_NOMBRE\": \"PISAHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"HONDURAS\",\n            \"banco\": \"BANCO DEL PAIS, S.A.\",\n            \"bic\": \"PISAHNTE\"\n        },\n        {\n            \"id\": 34,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"HONDURAS\",\n            \"nombre_BANCO\": \"BANCO FINANCIERA CENTROAMERICANA HONDUREÑA, S.A. (FICENSA)\",\n            \"bic_NOMBRE\": \"CABFHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"HONDURAS\",\n            \"banco\": \"BANCO FINANCIERA CENTROAMERICANA HONDUREÑA, S.A. (FICENSA)\",\n            \"bic\": \"CABFHNTE\"\n        },\n        {\n            \"id\": 35,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"HONDURAS\",\n            \"nombre_BANCO\": \"BANCO LAFISE, S.A.\",\n            \"bic_NOMBRE\": \"BCCEHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"HONDURAS\",\n            \"banco\": \"BANCO LAFISE, S.A.\",\n            \"bic\": \"BCCEHNTE\"\n        },\n        {\n            \"id\": 36,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"HONDURAS\",\n            \"nombre_BANCO\": \"BANCO FINANCIERA COMERCIAL HONDUREÑA, S.A. (FICOHSA)\",\n            \"bic_NOMBRE\": \"FCOHHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"HONDURAS\",\n            \"banco\": \"BANCO FINANCIERA COMERCIAL HONDUREÑA, S.A. (FICOHSA)\",\n            \"bic\": \"FCOHHNTE\"\n        },\n        {\n            \"id\": 37,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"HONDURAS\",\n            \"nombre_BANCO\": \"BANCO CUSCATLÁN HONDURAS, S.A.\",\n            \"bic_NOMBRE\": \"TSBOHNTA\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"HONDURAS\",\n            \"banco\": \"BANCO CUSCATLÁN HONDURAS, S.A.\",\n            \"bic\": \"TSBOHNTA\"\n        },\n        {\n            \"id\": 38,\n            \"pais_SIG\": \"NI\",\n            \"pais_NOMBRE\": \"NICARAGUA\",\n            \"nombre_BANCO\": \"BANCO DE FINANZAS (BDF)\",\n            \"bic_NOMBRE\": \"BBDFNIMA\",\n            \"estado\": \"A\",\n            \"pais\": \"NI\",\n            \"nombrePais\": \"NICARAGUA\",\n            \"banco\": \"BANCO DE FINANZAS (BDF)\",\n            \"bic\": \"BBDFNIMA\"\n        },\n        {\n            \"id\": 39,\n            \"pais_SIG\": \"NI\",\n            \"pais_NOMBRE\": \"NICARAGUA\",\n            \"nombre_BANCO\": \"BANCO FICOHSA DE NICARAGUA, S.A. (FICOHSA)\",\n            \"bic_NOMBRE\": \"BUNONIMA\",\n            \"estado\": \"A\",\n            \"pais\": \"NI\",\n            \"nombrePais\": \"NICARAGUA\",\n            \"banco\": \"BANCO FICOHSA DE NICARAGUA, S.A. (FICOHSA)\",\n            \"bic\": \"BUNONIMA\"\n        },\n        {\n            \"id\": 40,\n            \"pais_SIG\": \"NI\",\n            \"pais_NOMBRE\": \"NICARAGUA\",\n            \"nombre_BANCO\": \"BANCO DE AMERICA CENTRAL, S.A. (BAC)\",\n            \"bic_NOMBRE\": \"BAMCNIMA\",\n            \"estado\": \"A\",\n            \"pais\": \"NI\",\n            \"nombrePais\": \"NICARAGUA\",\n            \"banco\": \"BANCO DE AMERICA CENTRAL, S.A. (BAC)\",\n            \"bic\": \"BAMCNIMA\"\n        },\n        {\n            \"id\": 41,\n            \"pais_SIG\": \"NI\",\n            \"pais_NOMBRE\": \"NICARAGUA\",\n            \"nombre_BANCO\": \"BANCO DE LA PRODUCCION, S.A. (BANPRO)\",\n            \"bic_NOMBRE\": \"BAPRNIMA\",\n            \"estado\": \"A\",\n            \"pais\": \"NI\",\n            \"nombrePais\": \"NICARAGUA\",\n            \"banco\": \"BANCO DE LA PRODUCCION, S.A. (BANPRO)\",\n            \"bic\": \"BAPRNIMA\"\n        },\n        {\n            \"id\": 42,\n            \"pais_SIG\": \"NI\",\n            \"pais_NOMBRE\": \"NICARAGUA\",\n            \"nombre_BANCO\": \"BANCO LAFISE BANCENTRO, S.A.\",\n            \"bic_NOMBRE\": \"BCCENIMA\",\n            \"estado\": \"A\",\n            \"pais\": \"NI\",\n            \"nombrePais\": \"NICARAGUA\",\n            \"banco\": \"BANCO LAFISE BANCENTRO, S.A.\",\n            \"bic\": \"BCCENIMA\"\n        },\n        {\n            \"id\": 43,\n            \"pais_SIG\": \"NI\",\n            \"pais_NOMBRE\": \"NICARAGUA\",\n            \"nombre_BANCO\": \"BANCO AVANZ, S.A.\",\n            \"bic_NOMBRE\": \"PRCBNIMA\",\n            \"estado\": \"A\",\n            \"pais\": \"NI\",\n            \"nombrePais\": \"NICARAGUA\",\n            \"banco\": \"BANCO AVANZ, S.A.\",\n            \"bic\": \"PRCBNIMA\"\n        },\n        {\n            \"id\": 44,\n            \"pais_SIG\": \"NI\",\n            \"pais_NOMBRE\": \"NICARAGUA\",\n            \"nombre_BANCO\": \"BANCO ATLANTIDA NICARAGUA, S.A. (BANCATLAN)\",\n            \"bic_NOMBRE\": \"ATTDNIMA\",\n            \"estado\": \"A\",\n            \"pais\": \"NI\",\n            \"nombrePais\": \"NICARAGUA\",\n            \"banco\": \"BANCO ATLANTIDA NICARAGUA, S.A. (BANCATLAN)\",\n            \"bic\": \"ATTDNIMA\"\n        },\n        {\n            \"id\": 45,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE BDI, S.A.\",\n            \"bic_NOMBRE\": \"BBDIDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE BDI, S.A.\",\n            \"bic\": \"BBDIDOSDXXX\"\n        },\n        {\n            \"id\": 46,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE BHD LEON, S.A.\",\n            \"bic_NOMBRE\": \"BCBHDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE BHD LEON, S.A.\",\n            \"bic\": \"BCBHDOSDXXX\"\n        },\n        {\n            \"id\": 47,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO DE RESERVAS DE LA REPUBLICA DOMINICANA\",\n            \"bic_NOMBRE\": \"BRRDDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO DE RESERVAS DE LA REPUBLICA DOMINICANA\",\n            \"bic\": \"BRRDDOSDXXX\"\n        },\n        {\n            \"id\": 48,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE ADEMI, S.A.\",\n            \"bic_NOMBRE\": \"AHCMDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE ADEMI, S.A.\",\n            \"bic\": \"AHCMDOSDXXX\"\n        },\n        {\n            \"id\": 49,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE CARIBE INTERNACIONAL, S.A.\",\n            \"bic_NOMBRE\": \"STGODOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE CARIBE INTERNACIONAL, S.A.\",\n            \"bic\": \"STGODOSDXXX\"\n        },\n        {\n            \"id\": 50,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE DE LAS AMERICAS, S.A. (BANCAMERICA)\",\n            \"bic_NOMBRE\": \"AHCSDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE DE LAS AMERICAS, S.A. (BANCAMERICA)\",\n            \"bic\": \"AHCSDOSDXXX\"\n        },\n        {\n            \"id\": 51,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE LAFISE, S.A.\",\n            \"bic_NOMBRE\": \"BCCEDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE LAFISE, S.A.\",\n            \"bic\": \"BCCEDOSDXXX\"\n        },\n        {\n            \"id\": 52,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE LOPEZ DE HARO, S.A.\",\n            \"bic_NOMBRE\": \"BLDHDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE LOPEZ DE HARO, S.A.\",\n            \"bic\": \"BLDHDOSDXXX\"\n        },\n        {\n            \"id\": 53,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE PROMERICA DE LA REPUBLICA DOMINICANA, S.A.\",\n            \"bic_NOMBRE\": \"PRHRDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE PROMERICA DE LA REPUBLICA DOMINICANA, S.A.\",\n            \"bic\": \"PRHRDOSDXXX\"\n        },\n        {\n            \"id\": 54,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO POPULAR DOMINICANO, S.A. - BANCO MULTIPLE\",\n            \"bic_NOMBRE\": \"BPDODOSXXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO POPULAR DOMINICANO, S.A. - BANCO MULTIPLE\",\n            \"bic\": \"BPDODOSXXXX\"\n        },\n        {\n            \"id\": 55,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE SANTA CRUZ, S.A.\",\n            \"bic_NOMBRE\": \"SCRZDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE SANTA CRUZ, S.A.\",\n            \"bic\": \"SCRZDOSDXXX\"\n        },\n        {\n            \"id\": 56,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE VIMENCA, S.A.\",\n            \"bic_NOMBRE\": \"VIMEDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE VIMENCA, S.A.\",\n            \"bic\": \"VIMEDOSDXXX\"\n        },\n        {\n            \"id\": 57,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANESCO BANCO MULTIPLE, S.A.\",\n            \"bic_NOMBRE\": \"BANSDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANESCO BANCO MULTIPLE, S.A.\",\n            \"bic\": \"BANSDOSDXXX\"\n        },\n        {\n            \"id\": 58,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"CITIBANK, N.A.\",\n            \"bic_NOMBRE\": \"CITIDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"CITIBANK, N.A.\",\n            \"bic\": \"CITIDOSDXXX\"\n        },\n        {\n            \"id\": 59,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"SCOTIABANK REPUBLICA DOMINICANA, S.A. - BANCO MULTIPLE\",\n            \"bic_NOMBRE\": \"NOSCDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"SCOTIABANK REPUBLICA DOMINICANA, S.A. - BANCO MULTIPLE\",\n            \"bic\": \"NOSCDOSDXXX\"\n        },\n        {\n            \"id\": 60,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE BELLBANK, S.A.\",\n            \"bic_NOMBRE\": \"BELNDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE BELLBANK, S.A.\",\n            \"bic\": \"BELNDOSDXXX\"\n        },\n        {\n            \"id\": 61,\n            \"pais_SIG\": \"DO\",\n            \"pais_NOMBRE\": \"REPUBLICA DOMINICANA\",\n            \"nombre_BANCO\": \"BANCO MULTIPLE ACTIVO DOMINICANA, S.A.\",\n            \"bic_NOMBRE\": \"PVDLDOSDXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"DO\",\n            \"nombrePais\": \"REPUBLICA DOMINICANA\",\n            \"banco\": \"BANCO MULTIPLE ACTIVO DOMINICANA, S.A.\",\n            \"bic\": \"PVDLDOSDXXX\"\n        },\n        {\n            \"id\": 62,\n            \"pais_SIG\": \"CR\",\n            \"pais_NOMBRE\": \"COSTA RICA\",\n            \"nombre_BANCO\": \"BANCO NACIONAL DE COSTA RICA (BNCR)\",\n            \"bic_NOMBRE\": \"BNCRCRSJXXX\",\n            \"estado\": \"A\",\n            \"pais\": \"CR\",\n            \"nombrePais\": \"COSTA RICA\",\n            \"banco\": \"BANCO NACIONAL DE COSTA RICA (BNCR)\",\n            \"bic\": \"BNCRCRSJXXX\"\n        },\n        {\n            \"id\": 67,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"Honduras\",\n            \"nombre_BANCO\": \"BANCO PROMERICA, S.A.\",\n            \"bic_NOMBRE\": \"BPRHHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"Honduras\",\n            \"banco\": \"BANCO PROMERICA, S.A.\",\n            \"bic\": \"BPRHHNTE\"\n        },\n        {\n            \"id\": 64,\n            \"pais_SIG\": \"CR\",\n            \"pais_NOMBRE\": \"COSTA RICA\",\n            \"nombre_BANCO\": \"BANCO BAC SAN JOSE\",\n            \"bic_NOMBRE\": \"BSNJCRSJ\",\n            \"estado\": \"A\",\n            \"pais\": \"CR\",\n            \"nombrePais\": \"COSTA RICA\",\n            \"banco\": \"BANCO BAC SAN JOSE\",\n            \"bic\": \"BSNJCRSJ\"\n        },\n        {\n            \"id\": 65,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"HONDURAS\",\n            \"nombre_BANCO\": \"BANCO DE DESARROLLO RURAL HONDURAS, S.A.\",\n            \"bic_NOMBRE\": \"PRCBHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"HONDURAS\",\n            \"banco\": \"BANCO DE DESARROLLO RURAL HONDURAS, S.A.\",\n            \"bic\": \"PRCBHNTE\"\n        },\n        {\n            \"id\": 66,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"HONDURAS\",\n            \"nombre_BANCO\": \"BANCO HONDUREÑO DEL CAFÉ. S.A.\",\n            \"bic_NOMBRE\": \"BHCAHNTH\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"HONDURAS\",\n            \"banco\": \"BANCO HONDUREÑO DEL CAFÉ. S.A.\",\n            \"bic\": \"BHCAHNTH\"\n        },\n        {\n            \"id\": 68,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"Honduras\",\n            \"nombre_BANCO\": \"BANCO DE HONDURAS S.A. \",\n            \"bic_NOMBRE\": \"HONAHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"Honduras\",\n            \"banco\": \"BANCO DE HONDURAS S.A. \",\n            \"bic\": \"HONAHNTE\"\n        },\n        {\n            \"id\": 69,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"Honduras\",\n            \"nombre_BANCO\": \"BANCO DAVIVIENDA HONDURAS, S. A. \",\n            \"bic_NOMBRE\": \"BGAHHNTE\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"Honduras\",\n            \"banco\": \"BANCO DAVIVIENDA HONDURAS, S. A. \",\n            \"bic\": \"BGAHHNTE\"\n        },\n        {\n            \"id\": 70,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"Honduras\",\n            \"nombre_BANCO\": \"BANCO DE OCCIDENTE, S.A.\",\n            \"bic_NOMBRE\": \"BOCCHNTE \",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"Honduras\",\n            \"banco\": \"BANCO DE OCCIDENTE, S.A.\",\n            \"bic\": \"BOCCHNTE \"\n        },\n        {\n            \"id\": 72,\n            \"pais_SIG\": \"HN\",\n            \"pais_NOMBRE\": \"Honduras\",\n            \"nombre_BANCO\": \"BANCO DE PRUEBA 365 CARD\",\n            \"bic_NOMBRE\": \"PRUECARD365\",\n            \"estado\": \"A\",\n            \"pais\": \"HN\",\n            \"nombrePais\": \"Honduras\",\n            \"banco\": \"BANCO DE PRUEBA 365 CARD\",\n            \"bic\": \"PRUECARD365\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "t365/create-CARD",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"assigCountry\": \"HN\",\r\n        \"bankName\": \"PRUEBA DE BANCO 365 CARD\",\r\n        \"codeBic\": \"PRCARD365\",\r\n        \"user\": \"RIVAS\"\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/t365/bank-create-CARD",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "t365",
+                "bank-create-CARD"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "t365/modify-CARD",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"id\": 185,\r\n        \"assigCountry\": \"HN\",\r\n        \"countryName\": \"HONDURAS\",\r\n        \"bankName\": \"PRUEBA DE BANCO 365 CARD\",\r\n        \"codeBic\": \"PRCARD365\",\r\n        \"user\": \"RIVAS\",\r\n        \"status\": \"A\"\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/t365/bank-modify-CARD",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "t365",
+                "bank-modify-CARD"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    //\"requestId\": \"0000\",\r\n    \"uuid\": \"504ecdec-13ce-4ad2-b09c-28e48abea932\",\r\n    \"pageId\": 1,\r\n    \"channel\": \"WEB\",\r\n    \"request\": {\r\n        \"id\": 185,\r\n        \"assigCountry\": \"HN\",\r\n        \"countryName\": \"HONDURAS\",\r\n        \"bankName\": \"PRUEBA DE BANCO 365 CARD\",\r\n        \"codeBic\": \"PRCARD365\",\r\n        \"user\": \"RIVAS\",\r\n        \"status\": \"A\"\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/t365/bank-modify-CARD",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "t365",
+                    "bank-modify-CARD"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 26 Jan 2026 08:12:22 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Modificación exitosa\"\n    },\n    \"correlative\": \"5DCEB475FD5249C094B1C6B368D47CEC\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-01-26T02:12:22.3221863\",\n        \"transactionId\": \"4cd4b4f3-d1d0-418f-b8bb-cfb5c030dac9\"\n    },\n    \"data\": {\n        \"id\": 185,\n        \"assigCountry\": \"HN\",\n        \"countryName\": \"Honduras\",\n        \"bankName\": \"PRUEBA DE BANCO 365 CARD\",\n        \"codeBic\": null,\n        \"status\": \"A\"\n    },\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "softoken",
+      "item": [
+        {
+          "name": "get-devices",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "codigo",
+                  "value": "",
+                  "description": "Identidad a consultar (enviar vacío para obtener lista completa)",
+                  "type": "text",
+                  "uuid": "611ee49b-2e10-41dc-896c-6a4740ec02ab"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sft/get-devices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sft",
+                "get-devices"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "dummy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{local}}/api/sft/get-devices",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sft",
+                    "get-devices"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 28 Jan 2026 06:36:44 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Exito\"\n    },\n    \"correlative\": \"CBC9A0481FF44B6C9F402C809C597C9D\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-01-28T00:36:44.2065969\",\n        \"transactionId\": \"3410b73f-0789-48f4-9b83-a9c340561ed0\"\n    },\n    \"data\": {\n        \"codigo\": \"CMDCKCY30LT2R9HIKDT1\",\n        \"credencial\": \"CMDCOR94PWAQ4GINNV36B0UPH2YPACH62F5\",\n        \"creado\": \"2026-01-28T06:36:44.201+00:00\",\n        \"estado\": \"A\",\n        \"dispositivos\": [\n            {\n                \"codigo\": \"CMDCYF6HWRMQ3RN8YYDU\",\n                \"hardware\": \"QCOM\",\n                \"alias\": null,\n                \"ultimoAcceso\": \"2026-01-28T06:36:44.201+00:00\",\n                \"estado\": \"A\",\n                \"marca\": \"Xiaomi\",\n                \"modelo\": \"24115RA8EG\",\n                \"sistemaOperativo\": \"Android\"\n            },\n            {\n                \"codigo\": \"CMDCFNNXLGXAIM4FQOFE\",\n                \"hardware\": \"QCOM\",\n                \"alias\": \"comedica\",\n                \"ultimoAcceso\": \"2026-01-28T06:36:44.201+00:00\",\n                \"estado\": \"B\",\n                \"marca\": \"Samsung\",\n                \"modelo\": \"A52\",\n                \"sistemaOperativo\": \"Android\"\n            }\n        ]\n    },\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "catalog",
+      "item": [
+        {
+          "name": "get-municipios",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "mun",
+                  "value": "2",
+                  "description": "Id de municipio (enviar vacio para obtener todos los registros)",
+                  "type": "text",
+                  "uuid": "359d72ff-9553-4fa0-adc1-eb5e9145992d"
+                },
+                {
+                  "key": "dep",
+                  "value": "",
+                  "description": "Id departamento",
+                  "type": "text",
+                  "uuid": "9965ba1b-4cb6-4364-a827-012cef1db19b",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/get-mun-dist",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "catalog",
+                "get-mun-dist"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "mun",
+                      "value": "2",
+                      "description": "Id de municipio (enviar vacio para obtener todos los registros)",
+                      "type": "text",
+                      "uuid": "359d72ff-9553-4fa0-adc1-eb5e9145992d"
+                    },
+                    {
+                      "key": "dep",
+                      "value": "",
+                      "description": "Id departamento",
+                      "type": "text",
+                      "uuid": "9965ba1b-4cb6-4364-a827-012cef1db19b"
+                    }
+                  ],
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local}}/api/catalog/get-mun-dist",
+                  "host": [
+                    "{{local}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catalog",
+                    "get-mun-dist"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 08 Feb 2026 01:54:39 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"result\": {\n        \"code\": 0,\n        \"message\": \"Consulta exitosa\"\n    },\n    \"correlative\": \"0E7115A6CAA04A7FBC2577BB5D16867E\",\n    \"metadata\": {\n        \"totalCount\": 1,\n        \"filteredCount\": 1,\n        \"timestamp\": \"2026-02-07T19:54:39.1369315\",\n        \"transactionId\": \"2d93cda0-1bf6-4f13-b838-e7d2a41aa39c\"\n    },\n    \"data\": [\n        {\n            \"codigoMunicipio\": 2,\n            \"nombreMunicipio\": \"ATIQUIZAYA\",\n            \"codigoDepartamento\": 103,\n            \"nombreDepartamento\": \"AHUACHAPÁN\"\n        }\n    ],\n    \"errors\": null,\n    \"version\": 1,\n    \"pagination\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "get-states-reclaim",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Id de municipio (enviar vacio para obtener todos los registros)",
+                  "type": "text",
+                  "uuid": "359d72ff-9553-4fa0-adc1-eb5e9145992d"
+                },
+                {
+                  "key": "dep",
+                  "value": "",
+                  "description": "Id departamento",
+                  "type": "text",
+                  "uuid": "9965ba1b-4cb6-4364-a827-012cef1db19b",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/get-states-reclaim",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "catalog",
+                "get-states-reclaim"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-tran-types",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Id de municipio (enviar vacio para obtener todos los registros)",
+                  "type": "text",
+                  "uuid": "359d72ff-9553-4fa0-adc1-eb5e9145992d"
+                },
+                {
+                  "key": "dep",
+                  "value": "",
+                  "description": "Id departamento",
+                  "type": "text",
+                  "uuid": "9965ba1b-4cb6-4364-a827-012cef1db19b",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/get-tran-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "catalog",
+                "get-tran-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-res-types",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Id de municipio (enviar vacio para obtener todos los registros)",
+                  "type": "text",
+                  "uuid": "359d72ff-9553-4fa0-adc1-eb5e9145992d"
+                },
+                {
+                  "key": "dep",
+                  "value": "",
+                  "description": "Id departamento",
+                  "type": "text",
+                  "uuid": "9965ba1b-4cb6-4364-a827-012cef1db19b",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/get-res-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "catalog",
+                "get-res-types"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "local",
+      "value": ""
+    },
+    {
+      "key": "baseUrl",
+      "value": "https://bel-comedica-service-dev.echotechs.net/api"
+    }
+  ]
+}
