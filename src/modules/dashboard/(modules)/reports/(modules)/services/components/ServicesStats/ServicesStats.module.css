@@ -1,0 +1,35 @@
+.statsContainer {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  padding: 24px;
+  background: #f2f2f7;
+  margin-top: 24px;
+}
+
+.statCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16.8px;
+  background: #ffffff;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 6px;
+}
+
+.statValue {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #23366a;
+}
+
+.statLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 16.5px;
+  color: #6b7280;
+}

@@ -1,0 +1,276 @@
+.sidebar,
+.sidebarCollapsed {
+  position: fixed;
+  inset: 0 auto 0 0;
+  background: #23366a;
+  color: #fff;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar {
+  width: 256px;
+}
+
+.sidebarCollapsed {
+  width: 72px;
+}
+
+.top {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 0 12px;
+}
+
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  height: 31px;
+  width: auto;
+}
+
+.toggle {
+  min-width: 34px;
+  min-height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.10);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.nav {
+  padding: 16px 16px 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.navItem {
+  height: 40px;
+  border-radius: 4px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.active {
+  background: #2a4d87;
+  outline: none;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.chev {
+  opacity: 0.9;
+  width: 16px;
+  height: 16px;
+}
+
+.userBar {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: none;
+  margin-top: auto;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #23366a;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.userText {
+  flex: 1;
+  min-width: 0;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userRole {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.dots {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: none;
+}
+
+/* Submenu styles */
+.submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0 4px 16px;
+  margin-top: 2px;
+  overflow: hidden auto;
+  
+  transition: max-height 220ms ease, opacity 220ms ease;
+  opacity: 0;
+}
+
+.submenuExpanded {
+  opacity: 1;
+}
+
+.submenuCollapsed {
+  opacity: 0;
+}
+
+.submenuItem {  
+  height: auto;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  transition: all 0.2s;
+  padding: 8px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.submenuItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.submenuActive {
+  background: #13233d;
+  color: #ffffff;
+  font-weight: 400;
+}
+
+/* Nav group (relative anchor for popover) */
+.navGroup {
+  position: relative;
+}
+
+/* Popover styles (collapsed sidebar) */
+.popover {
+  position: absolute;
+  left: calc(100% + 4px);
+  top: 0;
+  min-width: 220px;
+  max-width: 260px;
+  background: #23366a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: popoverIn 150ms ease;
+}
+
+/* Invisible bridge to prevent hover gap */
+.popover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 8px;
+  height: 100%;
+}
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.popoverTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2px;
+}
+
+.popoverItem {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  line-height: 20px;
+  transition: background 0.15s ease;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.popoverItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.popoverItemActive {
+  background: #13233d;
+  color: #ffffff;
+}

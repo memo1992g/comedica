@@ -1,0 +1,148 @@
+"use server";
+
+import { APP_COOKIES } from "@/consts/cookies/cookies.consts";
+import type { BackofficeApiResponse } from "@/interfaces/ApiResponse.interface";
+import type {
+  ComplaintI,
+  ComplaintListRequestI,
+  CatalogItemI,
+  CreateComplaintRequestI,
+  UpdateComplaintRequestI,
+} from "@/interfaces/management/claims";
+import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
+import { cookies } from "next/headers";
+
+const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+
+function getAuthHeaders(): Record<string, string> {
+  const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
+  const accessToken = clientTokenJSON
+    ? JSON.parse(clientTokenJSON)?.accessToken
+    : null;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return headers;
+}
+
+function buildContext() {
+  return {
+    uuid: crypto.randomUUID(),
+    pageId: 1,
+    channel: "E",
+    requestId: crypto.randomUUID(),
+  };
+}
+
+/**
+ * POST /complaints-list — List complaints with filters and pagination
+ */
+export const listComplaintsService = async (
+  request: ComplaintListRequestI,
+): Promise<BackofficeApiResponse<ComplaintI[]>> => {
+  const headers = getAuthHeaders();
+  const body = { ...request, ...buildContext() };
+
+  return customAuthFetch(`${API_URL}/complaints-list`, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers,
+  });
+};
+
+/**
+ * POST /channel-list — Get complaint channel catalog
+ */
+export const listChannelsService = async (): Promise<
+  BackofficeApiResponse<CatalogItemI[]>
+> => {
+  const headers = getAuthHeaders();
+
+  return customAuthFetch(`${API_URL}/channel-list`, {
+    method: "POST",
+    body: JSON.stringify(buildContext()),
+    headers,
+  });
+};
+
+/**
+ * POST /type-list — Get complaint type catalog
+ */
+export const listComplaintTypesService = async (): Promise<
+  BackofficeApiResponse<CatalogItemI[]>
+> => {
+  const headers = getAuthHeaders();
+
+  return customAuthFetch(`${API_URL}/type-list`, {
+    method: "POST",
+    body: JSON.stringify(buildContext()),
+    headers,
+  });
+};
+
+/**
+ * POST /status-list — Get complaint status catalog
+ */
+export const listComplaintStatusesService = async (): Promise<
+  BackofficeApiResponse<CatalogItemI[]>
+> => {
+  const headers = getAuthHeaders();
+
+  return customAuthFetch(`${API_URL}/status-list`, {
+    method: "POST",
+    body: JSON.stringify(buildContext()),
+    headers,
+  });
+};
+
+/**
+ * POST /resolutionService-list — Get complaint resolution catalog
+ */
+export const listResolutionsService = async (): Promise<
+  BackofficeApiResponse<CatalogItemI[]>
+> => {
+  const headers = getAuthHeaders();
+
+  return customAuthFetch(`${API_URL}/resolutionService-list`, {
+    method: "POST",
+    body: JSON.stringify(buildContext()),
+    headers,
+  });
+};
+
+/**
+ * POST /create-complaint — Create a new complaint
+ */
+export const createComplaintService = async (
+  data: CreateComplaintRequestI,
+): Promise<BackofficeApiResponse<ComplaintI>> => {
+  const headers = getAuthHeaders();
+  const body = { context: buildContext(), data };
+
+  return customAuthFetch(`${API_URL}/create-complaint`, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers,
+  });
+};
+
+/**
+ * POST /update-complaint/:id — Update complaint status/resolution
+ */
+export const updateComplaintService = async (
+  id: number,
+  data: UpdateComplaintRequestI,
+): Promise<BackofficeApiResponse<ComplaintI>> => {
+  const headers = getAuthHeaders();
+  const body = { context: buildContext(), data };
+
+  return customAuthFetch(`${API_URL}/update-complaint${id}`, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers,
+  });
+};

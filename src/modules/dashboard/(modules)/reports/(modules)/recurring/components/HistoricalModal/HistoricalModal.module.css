@@ -1,0 +1,56 @@
+.modalContent {
+  max-width: 75vw !important;
+  width: 75vw !important;
+  max-height: 80vh;
+  padding: 24px !important;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.modalHeader {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #23366a;
+  margin: 0;
+  font-variation-settings: 'opsz' 14;
+}
+
+.modalTitle > span{
+  display: block;
+  margin-bottom: 8px;
+}
+
+.modalTitle > p{
+  font-size: 16px;
+  color: #4A4A4C;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: #23366a;
+}
+
+.tableContainer {
+  margin-top: 16px;
+  padding: 0;
+  overflow-x: auto;
+  max-height: calc(80vh - 140px);
+}

@@ -1,0 +1,146 @@
+.searchPanel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.searchHeader {
+  padding: 20px 20px 0;
+}
+
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIconLeft {
+  position: absolute;
+  left: 12px;
+  color: #8e8e93;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 36px;
+  padding: 4px 12px 4px 40px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #23366a;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: #8e8e93;
+}
+
+/* Sub-tabs (segment control) */
+.subTabsWrapper {
+  padding: 12px 20px;
+}
+
+.subTabs {
+  display: flex;
+  width: 100%;
+  background: #f2f2f7;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 0;
+  height: auto;
+}
+
+.subTab {
+  flex: 1;
+  padding: 6px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.3px;
+  font-weight: 500;
+  color: #8e8e93;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  box-shadow: none;
+  line-height: 19.95px;
+}
+
+.subTab:hover {
+  color: #23366a;
+}
+
+.subTab[data-state="active"] {
+  background: white;
+  color: #23366a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Content area */
+.contentArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 8px;
+  padding: 48px 16px;
+}
+
+.emptyText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #8e8e93;
+  text-align: center;
+  margin: 0;
+}
+
+.emptyHint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #8e8e93;
+  text-align: center;
+  margin: 0;
+}
+
+/* Verification completed state */
+.verificationCompleted {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  padding: 48px 16px;
+}
+
+.verificationIcon {
+  color: #00a63e;
+}
+
+.verificationText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #00a63e;
+  margin: 0;
+}
+
+.verificationHint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #8e8e93;
+  text-align: center;
+  margin: 0;
+}

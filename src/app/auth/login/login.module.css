@@ -1,0 +1,64 @@
+.loginRoot {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1.35fr; /* similar a la imagen */
+  background: #ffffff;
+}
+
+.leftPanel {
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leftInner {
+  width: 100%;
+  max-width: 520px;
+  padding: 48px 56px;
+}
+
+.brand {
+  margin-bottom: 26px;
+}
+
+.brandLogo {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+.title {
+  margin: 0;
+  font-size: 56px;
+  line-height: 1.05;
+  font-weight: 800;
+  color: #111827;
+}
+
+.subtitle {
+  margin: 12px 0 26px 0;
+  font-size: 16px;
+  color: #9ca3af;
+}
+
+.formWrap {
+  margin-top: 8px;
+}
+
+/* Responsive: en móvil ocultamos el carrusel y centramos */
+@media (max-width: 1024px) {
+  .loginRoot {
+    grid-template-columns: 1fr;
+  }
+  .rightPanel {
+    display: none;
+  }
+  .leftInner {
+    padding: 28px 20px;
+    max-width: 560px;
+  }
+  .title {
+    font-size: 42px;
+  }
+}

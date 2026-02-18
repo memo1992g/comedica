@@ -1,0 +1,67 @@
+/* Custom table overrides for Reports Services */
+[data-custom-table] table {
+  font-family: 'DM Sans', sans-serif;
+}
+
+[data-custom-table] thead {
+  border-bottom: 0.8px solid #e2e2e7;
+}
+
+[data-custom-table] thead th {
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 16.5px;
+  color: #6b7280;
+  text-align: left;
+  padding: 16px;
+  border-bottom: 0.8px solid #e2e2e7;
+}
+
+[data-custom-table] tbody tr {
+  border-bottom: 0.8px solid #e2e2e7;
+  transition: background-color 0.15s ease;
+}
+
+[data-custom-table] tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+[data-custom-table] tbody tr:nth-child(odd) {
+  background-color: #f2f2f7;
+}
+
+[data-custom-table] tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+[data-custom-table] tbody td {
+  padding: 16px;
+  font-size: 11px;
+  line-height: 16.5px;
+  color: #4a4a4c;
+  vertical-align: middle;
+}
+
+[data-custom-table] tbody td:first-child {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* Scrollbar styling */
+[data-custom-table] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-custom-table] ::-webkit-scrollbar-track {
+  background: #f2f2f7;
+}
+
+[data-custom-table] ::-webkit-scrollbar-thumb {
+  background: #d1d1d6;
+  border-radius: 4px;
+}
+
+[data-custom-table] ::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
+}

@@ -1,0 +1,114 @@
+/* Popover animations */
+
+.popover-content {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.popover-content[data-state="open"] {
+  animation-name: popoverSlideIn;
+}
+
+.popover-content[data-state="closed"] {
+  animation-name: popoverSlideOut;
+}
+
+/* Animation based on side */
+.popover-content[data-side="top"] {
+  --transform-origin: bottom;
+}
+
+.popover-content[data-side="bottom"] {
+  --transform-origin: top;
+}
+
+.popover-content[data-side="left"] {
+  --transform-origin: right;
+}
+
+.popover-content[data-side="right"] {
+  --transform-origin: left;
+}
+
+@keyframes popoverSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes popoverSlideOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+}
+
+/* Side-specific animations */
+.popover-content[data-side="bottom"][data-state="open"] {
+  animation-name: popoverSlideInFromTop;
+}
+
+.popover-content[data-side="bottom"][data-state="closed"] {
+  animation-name: popoverSlideOutToTop;
+}
+
+.popover-content[data-side="top"][data-state="open"] {
+  animation-name: popoverSlideInFromBottom;
+}
+
+.popover-content[data-side="top"][data-state="closed"] {
+  animation-name: popoverSlideOutToBottom;
+}
+
+@keyframes popoverSlideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popoverSlideOutToTop {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes popoverSlideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popoverSlideOutToBottom {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

@@ -1,0 +1,81 @@
+/* Confirmation Modal */
+.modal {
+  width: 510px;
+  max-width: 90vw;
+  background: white;
+  border-radius: 16px;
+  border: 0.8px solid #e8e8e8;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modalHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modalTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #000;
+  margin: 0;
+  line-height: 30px;
+}
+
+.modalSubtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #bbb;
+  margin: 0;
+  line-height: 24px;
+}
+
+.modalActions {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 40px;
+  background: white;
+  border: 0.8px solid #23366a;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #23366a;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancelBtn:hover {
+  background: #f8f9fc;
+}
+
+.confirmBtn {
+  flex: 1;
+  height: 40px;
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  border: none;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: white;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.confirmBtn:hover {
+  opacity: 0.9;
+}

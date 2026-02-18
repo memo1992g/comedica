@@ -1,0 +1,86 @@
+/* Message panel */
+.messageLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #8e8e93;
+  margin: 0 0 8px;
+  line-height: 16.5px;
+}
+
+.messageTextarea {
+  width: 100%;
+  height: 240px;
+  padding: 16px;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 8px;
+  background: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #1a1a1a;
+  resize: none;
+  outline: none;
+  line-height: 20px;
+}
+
+.messageTextarea::placeholder {
+  color: #bbb;
+}
+
+.messageTextarea:focus {
+  border-color: #23366a;
+}
+
+/* Image upload */
+.imageSection {
+  margin-top: 24px;
+}
+
+.imageLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.imageLabelIcon {
+  color: #8e8e93;
+}
+
+.imageLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #8e8e93;
+  line-height: 16.5px;
+}
+
+.imageUploadBox {
+  width: 78px;
+  height: 78px;
+  border: 1.6px solid #e2e2e7;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  background: white;
+}
+
+.imageUploadBox:hover {
+  background: #f9f9fb;
+}
+
+.imageUploadIcon {
+  color: #bbb;
+}
+
+.imageUploadText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #bbb;
+}

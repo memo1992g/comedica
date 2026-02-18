@@ -1,0 +1,124 @@
+.tableWrapper {
+  width: 100%;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 0;
+  overflow: hidden;
+  background: white;
+  margin-top: 24px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.headerRowTop {
+  height: 32.9px;
+  background: white;
+}
+
+.headerRowBottom {
+  height: 33.3px;
+  background: white;
+}
+
+.headerCellCanal {
+  width: 36%;
+  text-align: left;
+  padding-left: 16px;
+  color: #23366a;
+  font-size: 11px;
+  line-height: 16.5px;
+  font-weight: 700;
+  border-right: 0.8px solid #e2e2e7;
+  border-bottom: 0.8px solid #e2e2e7;
+}
+
+.headerCellGroup {
+  text-align: center;
+  color: #23366a;
+  font-size: 11px;
+  line-height: 16.5px;
+  font-weight: 700;
+  border-bottom: 0.8px solid #e2e2e7;
+  border-right: 0.8px solid #e2e2e7;
+}
+
+.headerCellSubgroup {
+  text-align: center;
+  color: #23366a;
+  font-size: 11px;
+  line-height: 16.5px;
+  font-weight: 700;
+  border-bottom: 0.8px solid #e2e2e7;
+  border-right: 0.8px solid #e2e2e7;
+}
+
+.headerRowTop th:last-child,
+.headerRowBottom th:last-child {
+  border-right: none;
+}
+
+.oddRow {
+  background: #f2f2f7;
+}
+
+.evenRow {
+  background: white;
+}
+
+.totalRow {
+  background: #f8f9fa;
+}
+
+.oddRow td,
+.evenRow td,
+.totalRow td {
+  border-bottom: 0.8px solid #e2e2e7;
+  border-right: 0.8px solid #e2e2e7;
+  height: 41.3px;
+}
+
+.oddRow td:last-child,
+.evenRow td:last-child,
+.totalRow td:last-child {
+  border-right: none;
+}
+
+.cellCanal {
+  padding-left: 16px;
+  color: #23366a;
+  font-size: 11px;
+  line-height: 16.5px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.cellAmount {
+  padding-right: 12px;
+  color: #4a4a4c;
+  font-size: 11px;
+  line-height: 16.5px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.cellCountDanger {
+  padding-right: 12px;
+  color: #e7000b;
+  font-size: 11px;
+  line-height: 16.5px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.cellCountPrimary {
+  padding-right: 12px;
+  color: #23366a;
+  font-size: 11px;
+  line-height: 16.5px;
+  font-weight: 700;
+  text-align: right;
+}

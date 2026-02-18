@@ -1,0 +1,36 @@
+.tabsContainer {
+  display: flex;
+  gap: 8px;
+  border-bottom: 0.8px solid #e2e2e7;
+  width: 100%;
+}
+
+.tab {
+  position: relative;
+  padding: 6.8px 16px;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.3px;
+  font-weight: 500;
+  color: #bbbbbb;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.tab:hover {
+  color: #23366a;
+}
+
+.tabActive {
+  color: #23366a !important;
+}
+
+.tabIndicator {
+  position: absolute;
+  bottom: -0.8px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #23366a;
+}

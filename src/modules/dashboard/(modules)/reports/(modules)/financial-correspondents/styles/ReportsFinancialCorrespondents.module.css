@@ -1,0 +1,47 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  width: 100%;
+  background-color: white;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.innerContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;  
+}
+
+.statsSection {
+  margin-top: 24px;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+}
+
+.tableWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  position: relative;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 0;
+}
+
+.tableSection {
+  width: 100%;
+  border-radius: 0;
+  overflow: hidden;
+  background: white;
+}

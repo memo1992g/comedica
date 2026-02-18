@@ -1,0 +1,74 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  width: 100%;
+}
+
+/* Input base (forzamos look del screenshot) */
+.input {
+  background: #f3f5f9 !important;
+  border: 1px solid #d7dbe5 !important;
+  border-radius: 4px !important;
+  height: 44px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  color: #1f3d7a;
+}
+
+.iconButton {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.error {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Botón exactamente estilo (degradado) */
+.submit {
+  width: 100%;
+  border-radius: 4px !important;
+  height: 44px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px;
+  background: linear-gradient(180deg, #4c78c2 0%, #24407c 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.submit:hover {
+  background: linear-gradient(180deg, #416db8 0%, #1f376f 100%) !important;
+}
+
+.recoverRow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 14px;
+  color: #374151;
+}
+
+.recoverLink {
+  color: #1f3d7a;
+  font-weight: 700;
+  text-decoration: underline;
+}

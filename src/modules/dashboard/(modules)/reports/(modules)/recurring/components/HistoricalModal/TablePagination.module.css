@@ -1,0 +1,110 @@
+.paginationContainer {
+  background-color: white;  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.8px;
+  min-height: 48px;
+}
+
+.paginationContent {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 36px;
+}
+
+.pageSelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+}
+
+.pageLabel {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #bbbbbb;
+  font-variation-settings: 'opsz' 9;
+}
+
+.selectTrigger {
+  background-color: white;
+  border: 0.8px solid white;
+  border-radius: 14px;
+  height: 36px;
+  width: 70px;
+  padding: 0.8px 12.8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: black;
+  font-variation-settings: 'opsz' 9;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.selectTrigger:hover {
+  border-color: #e2e2e7;
+}
+
+.selectTrigger:focus {
+  outline: none;
+  border-color: #23366a;
+}
+
+.selectIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.rangeText {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #bbbbbb;
+  white-space: nowrap;
+  font-variation-settings: 'opsz' 9;
+}
+
+.navigationButtons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+}
+
+.navButton {
+  background-color: white;
+  border: none;
+  border-radius: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.navButton:hover:not(:disabled) {
+  background-color: #f5f5f7;
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.navIcon {
+  width: 16px;
+  height: 16px;
+}

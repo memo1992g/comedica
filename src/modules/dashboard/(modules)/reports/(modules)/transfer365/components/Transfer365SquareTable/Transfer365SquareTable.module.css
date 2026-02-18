@@ -1,0 +1,96 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.headerRow {
+  background: white;
+  border-bottom: 0.8px solid #e2e2e7;
+}
+
+.headerCell {
+  padding: 11.8px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #23366a;
+  text-align: left;
+  border-right: 0.8px solid #e2e2e7;
+}
+
+.headerCell:last-child {
+  border-right: none;
+}
+
+.centerAlign {
+  text-align: center;
+}
+
+.bodyRow {
+  background: white;
+  border-bottom: 0.8px solid #e2e2e7;
+}
+
+.alternateRow {
+  background: #f2f2f7;
+}
+
+.bodyCell {
+  padding: 12.2px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #23366a;
+  border-right: 0.8px solid #e2e2e7;
+}
+
+.bodyCell:last-child {
+  border-right: none;
+}
+
+.rightAlign {
+  text-align: right;
+}
+
+.differenceCell {
+  color: #e7000b;
+}
+
+.negativeValue {
+  color: #e7000b;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.currencySymbol {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #4a4a4c;
+}
+
+.input {
+  background: transparent;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #bbbbbb;
+  text-align: right;
+  width: 80px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: #bbbbbb;
+}

@@ -1,0 +1,317 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  width: 100%;
+  background-color: white;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+  color: #23366a;
+  margin: 0;
+}
+
+.subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #bbb;
+  margin: 0;
+}
+
+/* Main card */
+.card {
+  width: 100%;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Upload bar */
+.uploadBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 0.8px solid #e2e2e7;
+  background: white;
+}
+
+.uploadInfoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f9fa;
+  border: 0.8px solid #d1d1d6;
+  padding: 16px;
+  width: 100%;
+}
+
+.uploadTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #23366a;
+  margin: 0;
+}
+
+.uploadHint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16.5px;
+  color: #bbb;
+  margin: 0;
+}
+
+/* Upload actions */
+.uploadActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.uploadButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+
+.uploadButton:hover {
+  opacity: 0.9;
+}
+
+.uploadButton:active {
+  opacity: 0.8;
+}
+
+/* Save button */
+.saveButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #05df72 0%, #00a63e 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.saveButton:hover {
+  opacity: 0.9;
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  padding: 64px 16px;
+  gap: 16px;
+  flex: 1;
+  min-height: 280px;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 0.8px solid #e2e2e7;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyIconSvg {
+  width: 32px;
+  height: 32px;
+  color: #bbb;
+}
+
+.emptyTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #23366a;
+  margin: 0;
+}
+
+.emptyHint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #bbb;
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* Footer */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-top: 0.8px solid #e2e2e7;
+  background: white;
+  min-height: 32px;
+}
+
+/* XML buttons */
+.xmlButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.xmlButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  height: 36px;
+  background: white;
+  color: #23366a;
+  border: 0.8px solid #23366a;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.xmlButton:hover {
+  background: #f2f2f7;
+}
+
+/* Pagination */
+.paginationInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.paginationText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #bbb;
+}
+
+.paginationButtons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pageButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #23366a;
+  transition: background 0.2s;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: #f2f2f7;
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* File info (after upload) */
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #23366a;
+}
+
+.fileName {
+  font-weight: 500;
+}
+
+.fileDate {
+  color: #bbb;
+  font-weight: 400;
+}
+
+/* Error message */
+.errorMessage {
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 0.8px solid #fca5a5;
+  color: #b91c1c;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.errorMessage p {
+  margin: 0;
+}

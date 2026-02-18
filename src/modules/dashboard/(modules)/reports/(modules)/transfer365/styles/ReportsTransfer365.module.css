@@ -1,0 +1,38 @@
+.container {
+  width: 100%;
+  height: 100%;
+  background: #f9fafb;
+  overflow-y: auto;
+}
+
+.content {
+  padding: 0px;
+}
+
+.innerContent {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.statsSection {
+  overflow: hidden;
+}
+
+.tableWrapper {
+  width: 100%;
+  border: 0px solid #e2e2e7;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tableSection {
+  overflow-x: auto;
+}
+
+.squareSection {
+  padding: 24px 10.4px 24px 10.4px;
+}

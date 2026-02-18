@@ -1,0 +1,192 @@
+.paginationContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 0;
+  background: white;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.leftSection {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.searchBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: #bbbbbb;
+  pointer-events: none;
+}
+
+.searchInput {
+  height: 36px;
+  padding: 4px 12px 4px 40px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: #4a4a4c;
+  background: #f2f2f7;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 250px;
+}
+
+.searchInput:focus {
+  border-color: #d1d1d6;
+}
+
+.searchInput::placeholder {
+  color: #bbbbbb;
+}
+
+.dateButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  color: #bbbbbb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  color: #bbbbbb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterButton:hover {
+  background: #f2f2f7;
+  border-color: #d1d1d6;
+  color: #bbbbbb;
+}
+
+.filterIcon {
+  color: #bbbbbb;
+}
+
+.filterPopover {
+  border: 0.8px solid #d1d1d6;
+  border-radius: 8px;
+  background: white;
+  padding: 4px;
+}
+
+.filterList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 220px;
+}
+
+.filterOption {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #4a4a4c;
+  cursor: pointer;
+}
+
+.filterOption[data-active='true'] {
+  background: #f2f2f7;
+  color: #23366a;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.pageSelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #bbbbbb;
+}
+
+.select {
+  height: 36px;
+  padding: 0 12.8px;
+  background: white;
+  border: 0.8px solid white;
+  border-radius: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: black;
+  cursor: pointer;
+  width: 70px;
+}
+
+.pageInfo {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #bbbbbb;
+}
+
+.navigationButtons {
+  display: flex;
+  gap: 4px;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #23366a;
+  transition: opacity 0.2s;
+}
+
+.navButton:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.navIcon {
+  background: #f2f2f7;
+  color: #23366a;
+}

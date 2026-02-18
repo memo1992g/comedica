@@ -1,0 +1,254 @@
+.formCardBody {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+/* Status badge */
+.statusBadge {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.statusIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #00a63e;
+}
+
+.statusInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statusLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #00a63e;
+}
+
+.statusDesc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #8e8e93;
+}
+
+/* Field groups */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #8e8e93;
+  margin: 0;
+}
+
+.required {
+  color: #fb2c36;
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.selectField {
+  width: 100%;
+  height: 36px;
+  padding: 0 12.8px;
+  border: 0.8px solid #d1d1d6 !important;
+  border-radius: 4px !important;
+  background: white !important;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+/* Toggle sections */
+.sectionsWrapper {
+  border-top: 0.8px solid #f3f4f6;
+  padding-top: 24px;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.toggleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sectionTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #23366a;
+  margin: 0;
+}
+
+.sectionDesc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #bbb;
+  margin: 0 0 4px;
+}
+
+.toggleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f2f2f7;
+  border-radius: 8px;
+  padding: 8px 16px;
+  min-height: 54px;
+}
+
+.toggleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.toggleLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.33px;
+  color: #4a4a4c;
+}
+
+.toggleHint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #bbb;
+}
+
+.toggle {
+  width: 32px;
+  height: 18.4px;
+  border-radius: 999px;
+  border: 1.6px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.toggleOff {
+  background: #e8e8e8;
+  border-color: #e8e8e8;
+}
+
+.toggleOn {
+  background: #23366a;
+  border-color: transparent;
+}
+
+.toggleKnob {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: left 0.2s;
+}
+
+.toggleKnobOff {
+  left: 2px;
+  background: #bbb;
+}
+
+.toggleKnobOn {
+  left: 14px;
+  background: white;
+}
+
+/* Textarea */
+.textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 8px 12px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #1a1a1a;
+  resize: vertical;
+  outline: none;
+}
+
+.textarea::placeholder {
+  color: #bbb;
+}
+
+.helpText {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #8e8e93;
+}
+
+.helpIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #8e8e93;
+}
+
+/* Save button */
+.footerDivider {
+  border-top: 0.8px solid #e2e2e7;
+  padding-top: 16px;
+  margin-top: 24px;
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.saveButton:hover {
+  opacity: 0.9;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

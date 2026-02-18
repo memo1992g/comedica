@@ -1,0 +1,102 @@
+const APP_PREFIX = "BANCA_COMEDICA_";
+
+// Tipos para las cookies
+export interface AuthCookies {
+  SHADOW_TOKEN: string;
+  CLIENT_TOKEN: string;
+  ACCESS_TOKEN: string;
+  LOGIN_USERNAME: string;
+  LINKED_ACCOUNT: string;
+  USER_ID: string;
+  LOGIN_TOKEN: string;
+  SUB_CLIENT_ID: string;
+  ANTI_FRAUD_REQUEST_ID: string;
+}
+
+export interface PassRecoveryCookies {
+  USERNAME: string;
+  VALIDATION_COMPLETED: string;
+  NOTIFICATION_TYPE: string;
+}
+
+export interface SecurityCookies {
+  SECURITY_PHRASE_NEEDED: string;
+}
+
+export interface SubscriptionCookies {
+  USERNAME: string;
+  DOCUMENT_TYPE: string;
+  DOCUMENT_NUMBER: string;
+  USER_EMAIL: string;
+  PRODUCTS_LIST: string;
+  SUB_COMPLETED: string;
+  ID_COMPLETED: string;
+  CLIENT_ID: string;
+}
+
+export interface TransfersCookies {
+  TRANSFER_SUBMITTED: string;
+  TRANSFER_DATA: string;
+}
+
+export interface PaymentsCookies {
+  PAYMENT_SUBMITTED: string;
+  PAYMENT_DATA: string;
+}
+
+export interface ServicesCookies {
+  SERVICE_PAYMENT_SUBMITTED: string;
+}
+
+export interface AppCookies {
+  AUTH: AuthCookies;
+  PASS_RECOVERY: PassRecoveryCookies;
+  SECURITY: SecurityCookies;
+  SUBSCRIPTION: SubscriptionCookies;
+  TRANSFERS: TransfersCookies;
+  PAYMENTS: PaymentsCookies;
+  SERVICES: ServicesCookies;
+}
+
+export const APP_COOKIES: AppCookies = {
+  AUTH: {
+    SHADOW_TOKEN: `${APP_PREFIX}SHADOW_TOKEN`,
+    CLIENT_TOKEN: `${APP_PREFIX}CLIENT_TOKEN`,
+    ACCESS_TOKEN: `${APP_PREFIX}ACCESS_TOKEN`,    
+    LOGIN_TOKEN: `${APP_PREFIX}LOGIN_TOKEN`,
+    LOGIN_USERNAME: `LOGIN_USERNAME`,
+    LINKED_ACCOUNT: `LINKED_ACCOUNT`,
+    USER_ID: `USER_ID`,
+    SUB_CLIENT_ID: `SUB_CLIENT_ID`,
+    ANTI_FRAUD_REQUEST_ID: `${APP_PREFIX}ANTI_FRAUD_REQUEST_ID`
+  },
+  PASS_RECOVERY: {
+    USERNAME: `RECOVERY_PASS_USERNAME`,
+    VALIDATION_COMPLETED: `RECOVERY_VALIDATION_COMPLETED`,
+    NOTIFICATION_TYPE: `RECOVERY_NOTIFICATION_TYPE`
+  },
+  SECURITY: {
+    SECURITY_PHRASE_NEEDED: `SECURITY_PHRASE_NEEDED`
+  },
+  SUBSCRIPTION: {
+    USERNAME: `SUB_USERNAME`,
+    DOCUMENT_TYPE: `SUB_DOCUMENT_TYPE`,
+    DOCUMENT_NUMBER: `SUB_DOCUMENT_NUMBER`,
+    USER_EMAIL: `SUB_USER_EMAIL`,
+    PRODUCTS_LIST: `SUB_PRODUCTS_LIST`,
+    SUB_COMPLETED: `SUB_COMPLETED`,
+    ID_COMPLETED: `ID_COMPLETED`,
+    CLIENT_ID: `SUB_CLIENT_ID`
+  },
+  TRANSFERS: {
+    TRANSFER_SUBMITTED: `TRANSFER_SUBMITTED`,
+    TRANSFER_DATA: `TRANSFER_DATA`
+  },
+  PAYMENTS: {
+    PAYMENT_SUBMITTED: `PAYMENT_SUBMITTED`,
+    PAYMENT_DATA: `PAYMENT_DATA`
+  },
+  SERVICES: {
+    SERVICE_PAYMENT_SUBMITTED: `SERVICE_PAYMENT_SUBMITTED`
+  }
+};

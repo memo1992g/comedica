@@ -1,0 +1,202 @@
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px 0;
+}
+
+.leftSection {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.searchWrapper {
+  position: relative;
+  width: 250px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #bbb;
+}
+
+.searchInput {
+  width: 100%;
+  height: 36px;
+  padding: 4px 12px 4px 40px;
+  background: #f2f2f7;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #4a4a4c;
+}
+
+.searchInput::placeholder {
+  color: #bbb;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #6d93d2;
+}
+
+.calendarButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  color: #bbbbbb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendarButton:hover {
+  background: #f2f2f7;
+  border-color: #d1d1d6;
+  color: #bbbbbb;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  color: #bbbbbb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterButton:hover {
+  background: #f2f2f7;
+  border-color: #d1d1d6;
+  color: #bbbbbb;
+}
+
+.filterIcon {
+  color: #bbbbbb;
+}
+
+.filterPopover {
+  border: 0.8px solid #d1d1d6;
+  border-radius: 8px;
+  background: white;
+  padding: 4px;
+}
+
+.filterList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 220px;
+}
+
+.filterOption {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #4a4a4c;
+  cursor: pointer;
+}
+
+.filterOption[data-active='true'] {
+  background: #f2f2f7;
+  color: #23366a;
+}
+
+.rightSection {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.pageSelector {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pageLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #bbb;
+}
+
+.pageDropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0.8px 12.8px;
+  background: #ffffff;
+  border: 0.8px solid #ffffff;
+  border-radius: 14px;
+  min-width: 70px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+.pageDropdown:hover {
+  background: #f9f9f9;
+}
+
+.itemsInfo {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #bbb;
+}
+
+.navigationButtons {
+  display: flex;
+  gap: 4px;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #4a4a4c;
+  transition: background-color 0.2s;
+}
+
+.navButton:hover:not(:disabled) {
+  background: #f2f2f7;
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
