@@ -1,0 +1,114 @@
+{
+  "info": {
+    "name": "Notificaciones - Backoffice",
+    "description": "Notificaciones masivas e individuales: registro masivo, pendientes y creación individual.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://bo-comedica-service-dev.echotechs.net/api"
+    }
+  ],
+  "item": [
+    {
+      "name": "Registrar notificación masiva",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Created-By",
+            "value": "backoffice-user",
+            "description": "Opcional. Usuario que registra la notificación."
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Mensaje de campaña para todos los segmentos\",\n  \"segments\": [\"AH\", \"TC\", \"CR\"],\n  \"channels\": [\"SMS\", \"EMAIL\"],\n  \"version\": 1\n}"
+        },
+        "url": "{{base_url}}/notifications/massive/create",
+        "description": "Registra notificación masiva (CREATED). El despacho se realiza en background. Segmentos: AH, TC, CR, POL, AP, DPF. Canales: SMS, EMAIL, PUSH."
+      },
+      "response": [
+        {
+          "name": "Éxito",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Notificación masiva registrada correctamente\" },\n  \"correlative\": \"mass-001\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-mass-create\" },\n  \"data\": [\n    { \"massiveId\": 1001, \"status\": \"CREATED\" }\n  ],\n  \"errors\": null,\n  \"version\": 1\n}"
+        }
+      ]
+    },
+    {
+      "name": "Listar notificaciones masivas pendientes",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"version\": 1\n}"
+        },
+        "url": "{{base_url}}/notifications/massive/pending",
+        "description": "Lista notificaciones masivas pendientes de envío (para dispatcher). El body es opcional; si no se envía, se usa version: 1 por defecto."
+      },
+      "response": [
+        {
+          "name": "Éxito",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Consulta realizada con éxito\" },\n  \"correlative\": \"pending-001\",\n  \"metadata\": { \"totalCount\": 2, \"filteredCount\": 2, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-pending\" },\n  \"data\": [\n    { \"massiveId\": 1001, \"message\": \"Mensaje de campaña\", \"status\": \"PENDING\", \"createdAt\": \"2026-01-26T10:00:00.000Z\" },\n    { \"massiveId\": 1002, \"message\": \"Segunda campaña\", \"status\": \"PENDING\", \"createdAt\": \"2026-01-26T11:30:00.000Z\" }\n  ],\n  \"errors\": null,\n  \"version\": 1\n}"
+        }
+      ]
+    },
+    {
+      "name": "Registrar notificación individual",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Created-By",
+            "value": "backoffice-user",
+            "description": "Opcional."
+          },
+          {
+            "key": "X-Questionnaire-Token",
+            "value": "",
+            "description": "Opcional. Token del cuestionario si aplica."
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"users\": [\n    { \"memberNumber\": 12345 },\n    { \"memberNumber\": 67890 }\n  ],\n  \"message\": \"Mensaje para usuario individual\",\n  \"channels\": [\"SMS\", \"EMAIL\"],\n  \"version\": 1\n}"
+        },
+        "url": "{{base_url}}/notifications/individual",
+        "description": "Registra notificación individual. Por cada memberNumber se llama a Consulta de Usuarios para obtener idCliente, email, phone. Opcional: imageName, imageContent (Base64 para Email/Push)."
+      },
+      "response": [
+        {
+          "name": "Éxito",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Notificación individual registrada correctamente\" },\n  \"correlative\": \"ind-001\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-ind-create\" },\n  \"data\": { \"individualId\": 5001, \"status\": \"CREATED\" },\n  \"errors\": null,\n  \"version\": 1\n}"
+        }
+      ]
+    }
+  ]
+}
