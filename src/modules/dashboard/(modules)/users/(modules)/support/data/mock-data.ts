@@ -3,6 +3,7 @@ export interface SupportUser {
   name: string;
   dui: string;
   initials: string;
+  username?: string;
   status: 'Activo' | 'Inactivo' | 'Bloqueado';
 }
 

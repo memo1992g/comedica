@@ -13,9 +13,16 @@ import {
   type SupportUser, type AttentionType,
 } from './data/mock-data';
 import styles from './styles/users-support.module.css';
+import { userManagementService } from '@/lib/api/user-management.service';
 
 type SubTab = 'tipos' | 'gestiones';
 type View = 'main' | 'history-table';
+
+const ATTENTION_ACTION_MAP: Record<string, 'block' | 'unblock' | 'inactivate' | null> = {
+  Bloqueo: 'block',
+  Desbloqueo: 'unblock',
+  'Soporte general': 'inactivate',
+};
 
 export default function UsersSupport() {
   const [view, setView] = useState<View>('main');
@@ -26,16 +33,34 @@ export default function UsersSupport() {
   const [verificationState, setVerificationState] = useState<'pending' | 'completed'>('pending');
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [queryError, setQueryError] = useState<string | null>(null);
 
-  const handleSearchChange = (query: string) => {
+  const handleSearchChange = async (query: string) => {
     setSearchQuery(query);
-    const match = mockSupportUsers.find((u) =>
-      u.id.includes(query) || u.dui.includes(query)
-    );
-    setSelectedUser(match ?? null);
-    if (!match) {
+
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setSelectedUser(null);
+      setQueryError(null);
       setVerificationState('pending');
       setSelectedType(null);
+      return;
+    }
+
+    const localMatch = mockSupportUsers.find((u) => u.id.includes(trimmed) || u.dui.includes(trimmed));
+    if (!/^\d{5,}$/.test(trimmed)) {
+      setSelectedUser(localMatch ?? null);
+      setQueryError(null);
+      return;
+    }
+
+    try {
+      setQueryError(null);
+      const profile = await userManagementService.consultUser(Number(trimmed));
+      setSelectedUser(userManagementService.toSupportUser(profile));
+    } catch (error) {
+      setSelectedUser(localMatch ?? null);
+      setQueryError(error instanceof Error ? error.message : 'No fue posible consultar el usuario');
     }
   };
 
@@ -51,12 +76,36 @@ export default function UsersSupport() {
 
   const handleSave = () => setShowConfirmationModal(true);
 
-  const handleConfirmSave = () => {
-    setShowConfirmationModal(false);
-    setVerificationState('pending');
-    setSelectedType(null);
-    setSearchQuery('');
-    setSelectedUser(null);
+  const handleConfirmSave = async () => {
+    if (!selectedUser?.username || !selectedType) {
+      setShowConfirmationModal(false);
+      return;
+    }
+
+    const action = ATTENTION_ACTION_MAP[selectedType.name] ?? null;
+    if (!action) {
+      setShowConfirmationModal(false);
+      return;
+    }
+
+    try {
+      if (action === 'block') {
+        await userManagementService.blockUser(selectedUser.username);
+      } else if (action === 'unblock') {
+        await userManagementService.unblockUser(selectedUser.username);
+      } else {
+        await userManagementService.inactivateUser(selectedUser.username);
+      }
+
+      setShowConfirmationModal(false);
+      setVerificationState('pending');
+      setSelectedType(null);
+      setSearchQuery('');
+      setSelectedUser(null);
+    } catch (error) {
+      setQueryError(error instanceof Error ? error.message : 'No fue posible ejecutar la gestión');
+      setShowConfirmationModal(false);
+    }
   };
 
   if (view === 'history-table') {
@@ -81,6 +130,7 @@ export default function UsersSupport() {
             <p className={styles.subtitle}>
               Administración de activaciones, bloqueos y desbloqueos de usuarios
             </p>
+            {queryError && <p className={styles.subtitle}>{queryError}</p>}
           </div>
           <Button
             variant="outline"
@@ -96,7 +146,7 @@ export default function UsersSupport() {
           <div className={styles.leftPanel}>
             <SearchPanel
               searchQuery={searchQuery}
-              onSearchChange={handleSearchChange}
+              onSearchChange={(value) => { void handleSearchChange(value); }}
               activeSubTab={activeSubTab}
               onSubTabChange={setActiveSubTab}
               attentionTypes={attentionTypes}
@@ -130,9 +180,10 @@ export default function UsersSupport() {
         <ConfirmationModal
           userName={selectedUser.name}
           onClose={() => setShowConfirmationModal(false)}
-          onConfirm={handleConfirmSave}
+          onConfirm={() => { void handleConfirmSave(); }}
         />
       )}
+
     </div>
   );
 }

@@ -45,16 +45,8 @@ export const listCorrespondentsService = async (): Promise<
   BackofficeApiResponse<CorrespondentI[]>
 > => {
   const headers = getAuthHeaders();
-  const body = {
-    uuid: crypto.randomUUID(),
-    pageId: 1,
-    channel: "WEB",
-    requestId: crypto.randomUUID(),
-  };
-
   return customAuthFetch(`${API_URL}/corresponsal-list`, {
     method: "GET",
-    body: JSON.stringify(body),
     headers,
   });
 };

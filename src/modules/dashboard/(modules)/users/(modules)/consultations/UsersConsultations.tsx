@@ -24,6 +24,8 @@ export default function UsersConsultations() {
     currentView,
     tabRefs,
     indicatorStyle,
+    isSearching,
+    searchError,
     setActiveSubTab,
     setSearchQuery,
     setSelectedUser,
@@ -34,6 +36,10 @@ export default function UsersConsultations() {
     handleVerify,
     handleTabChange,
   } = useUsersConsultations();
+
+  const usersForList = selectedUser
+    ? [selectedUser, ...mockUsers.filter((user) => user.id !== selectedUser.id)]
+    : mockUsers;
 
   if (currentView === 'history-table') {
     return (
@@ -56,6 +62,8 @@ export default function UsersConsultations() {
           <p className={styles.subtitle}>
             Ingrese los parámetros de búsqueda para visualizar la información del usuario
           </p>
+          {isSearching && <p className={styles.subtitle}>Consultando usuario en servicio real...</p>}
+          {searchError && <p className={styles.subtitle}>{searchError}</p>}
         </div>
 
         <MainTabs
@@ -74,7 +82,7 @@ export default function UsersConsultations() {
               onSearchChange={setSearchQuery}
               activeSubTab={activeSubTab}
               onSubTabChange={setActiveSubTab}
-              users={mockUsers}
+              users={usersForList}
               selectedUserId={selectedUser?.id ?? null}
               onSelectUser={setSelectedUser}
               searchHistory={mockSearchHistory}
