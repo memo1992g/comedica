@@ -6,7 +6,104 @@ import {
   AuditLog 
 } from '@/types';
 
+interface ParamsProxyRequest<T> {
+  uuid: string;
+  channel: string;
+  pageId: number;
+  request: T;
+}
+
+interface ParamsProxyResult {
+  code: number;
+  message: string;
+}
+
+interface ParamsProxyMetadata {
+  totalCount?: number;
+  filteredCount?: number;
+  timestamp?: string;
+  transactionId?: string;
+}
+
+interface ParamsProxyResponse<T> {
+  result: ParamsProxyResult;
+  correlative?: string;
+  metadata?: ParamsProxyMetadata;
+  data: T;
+  errors?: unknown;
+  version?: number;
+}
+
+export interface ParamsProxyItem {
+  name: string;
+  value: string | number | boolean | null;
+  description?: string | null;
+  status?: number | null;
+}
+
+function buildParamsProxyRequest<T>(request: T): ParamsProxyRequest<T> {
+  return {
+    uuid: crypto.randomUUID(),
+    channel: 'W',
+    pageId: 1,
+    request,
+  };
+}
+
+function assertProxySuccess<T>(response: ParamsProxyResponse<T>): T {
+  if (response?.result?.code !== 0) {
+    throw new Error(response?.result?.message || 'Error consumiendo servicio de parámetros');
+  }
+
+  return response.data;
+}
+
 export const parametersService = {
+  // Proxy real de parámetros (comedica-bel-msvc-params)
+  async getParams(request?: Partial<ParamsProxyItem>): Promise<ParamsProxyItem[]> {
+    try {
+      const response = await apiClient.post<ParamsProxyResponse<ParamsProxyItem[]>>(
+        '/params/get-params',
+        buildParamsProxyRequest({
+          name: request?.name ?? null,
+          value: request?.value ?? null,
+          description: request?.description ?? null,
+          status: request?.status ?? null,
+        })
+      );
+
+      return assertProxySuccess(response.data);
+    } catch (error) {
+      throw new Error(getErrorMessage(error));
+    }
+  },
+
+  async saveParam(param: ParamsProxyItem): Promise<ParamsProxyItem> {
+    try {
+      const response = await apiClient.post<ParamsProxyResponse<ParamsProxyItem>>(
+        '/params/save',
+        buildParamsProxyRequest(param)
+      );
+
+      return assertProxySuccess(response.data);
+    } catch (error) {
+      throw new Error(getErrorMessage(error));
+    }
+  },
+
+  async editParam(param: ParamsProxyItem): Promise<ParamsProxyItem> {
+    try {
+      const response = await apiClient.put<ParamsProxyResponse<ParamsProxyItem>>(
+        '/params/edit',
+        buildParamsProxyRequest(param)
+      );
+
+      return assertProxySuccess(response.data);
+    } catch (error) {
+      throw new Error(getErrorMessage(error));
+    }
+  },
+
   // Obtener límites generales
   async getGeneralLimits(): Promise<TransactionLimits[]> {
     try {
