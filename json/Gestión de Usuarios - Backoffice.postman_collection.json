@@ -1,0 +1,324 @@
+{
+  "info": {
+    "name": "Gestión de Usuarios - Backoffice",
+    "description": "Endpoints de gestión de usuarios (proxy a security) y cuestionario de soporte telefónico.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://bo-comedica-service-dev.echotechs.net/api"
+    },
+    {
+      "key": "questionnaireToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Cuestionario",
+      "item": [
+        {
+          "name": "Obtener preguntas (aleatorias)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"reasonCode\": \"BLOQUEO_DE_USUARIO\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/questionnaire/questions",
+            "description": "Devuelve preguntas aleatorias según el motivo (request.reasonCode). Usar el token devuelto en POST validate en el header X-Questionnaire-Token de las acciones."
+          },
+          "response": [
+            {
+              "name": "Éxito",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Consulta realizada con éxito\" },\n  \"correlative\": \"a1b2c3d4e5f6\",\n  \"metadata\": { \"totalCount\": 3, \"filteredCount\": 3, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-001\" },\n  \"data\": [ { \"id\": 1, \"questionText\": \"¿Cuál es el nombre de su primera mascota?\", \"questionId\": 1 }, { \"id\": 2, \"questionText\": \"¿Lugar de nacimiento de su madre?\", \"questionId\": 2 } ],\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Validar respuestas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "    pm.collectionVariables.set('questionnaireToken', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"reasonCode\": \"BLOQUEO_DE_USUARIO\",\n    \"clientIdentifier\": 12345,\n    \"answers\": [\n      { \"questionId\": 1, \"answer\": \"respuesta1\" },\n      { \"questionId\": 2, \"answer\": \"respuesta2\" },\n      { \"questionId\": 3, \"answer\": \"respuesta3\" }\n    ]\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/questionnaire/validate",
+            "description": "Valida respuestas por clientIdentifier. Si se supera el mínimo de aciertos, devuelve token. El test script guarda el token en la variable questionnaireToken."
+          },
+          "response": [
+            {
+              "name": "Éxito (token devuelto)",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Validación exitosa\" },\n  \"correlative\": \"b2c3d4e5f6a1\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-002\" },\n  \"data\": { \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\", \"valid\": true },\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gestión de usuarios (requieren X-Questionnaire-Token)",
+      "item": [
+        {
+          "name": "Consulta de usuario (por associatedNumber)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Questionnaire-Token",
+                "value": "{{questionnaireToken}}",
+                "description": "Token devuelto por POST questionnaire/validate (reasonCode CONSULTA_DE_USUARIO)"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"associatedNumber\": 12345\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/consult",
+            "description": "Consulta usuario por request.associatedNumber (VW_BOR_USER_INFO)."
+          },
+          "response": [
+            {
+              "name": "Éxito",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Consulta realizada con éxito\" },\n  \"correlative\": \"c3d4e5f6a1b2\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-003\" },\n  \"data\": { \"associatedNumber\": 12345, \"associatedClientId\": 1001, \"firstName\": \"Juan\", \"lastName\": \"Pérez\", \"fullName\": \"Juan Pérez\", \"identification\": \"12345678-9\", \"email\": \"juan@ejemplo.com\", \"phoneNumber\": \"70001122\", \"ebankingStatus\": \"ACTIVE\", \"username\": \"jperez\" },\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bloquear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Questionnaire-Token",
+                "value": "{{questionnaireToken}}",
+                "description": "Token con reasonCode BLOQUEO_DE_USUARIO"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"username\": \"usuario_ejemplo\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/block"
+          },
+          "response": [
+            {
+              "name": "Éxito",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Usuario bloqueado correctamente\" },\n  \"correlative\": \"d4e5f6a1b2c3\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-004\" },\n  \"data\": \"Usuario bloqueado\",\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Desbloquear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Questionnaire-Token",
+                "value": "{{questionnaireToken}}",
+                "description": "Token con reasonCode DESBLOQUEO_DE_USUARIO"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"username\": \"usuario_ejemplo\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/unblock"
+          },
+          "response": [
+            {
+              "name": "Éxito",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Usuario desbloqueado correctamente\" },\n  \"correlative\": \"e5f6a1b2c3d4\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-005\" },\n  \"data\": \"Usuario desbloqueado\",\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Recuperación de contraseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Questionnaire-Token",
+                "value": "{{questionnaireToken}}",
+                "description": "Token con reasonCode RECUPERACION_DE_CONTRASEÑA"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"requestId\": \"req-001\",\n  \"request\": {\n    \"documentType\": \"DUI\",\n    \"documentNumber\": \"12345678-9\",\n    \"userName\": \"usuario_ejemplo\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/password-recovery"
+          },
+          "response": [
+            {
+              "name": "Éxito",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Proceso de recuperación iniciado\" },\n  \"correlative\": \"f6a1b2c3d4e5\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-006\" },\n  \"data\": null,\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reset contraseña (backoffice)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Questionnaire-Token",
+                "value": "{{questionnaireToken}}",
+                "description": "Token con reasonCode RECUPERACION_DE_CONTRASEÑA"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"username\": \"usuario_ejemplo\",\n    \"newPassword\": \"NuevaClave123!\",\n    \"confirmPassword\": \"NuevaClave123!\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/reset-password"
+          },
+          "response": [
+            {
+              "name": "Éxito",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Contraseña actualizada exitosamente\" },\n  \"correlative\": \"a1b2c3d4e5f6\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-007\" },\n  \"data\": { \"success\": true, \"message\": \"Contraseña actualizada exitosamente\" },\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Questionnaire-Token",
+                "value": "{{questionnaireToken}}",
+                "description": "Token con reasonCode CREACION_DE_USUARIO"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"requestId\": \"req-002\",\n  \"request\": {\n    \"username\": \"nuevo_usuario\",\n    \"cliId\": 12345,\n    \"password\": \"ClaveInicial123!\",\n    \"email\": \"correo@ejemplo.com\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/create-user"
+          },
+          "response": [
+            {
+              "name": "Éxito",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Usuario creado correctamente\" },\n  \"correlative\": \"b2c3d4e5f6a1\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-008\" },\n  \"data\": { \"id\": 42, \"username\": \"nuevo_usuario\", \"cliId\": 12345 },\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Inactivar usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Questionnaire-Token",
+                "value": "{{questionnaireToken}}",
+                "description": "Token con reasonCode SOPORTE_GENERAL"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{$guid}}\",\n  \"channel\": \"W\",\n  \"pageId\": 1,\n  \"request\": {\n    \"username\": \"usuario_ejemplo\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/user-management/inactivate"
+          },
+          "response": [
+            {
+              "name": "Éxito",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"result\": { \"code\": 0, \"message\": \"Usuario inactivado correctamente\" },\n  \"correlative\": \"c3d4e5f6a1b2\",\n  \"metadata\": { \"totalCount\": 1, \"filteredCount\": 1, \"timestamp\": \"2026-01-26T12:00:00\", \"transactionId\": \"tid-009\" },\n  \"data\": \"Usuario inactivado\",\n  \"errors\": null,\n  \"version\": 1\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

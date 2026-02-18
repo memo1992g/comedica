@@ -33,7 +33,7 @@ function buildContext() {
   return {
     uuid: crypto.randomUUID(),
     pageId: 1,
-    channel: "E",
+    channel: "WEB",
     requestId: crypto.randomUUID(),
   };
 }
@@ -140,7 +140,7 @@ export const updateComplaintService = async (
   const headers = getAuthHeaders();
   const body = { context: buildContext(), data };
 
-  return customAuthFetch(`${API_URL}/update-complaint${id}`, {
+  return customAuthFetch(`${API_URL}/update-complaint/${id}`, {
     method: "POST",
     body: JSON.stringify(body),
     headers,

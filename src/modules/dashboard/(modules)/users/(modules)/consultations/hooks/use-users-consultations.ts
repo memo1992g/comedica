@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { mockUsers } from '../data/mock-data';
 import type { UserResult } from '../data/mock-data';
 import type { MainTab, SubTab, TabIndicatorStyle, View } from '../interfaces/UsersConsultations';
+import { userManagementService } from '@/lib/api/user-management.service';
 
 export function useUsersConsultations() {
   const [activeTab, setActiveTab] = useState<MainTab>('usuarios');
@@ -10,6 +11,8 @@ export function useUsersConsultations() {
   const [selectedUser, setSelectedUser] = useState<UserResult | null>(null);
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [currentView, setCurrentView] = useState<View>('main');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const [indicatorStyle, setIndicatorStyle] = useState<TabIndicatorStyle>({ left: 0, width: 0 });
@@ -33,9 +36,49 @@ export function useUsersConsultations() {
   );
 
   useEffect(() => {
-    if (searchQuery && filteredUsers.length === 0) {
+    if (!searchQuery.trim()) {
       setSelectedUser(null);
+      setSearchError(null);
+      return;
     }
+
+    const isAssociatedNumber = /^\d{5,}$/.test(searchQuery.trim());
+    if (!isAssociatedNumber) {
+      if (filteredUsers.length === 0) {
+        setSelectedUser(null);
+      }
+      setSearchError(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchUser = async () => {
+      setIsSearching(true);
+      setSearchError(null);
+
+      try {
+        const profile = await userManagementService.consultUser(Number(searchQuery.trim()));
+        if (!cancelled) {
+          setSelectedUser(userManagementService.toConsultationUser(profile));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setSelectedUser(null);
+          setSearchError(error instanceof Error ? error.message : 'No fue posible consultar el usuario');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsSearching(false);
+        }
+      }
+    };
+
+    fetchUser();
+
+    return () => {
+      cancelled = true;
+    };
   }, [searchQuery, filteredUsers.length]);
 
   const handleHistorySelect = (query: string) => {
@@ -68,6 +111,8 @@ export function useUsersConsultations() {
     currentView,
     tabRefs,
     indicatorStyle,
+    isSearching,
+    searchError,
     setActiveSubTab,
     setSearchQuery,
     setSelectedUser,

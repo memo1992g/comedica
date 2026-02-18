@@ -24,7 +24,8 @@ export default function SearchPanel({
   const filteredUsers = users.filter((u) =>
     u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.dui.includes(searchQuery) ||
-    u.username.toLowerCase().includes(searchQuery.toLowerCase())
+    u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.id.includes(searchQuery)
   );
 
   return (
