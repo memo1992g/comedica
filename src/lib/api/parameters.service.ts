@@ -12,7 +12,7 @@ import {
 export type { ParamsProxyItem } from './types/parameters.types';
 import type { ParamsProxyItem } from './types/parameters.types';
 
-const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL ?? 'https://bo-comedica-service-dev.echotechs.net/api';
 
 function getAuthHeaders(): Record<string, string> {
   const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
@@ -44,6 +44,7 @@ interface ParamsProxyRequest<T> {
   uuid: string;
   channel: string;
   pageId: number;
+  requestId: string;
   request: T;
 }
 
@@ -109,6 +110,7 @@ function buildParamsProxyRequest<T>(request: T): ParamsProxyRequest<T> {
     uuid: crypto.randomUUID(),
     channel: 'W',
     pageId: 1,
+    requestId: crypto.randomUUID(),
     request,
   };
 }
