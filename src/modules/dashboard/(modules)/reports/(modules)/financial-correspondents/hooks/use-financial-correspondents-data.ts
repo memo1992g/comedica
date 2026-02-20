@@ -22,15 +22,10 @@ export function useFinancialCorrespondentsData({
   const filteredData = useMemo(() => {
     let result = data;
 
-    // Filtro por búsqueda
-    if (searchQuery) {
-      result = result.filter(
-        (item) =>
-          item.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.numeroAsociado.includes(searchQuery) ||
-          item.cuenta.includes(searchQuery) ||
-          item.referencia.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.tipo.toLowerCase().includes(searchQuery.toLowerCase())
+    // Filtro por búsqueda (solo nombre)
+    if (searchQuery.trim()) {
+      result = result.filter((item) =>
+        item.nombre.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -44,7 +39,7 @@ export function useFinancialCorrespondentsData({
 
   const totalTransactions = filteredData.length;
   const totalAmount = filteredData.reduce((sum, item) => sum + item.monto, 0);
-  const totalPages = Math.ceil(totalTransactions / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(totalTransactions / itemsPerPage));
 
   const columns = useMemo(
     () =>

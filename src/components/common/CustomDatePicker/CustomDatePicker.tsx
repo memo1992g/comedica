@@ -14,31 +14,43 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { toZonedTime } from "date-fns-tz";
+import type { DateRange } from "react-day-picker";
 
 type ViewMode = "day" | "month" | "year";
+type SelectionMode = "single" | "range";
 
 export function CustomDatePicker({
   className,
   allowClear = false,
   iconOnly = false,
+  selectionMode = "single",
   defaultValue,
   value,
+  defaultRangeValue,
+  rangeValue,
   onChange,
+  onRangeChange,
   disableFutureDates = false,
   disablePastDates = false,
 }: Readonly<{
   className?: string;
   allowClear?: boolean;
   iconOnly?: boolean;
+  selectionMode?: SelectionMode;
   defaultValue?: Date;
   value?: Date;
+  defaultRangeValue?: DateRange;
+  rangeValue?: DateRange;
   onChange?: (date: Date | null) => void;
+  onRangeChange?: (range: DateRange | undefined) => void;
   disableFutureDates?: boolean;
   disablePastDates?: boolean;
 }>) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [hoverDate, setHoverDate] = useState<Date | undefined>(undefined);
   const [date, setDate] = useState<Date | null>(() => {
     if (value) {
       return toZonedTime(value, "UTC");
@@ -49,12 +61,45 @@ export function CustomDatePicker({
     return null;
   });
   const [viewMode, setViewMode] = useState<ViewMode>("day");
+  const [range, setRange] = useState<DateRange | undefined>(() => {
+    if (rangeValue) {
+      return {
+        from: rangeValue.from ? toZonedTime(rangeValue.from, "UTC") : undefined,
+        to: rangeValue.to ? toZonedTime(rangeValue.to, "UTC") : undefined,
+      };
+    }
+
+    if (defaultRangeValue) {
+      return {
+        from: defaultRangeValue.from
+          ? toZonedTime(defaultRangeValue.from, "UTC")
+          : undefined,
+        to: defaultRangeValue.to ? toZonedTime(defaultRangeValue.to, "UTC") : undefined,
+      };
+    }
+
+    return undefined;
+  });
   const [currentYear, setCurrentYear] = useState<number>(
     (value || defaultValue || new Date()).getFullYear()
   );
   const [currentMonth, setCurrentMonth] = useState<number>(
     (value || defaultValue || new Date()).getMonth()
   );
+
+  // Prefer internal range state so user clicks update the display immediately,
+  // even before the parent re-renders with a new rangeValue.
+  const effectiveRange = range ?? rangeValue;
+
+  // Keep internal range in sync when rangeValue is changed externally.
+  useEffect(() => {
+    if (rangeValue === undefined) return;
+    setRange({
+      from: rangeValue.from ? toZonedTime(rangeValue.from, "UTC") : undefined,
+      to: rangeValue.to ? toZonedTime(rangeValue.to, "UTC") : undefined,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rangeValue?.from?.getTime(), rangeValue?.to?.getTime()]);
 
   const months = [
     "January",
@@ -71,6 +116,33 @@ export function CustomDatePicker({
     "December",
   ];
 
+  const getAnchorDate = () => {
+    if (selectionMode === "range") {
+      const activeRange = effectiveRange;
+      if (activeRange?.from) {
+        return toZonedTime(activeRange.from, "UTC");
+      }
+    }
+
+    if (value) {
+      return toZonedTime(value, "UTC");
+    }
+
+    if (date) {
+      return date;
+    }
+
+    if (defaultValue) {
+      return toZonedTime(defaultValue, "UTC");
+    }
+
+    if (defaultRangeValue?.from) {
+      return toZonedTime(defaultRangeValue.from, "UTC");
+    }
+
+    return new Date();
+  };
+
   const handleDateSelect = (selectedDate: Date | null) => {
     if (selectedDate) {
       // Crear una nueva fecha para evitar problemas de zona horaria
@@ -78,10 +150,142 @@ export function CustomDatePicker({
 
       setDate(normalizedDate);
       onChange?.(normalizedDate);
+      setIsOpen(false);
     } else {
       setDate(selectedDate);
       onChange?.(selectedDate);
     }
+  };
+
+  const handleRangeSelect = (
+    selectedRange: DateRange | undefined,
+    selectedDay?: Date
+  ) => {
+    const activeRange = effectiveRange;
+    const hasCompletedRange = Boolean(activeRange?.from && activeRange?.to);
+    const isSingleDaySelection = Boolean(
+      selectedRange?.from &&
+      selectedRange?.to &&
+      selectedRange.from.getTime() === selectedRange.to?.getTime()
+    );
+
+    if (hasCompletedRange && selectedDay) {
+      const restartRange: DateRange = {
+        from: toZonedTime(selectedDay, "UTC"),
+        to: undefined,
+      };
+
+      setRange(restartRange);
+      onRangeChange?.(restartRange);
+      setHoverDate(undefined);
+      setIsOpen(true);
+      return;
+    }
+
+    if (hasCompletedRange && isSingleDaySelection && selectedRange?.from) {
+      const restartRange: DateRange = {
+        from: toZonedTime(selectedRange.from, "UTC"),
+        to: undefined,
+      };
+
+      setRange(restartRange);
+      onRangeChange?.(restartRange);
+      setHoverDate(undefined);
+      setIsOpen(true);
+      return;
+    }
+
+    const isFirstClickSameDayRange =
+      !activeRange?.from &&
+      !activeRange?.to &&
+      selectedRange?.from &&
+      selectedRange?.to &&
+      selectedRange.from.getTime() === selectedRange?.to.getTime();
+
+    if (isFirstClickSameDayRange) {
+      const partialRange: DateRange = {
+        from: toZonedTime(selectedRange.from!, "UTC"),
+        to: undefined,
+      };
+
+      setRange(partialRange);
+      onRangeChange?.(partialRange);
+      setHoverDate(undefined);
+      setIsOpen(true);
+      return;
+    }
+
+    const normalizedRange = selectedRange
+      ? {
+          from: selectedRange.from
+            ? toZonedTime(selectedRange.from, "UTC")
+            : undefined,
+          to: selectedRange.to ? toZonedTime(selectedRange.to, "UTC") : undefined,
+        }
+      : undefined;
+
+    setRange(normalizedRange);
+    onRangeChange?.(normalizedRange);
+    setHoverDate(undefined);
+
+    if (normalizedRange?.from && !normalizedRange?.to) {
+      setIsOpen(true);
+      return;
+    }
+
+    if (normalizedRange?.from && normalizedRange?.to) {
+      setIsOpen(false);
+      return;
+    }
+
+    setIsOpen(true);
+  };
+
+  const getPreviewRange = () => {
+    const activeRange = effectiveRange;
+
+    if (!activeRange?.from) {
+      return activeRange;
+    }
+
+    if (activeRange.to) {
+      return activeRange;
+    }
+
+    if (!hoverDate) {
+      return activeRange;
+    }
+
+    if (hoverDate.getTime() >= activeRange.from.getTime()) {
+      return {
+        from: activeRange.from,
+        to: hoverDate,
+      };
+    }
+
+    return {
+      from: hoverDate,
+      to: activeRange.from,
+    };
+  };
+
+  const previewRange = getPreviewRange();
+
+  const isPreviewDay = (day: Date) => {
+    if (!previewRange?.from || !previewRange?.to) {
+      return false;
+    }
+
+    const dayDate = toZonedTime(day, "UTC");
+    dayDate.setHours(0, 0, 0, 0);
+
+    const fromDate = toZonedTime(previewRange.from, "UTC");
+    fromDate.setHours(0, 0, 0, 0);
+
+    const toDate = toZonedTime(previewRange.to, "UTC");
+    toDate.setHours(0, 0, 0, 0);
+
+    return dayDate >= fromDate && dayDate <= toDate;
   };
 
   const goToToday = () => {
@@ -91,6 +295,19 @@ export function CustomDatePicker({
       today.getMonth(),
       today.getDate()
     );
+
+    if (selectionMode === "range") {
+      const todayRange: DateRange = {
+        from: normalizedToday,
+        to: normalizedToday,
+      };
+      setRange(todayRange);
+      setCurrentYear(normalizedToday.getFullYear());
+      setCurrentMonth(normalizedToday.getMonth());
+      onRangeChange?.(todayRange);
+      return;
+    }
+
     setDate(normalizedToday);
     setCurrentYear(normalizedToday.getFullYear());
     setCurrentMonth(normalizedToday.getMonth());
@@ -200,6 +417,27 @@ export function CustomDatePicker({
   };
 
   const getDisplayText = () => {
+    if (selectionMode === "range") {
+      const selectedRange = effectiveRange;
+
+      if (!selectedRange?.from && !selectedRange?.to) {
+        return "Selecciona rango";
+      }
+
+      if (selectedRange?.from && !selectedRange?.to) {
+        return `${format(selectedRange.from, "dd/MM/yyyy")} - ...`;
+      }
+
+      if (selectedRange?.from && selectedRange?.to) {
+        return `${format(selectedRange.from, "dd/MM/yyyy")} - ${format(
+          selectedRange.to,
+          "dd/MM/yyyy"
+        )}`;
+      }
+
+      return "Selecciona rango";
+    }
+
     if (!date) return "Selecciona una fecha";
 
     switch (viewMode) {
@@ -211,12 +449,118 @@ export function CustomDatePicker({
         return format(date, "dd/MM/yyyy");
     }
   };
+
+    const isDateDisabled = (calendarDate: Date) => {
+      const dateWithTime = toZonedTime(calendarDate, "UTC");
+      dateWithTime.setHours(0, 0, 0, 0);
+      const todayWithTime = toZonedTime(new Date(), "UTC");
+      todayWithTime.setHours(0, 0, 0, 0);
+
+      if (disableFutureDates) {
+        return dateWithTime > todayWithTime;
+      }
+
+      if (disablePastDates) {
+        return dateWithTime < todayWithTime;
+      }
+
+      return false;
+    };
+
+    const calendarComponents = {
+      Footer: () => (
+        <div className="flex items-center justify-between pt-3 border-t">
+          <div className="flex flex-col w-full items-end justify-center gap-2">
+            <Button variant="ghost" size="sm" onClick={goToToday}>
+              <RotateCcw className="h-3 w-3 mr-1" />
+              Hoy
+            </Button>
+          </div>
+        </div>
+      ),
+      MonthCaption: () => (
+        <div className="flex items-center justify-between pb-3 border-b">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const newMonth = currentMonth - 1;
+                if (newMonth < 0) {
+                  setCurrentMonth(11);
+                  setCurrentYear((prev) => prev - 1);
+                } else {
+                  setCurrentMonth(newMonth);
+                }
+              }}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewMode("month")}
+              className="h-8 px-1 font-medium text-sm"
+            >
+              {months[currentMonth]}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewMode("year")}
+              className="h-8 px-1 font-medium text-sm"
+            >
+              {currentYear}
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              const newMonth = currentMonth + 1;
+              if (newMonth > 11) {
+                setCurrentMonth(0);
+                setCurrentYear((prev) => prev + 1);
+              } else {
+                setCurrentMonth(newMonth);
+              }
+            }}
+            className="h-8 w-8 p-0"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    };
+
   return (
-    <Popover>
+    <Popover
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+
+        if (open) {
+          const anchorDate = getAnchorDate();
+          setCurrentYear(anchorDate.getFullYear());
+          setCurrentMonth(anchorDate.getMonth());
+        }
+
+        if (!open) {
+          setHoverDate(undefined);
+        }
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           variant={iconOnly ? "ghost" : "outline"}
-          data-empty={!date}
+          data-empty={
+            selectionMode === "range"
+              ? !effectiveRange?.from && !effectiveRange?.to
+              : !date
+          }
           type="button"
           aria-label={iconOnly ? "Seleccionar fecha" : undefined}
           className={cn(
@@ -230,8 +574,23 @@ export function CustomDatePicker({
           {!iconOnly && (
             <div className="flex w-full justify-between items-center">
               <span className="text-wrap leading-4">{getDisplayText()}</span>
-              {allowClear && date && (
-                <Button variant="ghost" size="icon" onClick={() => setDate(null)}>
+              {allowClear &&
+                ((selectionMode === "single" && date) ||
+                  (selectionMode === "range" && (effectiveRange?.from || effectiveRange?.to))) && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (selectionMode === "range") {
+                      setRange(undefined);
+                      onRangeChange?.(undefined);
+                      return;
+                    }
+
+                    setDate(null);
+                    onChange?.(null);
+                  }}
+                >
                   <X className="h-3 w-3" />
                 </Button>
               )}
@@ -243,103 +602,54 @@ export function CustomDatePicker({
         {viewMode === "day" && (
           <div>
             {/* Header personalizado */}
-            <Calendar
-              mode="single"
-              timeZone="UTC"
-              selected={value || date || undefined}
-              onSelect={handleDateSelect}
-              required
-              hideNavigation
-              month={new Date(currentYear, currentMonth)}
-              onMonthChange={(newMonth) => {
-                setCurrentMonth(newMonth.getMonth());
-                setCurrentYear(newMonth.getFullYear());
-                // No modificar la fecha seleccionada, solo cambiar la vista
-              }}
-              disabled={(date) => {
-                //Considerar la fecha justo a las 12:00:00
-                const dateWithTime = toZonedTime(date, "UTC");
-                dateWithTime.setHours(0, 0, 0, 0);
-                const todayWithTime = toZonedTime(new Date(), "UTC");
-                todayWithTime.setHours(0, 0, 0, 0);
-                if (disableFutureDates) {
-                  return dateWithTime > todayWithTime;
-                }
-                if (disablePastDates) {
-                  return dateWithTime < todayWithTime;
-                }
-                return false;
-              }}
-              footer
-              components={{
-                Footer: () => (
-                  <div className="flex items-center justify-between pt-3 border-t">
-                    <div className="flex flex-col w-full items-end justify-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={goToToday}>
-                        <RotateCcw className="h-3 w-3 mr-1" />
-                        Hoy
-                      </Button>
-                    </div>
-                  </div>
-                ),
-                MonthCaption: () => (
-                  <div className="flex items-center justify-between pb-3 border-b">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          const newMonth = currentMonth - 1;
-                          if (newMonth < 0) {
-                            setCurrentMonth(11);
-                            setCurrentYear((prev) => prev - 1);
-                          } else {
-                            setCurrentMonth(newMonth);
-                          }
-                        }}
-                        className="h-8 w-8 p-0"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setViewMode("month")}
-                        className="h-8 px-1 font-medium text-sm"
-                      >
-                        {months[currentMonth]}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setViewMode("year")}
-                        className="h-8 px-1 font-medium text-sm"
-                      >
-                        {currentYear}
-                      </Button>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const newMonth = currentMonth + 1;
-                        if (newMonth > 11) {
-                          setCurrentMonth(0);
-                          setCurrentYear((prev) => prev + 1);
-                        } else {
-                          setCurrentMonth(newMonth);
-                        }
-                      }}
-                      className="h-8 w-8 p-0"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ),
-              }}
-            />
+            {selectionMode === "range" ? (
+              <Calendar
+                mode="range"
+                timeZone="UTC"
+                selected={effectiveRange}
+                onSelect={handleRangeSelect}
+                onDayMouseEnter={(day) => {
+                  if (!effectiveRange?.from || effectiveRange?.to) return;
+                  setHoverDate(toZonedTime(day, "UTC"));
+                }}
+                onDayMouseLeave={() => {
+                  if (effectiveRange?.to) return;
+                  setHoverDate(undefined);
+                }}
+                hideNavigation
+                month={new Date(currentYear, currentMonth)}
+                onMonthChange={(newMonth) => {
+                  setCurrentMonth(newMonth.getMonth());
+                  setCurrentYear(newMonth.getFullYear());
+                }}
+                disabled={isDateDisabled}
+                modifiers={{
+                  preview_range: isPreviewDay,
+                }}
+                modifiersClassNames={{
+                  preview_range: "rdp-preview_range",
+                }}
+                footer
+                components={calendarComponents}
+              />
+            ) : (
+              <Calendar
+                mode="single"
+                timeZone="UTC"
+                selected={value || date || undefined}
+                onSelect={handleDateSelect}
+                required
+                hideNavigation
+                month={new Date(currentYear, currentMonth)}
+                onMonthChange={(newMonth) => {
+                  setCurrentMonth(newMonth.getMonth());
+                  setCurrentYear(newMonth.getFullYear());
+                }}
+                disabled={isDateDisabled}
+                footer
+                components={calendarComponents}
+              />
+            )}
           </div>
         )}
         {viewMode === "month" && renderMonthView()}

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Plus, Pencil, Trash2, Search, Check } from 'lucide-react';
-import { maintenanceService, SupportReason } from '@/lib/api/maintenance.service';
+import { Plus, Pencil, Trash2, Search, Check } from 'lucide-react';
+import { getSupportReasons, createSupportReason, updateSupportReason, deleteSupportReason, type SupportReason } from '@/lib/api/maintenance.service';
 import { Modal, ModalBody, ModalFooter } from '@/components/parametros/Modal';
 import { ConfirmationModal } from '@/components/parametros/ConfirmationModal';
 import modalStyles from '@/components/parametros/Modal.module.css';
@@ -31,7 +31,7 @@ export default function AtencionSoportePage() {
 
   const loadReasons = async () => {
     try {
-      const response = await maintenanceService.getSupportReasons({ search: searchQuery, page: currentPage, pageSize });
+      const response = await getSupportReasons({ search: searchQuery, page: currentPage, pageSize });
       setReasons(response.data);
       setTotal(response.total);
     } catch (error) {
@@ -54,9 +54,9 @@ export default function AtencionSoportePage() {
     setIsLoading(true);
     try {
       if (selectedReason) {
-        await maintenanceService.updateSupportReason(selectedReason.id, formData);
+        await updateSupportReason(selectedReason.id, formData);
       } else {
-        await maintenanceService.createSupportReason(formData);
+        await createSupportReason(formData);
       }
       await loadReasons();
       setShowAddModal(false);
@@ -73,7 +73,7 @@ export default function AtencionSoportePage() {
     if (!reasonToDelete) return;
     setIsLoading(true);
     try {
-      await maintenanceService.deleteSupportReason(reasonToDelete.id);
+      await deleteSupportReason(reasonToDelete.id);
       await loadReasons();
       setReasonToDelete(null);
     } catch (error) {
@@ -87,12 +87,6 @@ export default function AtencionSoportePage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.breadcrumb}>
-        <a href="/mantenimiento">Mantenimiento de</a>
-        <ChevronRight size={16} />
-        <span>Atención y Soporte</span>
-      </div>
-
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h1>Atención y Soporte</h1>

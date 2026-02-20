@@ -20,9 +20,14 @@ export function requestInterceptor(
   options: RequestInit
 ): { url: string; options: RequestInit } {
   const fullUrl = `${url}`;
+
+  // No establecer Content-Type para FormData; fetch lo genera automáticamente
+  // con el boundary correcto de multipart/form-data
+  const isFormData = options.body instanceof FormData;
+
   options.headers = {
     cache: "no-store",
-    "Content-Type": "application/json",
+    ...(!isFormData && { "Content-Type": "application/json" }),
     Accept: "application/json",
     ...options.headers, // Los headers pasados tienen prioridad
   };

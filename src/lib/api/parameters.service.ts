@@ -1,10 +1,44 @@
-import apiClient, { getErrorMessage } from './client';
+"use server";
+
+import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
+import { cookies } from "next/headers";
+import { APP_COOKIES } from "@/consts/cookies/cookies.consts";
 import {
-  ApiResponse,
   TransactionLimits,
   UserLimits,
   AuditLog,
 } from '@/types';
+
+export type { ParamsProxyItem } from './types/parameters.types';
+import type { ParamsProxyItem } from './types/parameters.types';
+
+const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+
+function getAuthHeaders(): Record<string, string> {
+  const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
+  const accessToken = clientTokenJSON
+    ? JSON.parse(clientTokenJSON)?.accessToken
+    : null;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return headers;
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return 'Error desconocido';
+}
+
+function buildUrl(path: string, queryParams?: URLSearchParams): string {
+  const qs = queryParams?.toString();
+  const base = `${API_URL}${path}`;
+  return qs ? base + '?' + qs : base;
+}
 
 interface ParamsProxyRequest<T> {
   uuid: string;
@@ -68,27 +102,7 @@ interface T365CardRaw {
   bic?: string;
 }
 
-export interface ParamsProxyItem {
-  name: string;
-  value: string | number | boolean | null;
-  description?: string | null;
-  status?: number | null;
-}
-
-function normalizeParamsProxyItems(payload: unknown): ParamsProxyItem[] {
-  const source = Array.isArray(payload)
-    ? payload
-    : Array.isArray((payload as any)?.data)
-      ? (payload as any).data
-      : [];
-
-  return source.map((item: any) => ({
-    name: item?.name ?? item?.paramName ?? '',
-    value: item?.value ?? item?.paramValue ?? null,
-    description: item?.description ?? item?.paramDescription ?? null,
-    status: item?.status ?? null,
-  } )).filter((item: ParamsProxyItem) => item.name);
-}
+// ParamsProxyItem is re-exported from ./types/parameters.types
 
 function buildParamsProxyRequest<T>(request: T): ParamsProxyRequest<T> {
   return {
@@ -107,18 +121,12 @@ function buildT365Context() {
   };
 }
 
-function assertProxySuccess<T>(response: ParamsProxyResponse<T> | ApiResponse<T>): T {
-  const hasResultCode = typeof (response as ParamsProxyResponse<T>)?.result?.code === 'number';
-
-  if (hasResultCode && (response as ParamsProxyResponse<T>).result.code !== 0) {
-    throw new Error((response as ParamsProxyResponse<T>)?.result?.message || 'Error consumiendo servicio de parámetros');
+function assertProxySuccess<T>(response: ParamsProxyResponse<T>): T {
+  if (response?.result?.code !== 0) {
+    throw new Error(response?.result?.message || 'Error consumiendo servicio de parámetros');
   }
 
-  if (typeof (response as ApiResponse<T>)?.success === 'boolean' && !(response as ApiResponse<T>).success) {
-    throw new Error((response as ApiResponse<T>).error || (response as ApiResponse<T>).message || 'Error consumiendo servicio de parámetros');
-  }
-
-  return (response as ParamsProxyResponse<T>).data ?? (response as ApiResponse<T>).data as T;
+  return response.data;
 }
 
 function assertT365Success<T>(response: T365Envelope<T>): T {
@@ -186,8 +194,8 @@ function paginate<T>(data: T[], page = 1, pageSize = 20): { data: T[]; total: nu
 }
 
 function findParamValue(items: ParamsProxyItem[], names: string[], fallback: number): number {
-  const normalizedNames = names.map((name) => name.toLowerCase());
-  const match = items.find((item) => normalizedNames.includes(item.name.toLowerCase()));
+  const normalizedNames = new Set(names.map((name) => name.toLowerCase()));
+  const match = items.find((item) => normalizedNames.has(item.name.toLowerCase()));
   const value = Number(match?.value);
   return Number.isFinite(value) ? value : fallback;
 }
@@ -208,290 +216,378 @@ function buildSecurityConfigFromParams(items: ParamsProxyItem[]) {
   };
 }
 
-export const parametersService = {
-  // Proxy real de parámetros (comedica-bel-msvc-params)
-  async getParams(request?: Partial<ParamsProxyItem>): Promise<ParamsProxyItem[]> {
-    try {
-      const response = await apiClient.post<ParamsProxyResponse<ParamsProxyItem[]>>(
-        '/params/get-params',
-        buildParamsProxyRequest({
+export async function getParams(request?: Partial<ParamsProxyItem>): Promise<ParamsProxyItem[]> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<ParamsProxyResponse<ParamsProxyItem[]>>(
+      `${API_URL}/params/get-params`,
+      {
+        method: "POST",
+        body: JSON.stringify(buildParamsProxyRequest({
           name: request?.name ?? null,
           value: request?.value ?? null,
           description: request?.description ?? null,
           status: request?.status ?? null,
-        })
+        })),
+        headers,
+      },
+    );
+
+    return assertProxySuccess(response);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function saveParam(param: ParamsProxyItem): Promise<ParamsProxyItem> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<ParamsProxyResponse<ParamsProxyItem>>(
+      `${API_URL}/params/save`,
+      {
+        method: "POST",
+        body: JSON.stringify(buildParamsProxyRequest(param)),
+        headers,
+      },
+    );
+
+    return assertProxySuccess(response);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function editParam(param: ParamsProxyItem): Promise<ParamsProxyItem> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<ParamsProxyResponse<ParamsProxyItem>>(
+      `${API_URL}/params/edit`,
+      {
+        method: "PUT",
+        body: JSON.stringify(buildParamsProxyRequest(param)),
+        headers,
+      },
+    );
+
+    return assertProxySuccess(response);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+// Obtener límites generales (proxy params con fallback al endpoint legacy)
+export async function getGeneralLimits(): Promise<TransactionLimits[]> {
+  try {
+    const params = await getParams();
+    return [
+      {
+        id: 'canales_electronicos',
+        category: 'canales_electronicos',
+        maxPerTransaction: findParamValue(params, ['CE_MAX_TX', 'CE_MAX_TRANSACCION'], 1000),
+        maxDaily: findParamValue(params, ['CE_MAX_DAILY', 'CE_MAX_DIARIO'], 2000),
+        maxMonthly: findParamValue(params, ['CE_MAX_MONTHLY', 'CE_MAX_MENSUAL'], 10000),
+        updatedAt: new Date().toISOString(),
+        updatedBy: 'sistema',
+      },
+      {
+        id: 'punto_xpress_ahorro',
+        category: 'punto_xpress',
+        subcategory: 'cuentas_ahorro',
+        maxPerTransaction: findParamValue(params, ['PX_AH_MAX_TX', 'PX_AHORRO_MONTO_MAX'], 500),
+        maxDaily: 0,
+        maxMonthly: 0,
+        maxMonthlyTransactions: findParamValue(params, ['PX_AH_MAX_TX_MENSUALES', 'PX_AHORRO_TX_MENSUAL'], 30),
+        updatedAt: new Date().toISOString(),
+        updatedBy: 'sistema',
+      },
+      {
+        id: 'punto_xpress_corriente',
+        category: 'punto_xpress',
+        subcategory: 'cuentas_corriente',
+        maxPerTransaction: findParamValue(params, ['PX_CC_MAX_TX', 'PX_CORRIENTE_MONTO_MAX'], 800),
+        maxDaily: 0,
+        maxMonthly: 0,
+        maxMonthlyTransactions: findParamValue(params, ['PX_CC_MAX_TX_MENSUALES', 'PX_CORRIENTE_TX_MENSUAL'], 50),
+        updatedAt: new Date().toISOString(),
+        updatedBy: 'sistema',
+      },
+    ];
+  } catch (proxyError) {
+    try {
+      const headers = getAuthHeaders();
+      const response = await customAuthFetch<{ data: TransactionLimits[] }>(
+        `${API_URL}/parameters/limits/general`,
+        { method: "GET", headers },
       );
-
-      const rawData = assertProxySuccess(response.data as any);
-      return normalizeParamsProxyItems(rawData);
+      return response.data;
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw new Error(getErrorMessage(proxyError || error));
     }
-  },
+  }
+}
 
-  async saveParam(param: ParamsProxyItem): Promise<ParamsProxyItem> {
-    try {
-      const response = await apiClient.post<ParamsProxyResponse<ParamsProxyItem>>(
-        '/params/save',
-        buildParamsProxyRequest(param)
+// Actualizar límites generales (proxy params con fallback legacy)
+export async function updateGeneralLimits(limits: Partial<TransactionLimits>[]): Promise<void> {
+  try {
+    const channels = limits.find((l) => l.category === 'canales_electronicos');
+    const pxSavings = limits.find((l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_ahorro');
+    const pxCurrent = limits.find((l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_corriente');
+
+    const updates: ParamsProxyItem[] = [];
+
+    if (channels) {
+      updates.push(
+        { name: 'CE_MAX_TRANSACCION', value: channels.maxPerTransaction ?? 0 },
+        { name: 'CE_MAX_DIARIO', value: channels.maxDaily ?? 0 },
+        { name: 'CE_MAX_MENSUAL', value: channels.maxMonthly ?? 0 },
       );
-
-      return assertProxySuccess(response.data);
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
     }
-  },
 
-  async editParam(param: ParamsProxyItem): Promise<ParamsProxyItem> {
-    try {
-      const response = await apiClient.put<ParamsProxyResponse<ParamsProxyItem>>(
-        '/params/edit',
-        buildParamsProxyRequest(param)
+    if (pxSavings) {
+      updates.push(
+        { name: 'PX_AHORRO_MONTO_MAX', value: pxSavings.maxPerTransaction ?? 0 },
+        { name: 'PX_AHORRO_TX_MENSUAL', value: pxSavings.maxMonthlyTransactions ?? 0 },
       );
+    }
 
-      return assertProxySuccess(response.data);
+    if (pxCurrent) {
+      updates.push(
+        { name: 'PX_CORRIENTE_MONTO_MAX', value: pxCurrent.maxPerTransaction ?? 0 },
+        { name: 'PX_CORRIENTE_TX_MENSUAL', value: pxCurrent.maxMonthlyTransactions ?? 0 },
+      );
+    }
+
+    await Promise.all(updates.map((item) => editParam(item)));
+  } catch (proxyError) {
+    try {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/limits/general`, {
+        method: "PUT",
+        body: JSON.stringify({ limits }),
+        headers,
+      });
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw new Error(getErrorMessage(proxyError || error));
     }
-  },
+  }
+}
 
-  // Obtener límites generales (proxy params con fallback al endpoint legacy)
-  async getGeneralLimits(): Promise<TransactionLimits[]> {
+// Obtener límites por usuario (sin endpoint real en colecciones; se mantiene legacy)
+export async function getUserLimits(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ data: UserLimits[]; total: number }> {
+  try {
+    const headers = getAuthHeaders();
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.set('search', params.search);
+    if (params?.page) queryParams.set('page', String(params.page));
+    if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
+
+    const response = await customAuthFetch<{ data: { data: UserLimits[]; total: number } }>(
+      buildUrl('/parameters/limits/users', queryParams),
+      { method: "GET", headers },
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+// Actualizar límites de un usuario específico
+export async function updateUserLimits(userId: string, limits: UserLimits['limits']): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/parameters/limits/users/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify({ limits }),
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+// Eliminar límites personalizados de un usuario (vuelve a usar los generales)
+export async function deleteUserLimits(userId: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/parameters/limits/users/${userId}`, {
+      method: "DELETE",
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+// Obtener historial de auditoría (sin endpoint real identificado para estos módulos)
+export async function getAuditLog(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+  module?: string;
+}): Promise<{ data: AuditLog[]; total: number }> {
+  try {
+    const headers = getAuthHeaders();
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.set('search', params.search);
+    if (params?.page) queryParams.set('page', String(params.page));
+    if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
+    if (params?.module) queryParams.set('module', params.module);
+
+    const response = await customAuthFetch<{ data: { data: AuditLog[]; total: number } }>(
+      buildUrl('/parameters/audit', queryParams),
+      { method: "GET", headers },
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+// Obtener resumen reciente de auditoría
+export async function getRecentAudit(limit: number = 5): Promise<AuditLog[]> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<{ data: AuditLog[] }>(
+      `${API_URL}/parameters/audit/recent?limit=${limit}`,
+      { method: "GET", headers },
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+// Obtener configuración de seguridad (proxy params con fallback)
+export async function getSecurityConfig(): Promise<any> {
+  try {
+    const params = await getParams();
+    return buildSecurityConfigFromParams(params);
+  } catch (proxyError) {
     try {
-      const params = await this.getParams();
-      return [
-        {
-          id: 'canales_electronicos',
-          category: 'canales_electronicos',
-          maxPerTransaction: findParamValue(params, ['CE_MAX_TX', 'CE_MAX_TRANSACCION'], 1000),
-          maxDaily: findParamValue(params, ['CE_MAX_DAILY', 'CE_MAX_DIARIO'], 2000),
-          maxMonthly: findParamValue(params, ['CE_MAX_MONTHLY', 'CE_MAX_MENSUAL'], 10000),
-          updatedAt: new Date().toISOString(),
-          updatedBy: 'sistema',
-        },
-        {
-          id: 'punto_xpress_ahorro',
-          category: 'punto_xpress',
-          subcategory: 'cuentas_ahorro',
-          maxPerTransaction: findParamValue(params, ['PX_AH_MAX_TX', 'PX_AHORRO_MONTO_MAX'], 500),
-          maxDaily: 0,
-          maxMonthly: 0,
-          maxMonthlyTransactions: findParamValue(params, ['PX_AH_MAX_TX_MENSUALES', 'PX_AHORRO_TX_MENSUAL'], 30),
-          updatedAt: new Date().toISOString(),
-          updatedBy: 'sistema',
-        },
-        {
-          id: 'punto_xpress_corriente',
-          category: 'punto_xpress',
-          subcategory: 'cuentas_corriente',
-          maxPerTransaction: findParamValue(params, ['PX_CC_MAX_TX', 'PX_CORRIENTE_MONTO_MAX'], 800),
-          maxDaily: 0,
-          maxMonthly: 0,
-          maxMonthlyTransactions: findParamValue(params, ['PX_CC_MAX_TX_MENSUALES', 'PX_CORRIENTE_TX_MENSUAL'], 50),
-          updatedAt: new Date().toISOString(),
-          updatedBy: 'sistema',
-        },
-      ];
-    } catch (proxyError) {
-      try {
-        const response = await apiClient.get<ApiResponse<TransactionLimits[]>>('/parameters/limits/general');
-        return response.data.data!;
-      } catch (error) {
-        throw new Error(getErrorMessage(proxyError || error));
-      }
-    }
-  },
-
-  // Actualizar límites generales (proxy params con fallback legacy)
-  async updateGeneralLimits(limits: Partial<TransactionLimits>[]): Promise<void> {
-    try {
-      const channels = limits.find((l) => l.category === 'canales_electronicos');
-      const pxSavings = limits.find((l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_ahorro');
-      const pxCurrent = limits.find((l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_corriente');
-
-      const updates: ParamsProxyItem[] = [];
-
-      if (channels) {
-        updates.push(
-          { name: 'CE_MAX_TRANSACCION', value: channels.maxPerTransaction ?? 0 },
-          { name: 'CE_MAX_DIARIO', value: channels.maxDaily ?? 0 },
-          { name: 'CE_MAX_MENSUAL', value: channels.maxMonthly ?? 0 },
-        );
-      }
-
-      if (pxSavings) {
-        updates.push(
-          { name: 'PX_AHORRO_MONTO_MAX', value: pxSavings.maxPerTransaction ?? 0 },
-          { name: 'PX_AHORRO_TX_MENSUAL', value: pxSavings.maxMonthlyTransactions ?? 0 },
-        );
-      }
-
-      if (pxCurrent) {
-        updates.push(
-          { name: 'PX_CORRIENTE_MONTO_MAX', value: pxCurrent.maxPerTransaction ?? 0 },
-          { name: 'PX_CORRIENTE_TX_MENSUAL', value: pxCurrent.maxMonthlyTransactions ?? 0 },
-        );
-      }
-
-      await Promise.all(updates.map((item) => this.editParam(item)));
-    } catch (proxyError) {
-      try {
-        await apiClient.put('/parameters/limits/general', { limits });
-      } catch (error) {
-        throw new Error(getErrorMessage(proxyError || error));
-      }
-    }
-  },
-
-  // Obtener límites por usuario (sin endpoint real en colecciones; se mantiene legacy)
-  async getUserLimits(params?: {
-    search?: string;
-    page?: number;
-    pageSize?: number;
-  }): Promise<{ data: UserLimits[]; total: number }> {
-    try {
-      const response = await apiClient.get<ApiResponse<{ data: UserLimits[]; total: number }>>('/parameters/limits/users', { params });
-      return response.data.data!;
+      const headers = getAuthHeaders();
+      const response = await customAuthFetch<{ data: any }>(
+        `${API_URL}/parameters/security`,
+        { method: "GET", headers },
+      );
+      return response.data;
     } catch (error) {
-      console.warn('No se pudieron cargar límites por usuario desde servicio real:', getErrorMessage(error));
-      return { data: [], total: 0 };
+      throw new Error(getErrorMessage(proxyError || error));
     }
-  },
+  }
+}
 
-  // Actualizar límites de un usuario específico
-  async updateUserLimits(userId: string, limits: UserLimits['limits']): Promise<void> {
+// Actualizar configuración de seguridad (proxy params con fallback)
+export async function updateSecurityConfig(config: any): Promise<void> {
+  try {
+    const updates: ParamsProxyItem[] = [
+      { name: 'VIGENCIA_CONTRASENA', value: config.passwordExpiration },
+      { name: 'TIEMPO_SESION', value: config.sessionTimeout },
+      { name: 'LONGITUD_MIN_USUARIO', value: config.minUsernameLength },
+      { name: 'LONGITUD_MAX_USUARIO', value: config.maxUsernameLength },
+      { name: 'LONGITUD_MIN_PASSWORD', value: config.minPasswordLength },
+      { name: 'LONGITUD_MAX_PASSWORD', value: config.maxPasswordLength },
+      { name: 'VIGENCIA_CODIGOS', value: config.codeExpiration },
+      { name: 'VIGENCIA_SOFT_TOKEN', value: config.softTokenExpiration },
+    ];
+
+    await Promise.all(updates.map((item) => editParam(item)));
+  } catch (proxyError) {
     try {
-      await apiClient.put(`/parameters/limits/users/${userId}`, { limits });
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/security`, {
+        method: "PUT",
+        body: JSON.stringify({ config }),
+        headers,
+      });
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw new Error(getErrorMessage(proxyError || error));
     }
-  },
+  }
+}
 
-  // Eliminar límites personalizados de un usuario (vuelve a usar los generales)
-  async deleteUserLimits(userId: string): Promise<void> {
+// ==================== TRANSFER365 ====================
+
+// Obtener instituciones locales (endpoint real colección BEL)
+export async function getLocalInstitutions(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ data: any[]; total: number }> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<T365Envelope<T365LocalRaw[]>>(
+      `${API_URL}/t365/get-banks`,
+      { method: "POST", headers },
+    );
+    const mapped = assertT365Success(response).map(mapLocalInstitution);
+    const filtered = filterBySearch(mapped, params?.search, ['bic', 'shortName', 'fullName', 'institution']);
+    return paginate(filtered, params?.page, params?.pageSize);
+  } catch (error) {
+    // fallback legacy
     try {
-      await apiClient.delete(`/parameters/limits/users/${userId}`);
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
+      const headers = getAuthHeaders();
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.set('search', params.search);
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
+
+      const response = await customAuthFetch<{ data: { data: any[]; total: number } }>(
+        buildUrl('/parameters/transfer365/local', queryParams),
+        { method: "GET", headers },
+      );
+      return response.data;
+    } catch (fallbackError) {
+      throw new Error(getErrorMessage(error || fallbackError));
     }
-  },
+  }
+}
 
-  // Obtener historial de auditoría (sin endpoint real identificado para estos módulos)
-  async getAuditLog(params?: {
-    search?: string;
-    page?: number;
-    pageSize?: number;
-    module?: string;
-  }): Promise<{ data: AuditLog[]; total: number }> {
+// Obtener instituciones CA-RD (endpoint real colección BEL)
+export async function getCARDInstitutions(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ data: any[]; total: number }> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<T365Envelope<T365CardRaw[]>>(
+      `${API_URL}/t365/get-banks-CARD`,
+      { method: "POST", headers },
+    );
+    const mapped = assertT365Success(response).map(mapCardInstitution);
+    const filtered = filterBySearch(mapped, params?.search, ['bic', 'fullName', 'country']);
+    return paginate(filtered, params?.page, params?.pageSize);
+  } catch (error) {
+    // fallback legacy
     try {
-      const response = await apiClient.get<ApiResponse<{ data: AuditLog[]; total: number }>>('/parameters/audit', { params });
-      return response.data.data!;
-    } catch (error) {
-      console.warn('No se pudo cargar auditoría desde servicio real:', getErrorMessage(error));
-      return { data: [], total: 0 };
+      const headers = getAuthHeaders();
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.set('search', params.search);
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
+
+      const response = await customAuthFetch<{ data: { data: any[]; total: number } }>(
+        buildUrl('/parameters/transfer365/card', queryParams),
+        { method: "GET", headers },
+      );
+      return response.data;
+    } catch (fallbackError) {
+      throw new Error(getErrorMessage(error || fallbackError));
     }
-  },
+  }
+}
 
-  // Obtener resumen reciente de auditoría
-  async getRecentAudit(limit: number = 5): Promise<AuditLog[]> {
-    try {
-      const response = await apiClient.get<ApiResponse<AuditLog[]>>('/parameters/audit/recent', { params: { limit } });
-      return response.data.data!;
-    } catch (error) {
-      console.warn('No se pudo cargar auditoría reciente desde servicio real:', getErrorMessage(error));
-      return [];
-    }
-  },
-
-  // Obtener configuración de seguridad (proxy params con fallback)
-  async getSecurityConfig(): Promise<any> {
-    try {
-      const params = await this.getParams();
-      return buildSecurityConfigFromParams(params);
-    } catch (proxyError) {
-      try {
-        const response = await apiClient.get<ApiResponse<any>>('/parameters/security');
-        return response.data.data!;
-      } catch (error) {
-        throw new Error(getErrorMessage(proxyError || error));
-      }
-    }
-  },
-
-  // Actualizar configuración de seguridad (proxy params con fallback)
-  async updateSecurityConfig(config: any): Promise<void> {
-    try {
-      const updates: ParamsProxyItem[] = [
-        { name: 'VIGENCIA_CONTRASENA', value: config.passwordExpiration },
-        { name: 'TIEMPO_SESION', value: config.sessionTimeout },
-        { name: 'LONGITUD_MIN_USUARIO', value: config.minUsernameLength },
-        { name: 'LONGITUD_MAX_USUARIO', value: config.maxUsernameLength },
-        { name: 'LONGITUD_MIN_PASSWORD', value: config.minPasswordLength },
-        { name: 'LONGITUD_MAX_PASSWORD', value: config.maxPasswordLength },
-        { name: 'VIGENCIA_CODIGOS', value: config.codeExpiration },
-        { name: 'VIGENCIA_SOFT_TOKEN', value: config.softTokenExpiration },
-      ];
-
-      await Promise.all(updates.map((item) => this.editParam(item)));
-    } catch (proxyError) {
-      try {
-        await apiClient.put('/parameters/security', { config });
-      } catch (error) {
-        throw new Error(getErrorMessage(proxyError || error));
-      }
-    }
-  },
-
-  // ==================== TRANSFER365 ====================
-
-  // Obtener instituciones locales (endpoint real colección BEL)
-  async getLocalInstitutions(params?: {
-    search?: string;
-    page?: number;
-    pageSize?: number;
-  }): Promise<{ data: any[]; total: number }> {
-    try {
-      const response = await apiClient.post<T365Envelope<T365LocalRaw[]>>('/t365/get-banks');
-      const mapped = assertT365Success(response.data).map(mapLocalInstitution);
-      const filtered = filterBySearch(mapped, params?.search, ['bic', 'shortName', 'fullName', 'institution']);
-      return paginate(filtered, params?.page, params?.pageSize);
-    } catch (error) {
-      // fallback legacy
-      try {
-        const response = await apiClient.get<ApiResponse<{ data: any[]; total: number }>>('/parameters/transfer365/local', { params });
-        return response.data.data!;
-      } catch (fallbackError) {
-        throw new Error(getErrorMessage(error || fallbackError));
-      }
-    }
-  },
-
-  // Obtener instituciones CA-RD (endpoint real colección BEL)
-  async getCARDInstitutions(params?: {
-    search?: string;
-    page?: number;
-    pageSize?: number;
-  }): Promise<{ data: any[]; total: number }> {
-    try {
-      const response = await apiClient.post<T365Envelope<T365CardRaw[]>>('/t365/get-banks-CARD');
-      const mapped = assertT365Success(response.data).map(mapCardInstitution);
-      const filtered = filterBySearch(mapped, params?.search, ['bic', 'fullName', 'country']);
-      return paginate(filtered, params?.page, params?.pageSize);
-    } catch (error) {
-      // fallback legacy
-      try {
-        const response = await apiClient.get<ApiResponse<{ data: any[]; total: number }>>('/parameters/transfer365/card', { params });
-        return response.data.data!;
-      } catch (fallbackError) {
-        throw new Error(getErrorMessage(error || fallbackError));
-      }
-    }
-  },
-
-  // Crear institución local
-  async createLocalInstitution(institution: any): Promise<void> {
-    try {
-      await apiClient.post('/t365/bank-create', {
+// Crear institución local
+export async function createLocalInstitution(institution: any): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/t365/bank-create`, {
+      method: "POST",
+      body: JSON.stringify({
         ...buildT365Context(),
         request: {
           codeBic: institution.bic,
@@ -506,22 +602,32 @@ export const parametersService = {
           user: 'BACKOFFICE',
           description: institution.institution || institution.fullName,
         },
-      });
-    } catch (error) {
-      // fallback legacy
-      try {
-        await apiClient.post('/parameters/transfer365/local', { institution });
-      } catch (fallbackError) {
-        throw new Error(getErrorMessage(error || fallbackError));
-      }
-    }
-  },
-
-  // Crear institución CA-RD
-  async createCARDInstitution(institution: any): Promise<void> {
+      }),
+      headers,
+    });
+  } catch (error) {
+    // fallback legacy
     try {
-      const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
-      await apiClient.post('/t365/bank-create-CARD', {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/transfer365/local`, {
+        method: "POST",
+        body: JSON.stringify({ institution }),
+        headers,
+      });
+    } catch (fallbackError) {
+      throw new Error(getErrorMessage(error || fallbackError));
+    }
+  }
+}
+
+// Crear institución CA-RD
+export async function createCARDInstitution(institution: any): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
+    await customAuthFetch(`${API_URL}/t365/bank-create-CARD`, {
+      method: "POST",
+      body: JSON.stringify({
         ...buildT365Context(),
         request: {
           assigCountry: countryCode,
@@ -529,21 +635,31 @@ export const parametersService = {
           codeBic: institution.bic,
           user: 'BACKOFFICE',
         },
-      });
-    } catch (error) {
-      // fallback legacy
-      try {
-        await apiClient.post('/parameters/transfer365/card', { institution });
-      } catch (fallbackError) {
-        throw new Error(getErrorMessage(error || fallbackError));
-      }
-    }
-  },
-
-  // Actualizar institución local
-  async updateLocalInstitution(id: string, institution: any): Promise<void> {
+      }),
+      headers,
+    });
+  } catch (error) {
+    // fallback legacy
     try {
-      await apiClient.post('/t365/bank-modify', {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/transfer365/card`, {
+        method: "POST",
+        body: JSON.stringify({ institution }),
+        headers,
+      });
+    } catch (fallbackError) {
+      throw new Error(getErrorMessage(error || fallbackError));
+    }
+  }
+}
+
+// Actualizar institución local
+export async function updateLocalInstitution(id: string, institution: any): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/t365/bank-modify`, {
+      method: "POST",
+      body: JSON.stringify({
         ...buildT365Context(),
         request: {
           id: Number(id),
@@ -560,22 +676,32 @@ export const parametersService = {
           description: institution.institution || institution.fullName,
           status: institution.status === 'Activo' ? 'A' : 'I',
         },
-      });
-    } catch (error) {
-      // fallback legacy
-      try {
-        await apiClient.put(`/parameters/transfer365/local/${id}`, { institution });
-      } catch (fallbackError) {
-        throw new Error(getErrorMessage(error || fallbackError));
-      }
-    }
-  },
-
-  // Actualizar institución CA-RD
-  async updateCARDInstitution(id: string, institution: any): Promise<void> {
+      }),
+      headers,
+    });
+  } catch (error) {
+    // fallback legacy
     try {
-      const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
-      await apiClient.post('/t365/bank-modify-CARD', {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/transfer365/local/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ institution }),
+        headers,
+      });
+    } catch (fallbackError) {
+      throw new Error(getErrorMessage(error || fallbackError));
+    }
+  }
+}
+
+// Actualizar institución CA-RD
+export async function updateCARDInstitution(id: string, institution: any): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
+    await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
+      method: "POST",
+      body: JSON.stringify({
         ...buildT365Context(),
         request: {
           id: Number(id),
@@ -586,56 +712,80 @@ export const parametersService = {
           user: 'BACKOFFICE',
           status: institution.status === 'Activo' ? 'A' : 'I',
         },
-      });
-    } catch (error) {
-      // fallback legacy
-      try {
-        await apiClient.put(`/parameters/transfer365/card/${id}`, { institution });
-      } catch (fallbackError) {
-        throw new Error(getErrorMessage(error || fallbackError));
-      }
-    }
-  },
-
-  // Eliminar institución local (en API real se usa modify con estado I)
-  async deleteLocalInstitution(id: string): Promise<void> {
+      }),
+      headers,
+    });
+  } catch (error) {
+    // fallback legacy
     try {
-      await apiClient.post('/t365/bank-modify', {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/transfer365/card/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ institution }),
+        headers,
+      });
+    } catch (fallbackError) {
+      throw new Error(getErrorMessage(error || fallbackError));
+    }
+  }
+}
+
+// Eliminar institución local (en API real se usa modify con estado I)
+export async function deleteLocalInstitution(id: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/t365/bank-modify`, {
+      method: "POST",
+      body: JSON.stringify({
         ...buildT365Context(),
         request: {
           id: Number(id),
           status: 'I',
           user: 'BACKOFFICE',
         },
-      });
-    } catch (error) {
-      // fallback legacy
-      try {
-        await apiClient.delete(`/parameters/transfer365/local/${id}`);
-      } catch (fallbackError) {
-        throw new Error(getErrorMessage(error || fallbackError));
-      }
-    }
-  },
-
-  // Eliminar institución CA-RD (en API real se usa modify con estado I)
-  async deleteCARDInstitution(id: string): Promise<void> {
+      }),
+      headers,
+    });
+  } catch (error) {
+    // fallback legacy
     try {
-      await apiClient.post('/t365/bank-modify-CARD', {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/transfer365/local/${id}`, {
+        method: "DELETE",
+        headers,
+      });
+    } catch (fallbackError) {
+      throw new Error(getErrorMessage(error || fallbackError));
+    }
+  }
+}
+
+// Eliminar institución CA-RD (en API real se usa modify con estado I)
+export async function deleteCARDInstitution(id: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
+      method: "POST",
+      body: JSON.stringify({
         ...buildT365Context(),
         request: {
           id: Number(id),
           status: 'I',
           user: 'BACKOFFICE',
         },
+      }),
+      headers,
+    });
+  } catch (error) {
+    // fallback legacy
+    try {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/transfer365/card/${id}`, {
+        method: "DELETE",
+        headers,
       });
-    } catch (error) {
-      // fallback legacy
-      try {
-        await apiClient.delete(`/parameters/transfer365/card/${id}`);
-      } catch (fallbackError) {
-        throw new Error(getErrorMessage(error || fallbackError));
-      }
+    } catch (fallbackError) {
+      throw new Error(getErrorMessage(error || fallbackError));
     }
-  },
-};
+  }
+}

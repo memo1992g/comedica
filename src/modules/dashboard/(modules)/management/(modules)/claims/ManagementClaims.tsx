@@ -3,36 +3,91 @@
 
 import { useState } from 'react';
 import ManagementReport from '../../components/management-report';
-import type { ReportRow } from '../../utils/report-columns';
-import { listComplaintsAction } from '@/actions/management/claims';
+import type { ComplaintI } from '@/interfaces/management/claims';
+import type { PersonI } from '@/interfaces/management/persons';
+import {
+  listComplaintsAction,
+  exportXmlReclaimAction,
+} from '@/actions/management/claims';
+import { exportXmlPersonsAction, listPersonsAction } from '@/actions/management/persons';
+import { claimsColumns } from './claims-columns';
 
 export default function ManagementClaims() {
-  const [data, setData] = useState<ReportRow[]>([]);
+  const [data, setData] = useState<ComplaintI[]>([]);
+  const [personsData, setPersonsData] = useState<PersonI[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isExportingPersons, setIsExportingPersons] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = async () => {
+  const handleSearch = async (month: number) => {
     setIsSearching(true);
     setError(null);
 
-    const result = await listComplaintsAction();
+    const [claimsResult, personsResult] = await Promise.all([
+      listComplaintsAction(),
+      listPersonsAction(month),
+    ]);
 
-    if (result.errors || !result.data) {
-      setError(result.errorMessage || 'Error al obtener reclamos');
+    if (claimsResult.errors || !claimsResult.data) {
+      setError(claimsResult.errorMessage || 'Error al obtener reclamos');
       setIsSearching(false);
       return;
     }
 
-    const mapped: ReportRow[] = result.data.map((c) => ({
-      code: String(c.id),
-      numTransTC: c.idTipoReclamo,
-      valTransTC: c.monto,
-      numTransCA: c.idEstadoReclamo,
-      valTransCA: c.idEstadoResolucion ?? 0,
-    }));
-
-    setData(mapped);
+    setData(claimsResult.data);
+    setPersonsData(personsResult.data ?? []);
     setIsSearching(false);
+  };
+
+  const handleExportXml = async (_month: number) => {
+    setIsExporting(true);
+    setError(null);
+
+    const result = await exportXmlReclaimAction(data);
+
+    if (result.errors || !result.data) {
+      setError(result.errorMessage || 'Error al exportar XML');
+      setIsExporting(false);
+      return;
+    }
+
+    const binary = atob(result.data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.codePointAt(i) ?? 0;
+    const blob = new Blob([bytes], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'reclamos.xml';
+    a.click();
+    URL.revokeObjectURL(url);
+    setIsExporting(false);
+  };
+
+  const handleExportXmlPersons = async (month: number) => {
+    setIsExportingPersons(true);
+    setError(null);
+
+    const result = await exportXmlPersonsAction(month);
+
+    if (result.errors || !result.data) {
+      setError(result.errorMessage || 'Error al exportar XML personas');
+      setIsExportingPersons(false);
+      return;
+    }
+
+    const binary = atob(result.data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.codePointAt(i) ?? 0;
+    const blob = new Blob([bytes], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'personas.xml';
+    a.click();
+    URL.revokeObjectURL(url);
+    setIsExportingPersons(false);
   };
 
   return (
@@ -40,10 +95,21 @@ export default function ManagementClaims() {
       title="Reclamos"
       subtitle="Consulta y gestión de reclamos mensuales."
       xmlButtonLabel="XML Reclamos"
+      columns={claimsColumns}
       data={data}
       onSearch={handleSearch}
+      onExportXml={handleExportXml}
       isSearching={isSearching}
+      isExporting={isExporting}
       error={error}
+      extraXmlButtons={[
+        {
+          label: 'XML Personas',
+          onExport: handleExportXmlPersons,
+          isExporting: isExportingPersons,
+          disabled: personsData.length === 0,
+        },
+      ]}
     />
   );
 }

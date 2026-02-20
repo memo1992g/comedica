@@ -51,6 +51,17 @@ export interface UpdateCorrespondentRequestI extends CreateCorrespondentRequestI
   id: number;
 }
 
+export interface CorrespondentXmlItemI {
+  codigoCorresponsal: string;
+  codigoInterno: string;
+  administrador: string;
+  fechaContratacion: string;
+  fechaInicio: string;
+  estado: string;
+  fechaFinContrato: string;
+  causaTerminacion: string;
+}
+
 export interface DeleteCorrespondentRequestI {
   id: number;
   internalCode: string;

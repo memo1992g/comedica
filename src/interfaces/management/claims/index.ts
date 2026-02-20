@@ -5,4 +5,5 @@ export type {
   CreateComplaintRequestI,
   UpdateComplaintRequestI,
   CatalogItemI,
+  ReclaimXmlItemI,
 } from "./Complaint.interface";

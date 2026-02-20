@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { mockUsers } from '../data/mock-data';
 import type { UserResult } from '../data/mock-data';
 import type { MainTab, SubTab, TabIndicatorStyle, View } from '../interfaces/UsersConsultations';
-import { userManagementService } from '@/lib/api/user-management.service';
+import { consultUser } from '@/lib/api/user-management.service';
+import { toConsultationUser } from '@/lib/api/types/user-management.types';
 
 export function useUsersConsultations() {
   const [activeTab, setActiveTab] = useState<MainTab>('usuarios');
@@ -58,9 +59,9 @@ export function useUsersConsultations() {
       setSearchError(null);
 
       try {
-        const profile = await userManagementService.consultUser(Number(searchQuery.trim()));
+        const profile = await consultUser(Number(searchQuery.trim()));
         if (!cancelled) {
-          setSelectedUser(userManagementService.toConsultationUser(profile));
+          setSelectedUser(toConsultationUser(profile));
         }
       } catch (error) {
         if (!cancelled) {

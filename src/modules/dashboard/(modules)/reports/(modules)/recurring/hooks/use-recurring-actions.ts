@@ -72,39 +72,59 @@ function mapEstadoEjecucion(
   return 'Fallido';
 }
 
+function extractItems<T>(data: T[] | { data?: T[] } | null | undefined): T[] {
+  if (!data) return [];
+  return Array.isArray(data) ? data : (data.data ?? []);
+}
+
+async function fetchRecurringTab(
+  filters: DateFilters,
+  pagination: { page: number; size: number },
+): Promise<{ items: RecurringReportItem[]; error?: string }> {
+  const res = await recurringReportAction(filters, pagination);
+  if (res && !res.errors && res.data) {
+    return { items: extractItems(res.data as RecurringReportItem[] | { data?: RecurringReportItem[] }) };
+  }
+  return { items: [], error: res?.errorMessage || 'Error al obtener reporte de recurrentes' };
+}
+
+async function fetchExecutedTab(
+  filters: DateFilters,
+  pagination: { page: number; size: number },
+): Promise<{ items: RecurringReportItem[]; error?: string }> {
+  const res = await recurringExReportAction(filters, pagination);
+  if (res && !res.errors && res.data) {
+    return { items: extractItems(res.data as RecurringReportItem[] | { data?: RecurringReportItem[] }) };
+  }
+  return { items: [], error: res?.errorMessage || 'Error al obtener reporte de ejecutadas' };
+}
+
 export function useRecurringActions() {
   const [recurringData, setRecurringData] = useState<RecurringReport[]>([]);
   const [executedData, setExecutedData] = useState<ExecutedReport[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasRecurringFetched, setHasRecurringFetched] = useState(false);
+  const [hasExecutedFetched, setHasExecutedFetched] = useState(false);
 
   const fetchReport = useCallback(
-    async (tab: RecurringTab, filters: DateFilters = {}, page = 0, size = 100) => {
+    async (tab: RecurringTab, filters: DateFilters = {}, page = 0, size = 1000) => {
       setIsLoading(true);
       setError(null);
 
       try {
         const pagination = { page, size };
 
-        switch (tab) {
-          case 'recurrentes': {
-            const res = await recurringReportAction(filters, pagination);
-            if (res && !res.errors && res.data) {
-              setRecurringData(mapToRecurringReport(res.data.data));
-            } else {
-              setError(res?.errorMessage || 'Error al obtener reporte de recurrentes');
-            }
-            break;
-          }
-          case 'ejecutadas': {
-            const res = await recurringExReportAction(filters, pagination);
-            if (res && !res.errors && res.data) {
-              setExecutedData(mapToExecutedReport(res.data.data));
-            } else {
-              setError(res?.errorMessage || 'Error al obtener reporte de ejecutadas');
-            }
-            break;
-          }
+        if (tab === 'recurrentes') {
+          const { items, error: err } = await fetchRecurringTab(filters, pagination);
+          setRecurringData(mapToRecurringReport(items));
+          if (err) setError(err);
+          setHasRecurringFetched(true);
+        } else {
+          const { items, error: err } = await fetchExecutedTab(filters, pagination);
+          setExecutedData(mapToExecutedReport(items));
+          if (err) setError(err);
+          setHasExecutedFetched(true);
         }
       } catch {
         setError('Error inesperado al obtener el reporte');
@@ -115,5 +135,5 @@ export function useRecurringActions() {
     [],
   );
 
-  return { recurringData, executedData, isLoading, error, fetchReport };
+  return { recurringData, executedData, isLoading, error, fetchReport, hasRecurringFetched, hasExecutedFetched };
 }

@@ -56,6 +56,47 @@
   gap: 12px;
 }
 
+/* Buttons */
+.btn {
+  height: 40px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btnPrimary {
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  background: white;
+  color: #23366a;
+  border: 0.8px solid #23366a;
+}
+
+.btnSecondary:hover {
+  background: #f2f2f7;
+}
+
 /* Tabs */
 .tabs {
   display: flex;

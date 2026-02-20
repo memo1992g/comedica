@@ -5,14 +5,13 @@ import { useRouter } from 'next/navigation';
 import { 
   Settings, 
   Users, 
-  ChevronRight, 
   LogOut,
   Pencil,
   Trash2,
   Search,
   Calendar
 } from 'lucide-react';
-import { parametersService } from '@/lib/api/parameters.service';
+import { getGeneralLimits, getUserLimits, getRecentAudit, updateGeneralLimits, updateUserLimits, deleteUserLimits } from '@/lib/api/parameters.service';
 import { TransactionLimits, UserLimits, AuditLog } from '@/types';
 import { EditGeneralLimitsModal } from '@/components/parametros/EditGeneralLimitsModal';
 import { EditUserLimitsModal } from '@/components/parametros/EditUserLimitsModal';
@@ -60,7 +59,7 @@ export default function LimitesYMontosPage() {
 
   const loadGeneralLimits = async () => {
     try {
-      const data = await parametersService.getGeneralLimits();
+      const data = await getGeneralLimits();
       setGeneralLimits(data);
     } catch (error) {
       console.error('Error al cargar límites generales:', error);
@@ -69,7 +68,7 @@ export default function LimitesYMontosPage() {
 
   const loadUserLimits = async () => {
     try {
-      const response = await parametersService.getUserLimits({
+      const response = await getUserLimits({
         search: searchQuery,
         page: currentPage,
         pageSize,
@@ -83,7 +82,7 @@ export default function LimitesYMontosPage() {
 
   const loadRecentAudit = async () => {
     try {
-      const data = await parametersService.getRecentAudit(5);
+      const data = await getRecentAudit(5);
       setRecentAudit(data);
     } catch (error) {
       console.error('Error al cargar auditoría:', error);
@@ -92,7 +91,7 @@ export default function LimitesYMontosPage() {
 
   const handleSaveGeneralLimits = async (limits: Partial<TransactionLimits>[]) => {
     try {
-      await parametersService.updateGeneralLimits(limits);
+      await updateGeneralLimits(limits);
       await loadGeneralLimits();
       await loadRecentAudit();
       setIsEditingGeneral(false);
@@ -106,7 +105,7 @@ export default function LimitesYMontosPage() {
     if (!selectedUser) return;
     
     try {
-      await parametersService.updateUserLimits(selectedUser.userId, limits);
+      await updateUserLimits(selectedUser.userId, limits);
       await loadUserLimits();
       await loadRecentAudit();
       setIsEditingUser(false);
@@ -122,7 +121,7 @@ export default function LimitesYMontosPage() {
     
     setIsLoading(true);
     try {
-      await parametersService.deleteUserLimits(userToDelete.userId);
+      await deleteUserLimits(userToDelete.userId);
       await loadUserLimits();
       await loadRecentAudit();
       setUserToDelete(null);
@@ -166,13 +165,6 @@ export default function LimitesYMontosPage() {
 
   return (
     <div className={styles.container}>
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <a href="/parametros">Parámetros</a>
-        <ChevronRight size={16} />
-        <span>Límites y Montos</span>
-      </div>
-
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>

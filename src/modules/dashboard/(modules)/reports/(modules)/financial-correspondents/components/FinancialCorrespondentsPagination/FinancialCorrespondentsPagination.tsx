@@ -13,15 +13,21 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CustomDatePicker } from '@/components/common/CustomDatePicker/CustomDatePicker';
 import styles from './FinancialCorrespondentsPagination.module.css';
 
+interface DateRangeFilter {
+  from: Date | null;
+  to: Date | null;
+}
+
 interface FinancialCorrespondentsPaginationProps {
   currentPage: number;
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
+  dateRange?: DateRangeFilter;
   onPageSizeChange?: (size: number) => void;
   onPageChange: (page: number) => void;
   onSearch?: (query: string) => void;
-  onDateFilter?: (date: Date | null) => void;
+  onDateFilter?: (range: DateRangeFilter) => void;
   onFilterChange?: (value: string) => void;
   searchQuery?: string;
 }
@@ -31,13 +37,14 @@ export default function FinancialCorrespondentsPagination({
   totalPages,
   totalItems,
   itemsPerPage,
+  dateRange,
   onPageSizeChange,
   onPageChange,
   onSearch,
   onDateFilter,
   onFilterChange,
   searchQuery = '',
-}: FinancialCorrespondentsPaginationProps) {
+}: Readonly<FinancialCorrespondentsPaginationProps>) {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
   const [filterValue, setFilterValue] = useState('all');
@@ -45,22 +52,34 @@ export default function FinancialCorrespondentsPagination({
   return (
     <div className={styles.paginationContainer}>
       <div className={styles.leftSection}>
-        <div className={styles.searchContainer}>
+        <div className={styles.searchBar}>
           <Search size={16} className={styles.searchIcon} />
           <input
             type="text"
-            placeholder="Buscar..."
+            placeholder="Buscar por nombre..."
             className={styles.searchInput}
             value={searchQuery}
             onChange={(e) => onSearch?.(e.target.value)}
           />
         </div>
-        
-        <CustomDatePicker
-          iconOnly
-          className={styles.calendarButton}
-          onChange={(date) => onDateFilter?.(date)}
-        />
+
+        <div className={styles.dateRangeContainer}>
+          <CustomDatePicker
+            selectionMode="range"
+            disableFutureDates
+            className={styles.dateRangeButton}
+            rangeValue={{
+              from: dateRange?.from ?? undefined,
+              to: dateRange?.to ?? undefined,
+            }}
+            onRangeChange={(range) =>
+              onDateFilter?.({
+                from: range?.from ?? null,
+                to: range?.to ?? null,
+              })
+            }
+          />
+        </div>
 
         <Popover>
           <PopoverTrigger asChild>
@@ -95,31 +114,21 @@ export default function FinancialCorrespondentsPagination({
       </div>
 
       <div className={styles.rightSection}>
-        <div className={styles.pageInfo}>
-          <span className={styles.pageLabel}>Página</span>
+        <div className={styles.pageSelector}>
+          <span className={styles.label}>Items por página</span>
           <Select
             value={String(itemsPerPage)}
             onValueChange={(value) => onPageSizeChange?.(Number(value))}
           >
-            <SelectTrigger className={styles.pageSizeTrigger}>
-              <SelectValue className={styles.pageSizeValue} />
+            <SelectTrigger className={styles.select}>
+              <SelectValue />
             </SelectTrigger>
-            <SelectContent className={styles.pageSizeContent}>
-              <SelectItem className={styles.pageSizeItem} value="5">
-                5
-              </SelectItem>
-              <SelectItem className={styles.pageSizeItem} value="10">
-                10
-              </SelectItem>
-              <SelectItem className={styles.pageSizeItem} value="25">
-                25
-              </SelectItem>
-              <SelectItem className={styles.pageSizeItem} value="50">
-                50
-              </SelectItem>
-              <SelectItem className={styles.pageSizeItem} value="100">
-                100
-              </SelectItem>
+            <SelectContent>
+              {[5, 10, 25, 50, 100].map((size) => (
+                <SelectItem key={size} value={String(size)}>
+                  {size}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -128,20 +137,20 @@ export default function FinancialCorrespondentsPagination({
           {totalItems === 0 ? 0 : startItem}-{endItem} de {totalItems}
         </div>
 
-        <div className={styles.navButtons}>
+        <div className={styles.navigationButtons}>
           <button
             className={styles.navButton}
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
-            <ChevronLeft size={16} className={styles.navIcon} />
+            <ChevronLeft size={16} />
           </button>
           <button
             className={styles.navButton}
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            <ChevronRight size={16} className={styles.navIcon} />
+            <ChevronRight size={16} />
           </button>
         </div>
       </div>

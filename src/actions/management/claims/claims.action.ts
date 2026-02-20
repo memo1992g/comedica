@@ -5,6 +5,7 @@ import type {
   ComplaintI,
   ComplaintFilterI,
   CatalogItemI,
+  ReclaimXmlItemI,
 } from "@/interfaces/management/claims";
 import { throwActionError } from "@/lib/error-handle";
 import {
@@ -13,6 +14,7 @@ import {
   listComplaintTypesService,
   listComplaintStatusesService,
   listResolutionsService,
+  exportXmlReclaimService,
 } from "@/services/management/claims";
 
 /**
@@ -129,6 +131,38 @@ export const listResolutionsAction = async (): Promise<
       errors: true,
       errorMessage: res.result?.message || "Error al obtener resoluciones",
     };
+  } catch (error: unknown) {
+    return throwActionError(error);
+  }
+};
+
+/**
+ * Action: Export XML for claims
+ * Returns base64-encoded XML; reconstruct Blob on the client.
+ */
+export const exportXmlReclaimAction = async (
+  complaints: ComplaintI[],
+): Promise<ActionResult<string>> => {
+  try {
+    const items: ReclaimXmlItemI[] = complaints.map((c) => ({
+      codigoCorresponsal: "",
+      administrador: "1",
+      tipoTransaccion: c.tipo,
+      numeroControl: String(c.idReclamo),
+      fecha: c.fechaPresenta,
+      tipoDocumento: "1",
+      numeroDocumento: c.dui,
+      motivo: c.tipo,
+      descripcion: c.descripcion,
+      estado: c.estadoReclamo,
+      resultadoResolucion: c.estadoResolucion,
+      fechaResolucion: c.fechaPresenta,
+      montoReclamado: c.monto,
+    }));
+
+    const blob = await exportXmlReclaimService(items);
+    const buffer = Buffer.from(await blob.arrayBuffer());
+    return { data: buffer.toString("base64"), errors: false };
   } catch (error: unknown) {
     return throwActionError(error);
   }

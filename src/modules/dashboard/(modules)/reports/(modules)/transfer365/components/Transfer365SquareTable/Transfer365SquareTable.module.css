@@ -57,8 +57,13 @@
   text-align: right;
 }
 
-.differenceCell {
-  color: #e7000b;
+.differenceLabel {
+  color: #23366a;
+  font-weight: 700;
+}
+
+.positiveValue {
+  color: #16a34a;
 }
 
 .negativeValue {
@@ -87,7 +92,7 @@
   font-weight: 400;
   color: #bbbbbb;
   text-align: right;
-  width: 80px;
+  width: 30%;
   outline: none;
 }
 

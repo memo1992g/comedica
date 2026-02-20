@@ -51,24 +51,26 @@
   color: #bbbbbb;
 }
 
-.calendarButton {
+.dateRangeContainer {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
+}
+
+.dateRangeButton {
   height: 36px;
+  min-width: 165px;
   border: 0.8px solid #d1d1d6;
   border-radius: 4px;
   background: #f2f2f7;
   color: #bbbbbb;
-  cursor: pointer;
-  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
 }
 
-.calendarButton:hover {
+.dateRangeButton:hover {
   background: #f2f2f7;
   border-color: #d1d1d6;
-  color: #bbbbbb;
 }
 
 .rightSection {
@@ -89,36 +91,19 @@
   color: #bbbbbb;
 }
 
-.pageSizeTrigger {
+.select {
   width: 70px;
   height: 36px;
   padding: 0 12px;
-  border: 0.8px solid #ffffff;
+  background: white;
+  border: 0.8px solid white;
   border-radius: 14px;
   font-family: 'DM Sans', sans-serif;
   font-size: 16px;
-  line-height: 24px;
-  color: #000000;
-  background: white;
+  color: black;
+  cursor: pointer;
   justify-content: space-between;
   gap: 8px;
-}
-
-.pageSizeValue {
-  color: #000000;
-}
-
-.pageSizeContent {
-  border: 0.8px solid #d1d1d6;
-  border-radius: 8px;
-  background: white;
-}
-
-.pageSizeItem {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  color: #4a4a4c;
 }
 
 .itemsInfo {

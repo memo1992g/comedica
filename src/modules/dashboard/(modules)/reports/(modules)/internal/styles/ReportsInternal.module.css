@@ -25,6 +25,7 @@
   margin-top: 24px;
   width: 100%;
   padding: 0;
+  position: relative;
 }
 
 .tableWrapper {
@@ -41,6 +42,7 @@
   border-radius: 0;
   overflow: hidden;
   background: white;
+  position: relative;
 }
 
 .mainSection {

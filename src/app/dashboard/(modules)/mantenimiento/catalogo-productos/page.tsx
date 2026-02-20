@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
-import { maintenanceService, Product } from '@/lib/api/maintenance.service';
+import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
+import { getProductCatalog, createProduct, updateProduct, deleteProduct, type Product } from '@/lib/api/maintenance.service';
 import { Modal, ModalBody, ModalFooter } from '@/components/parametros/Modal';
 import { ConfirmationModal } from '@/components/parametros/ConfirmationModal';
 import modalStyles from '@/components/parametros/Modal.module.css';
@@ -31,7 +31,7 @@ export default function CatalogoProductosPage() {
 
   const loadProducts = async () => {
     try {
-      const response = await maintenanceService.getProductCatalog({ search: searchQuery, page: currentPage, pageSize });
+      const response = await getProductCatalog({ search: searchQuery, page: currentPage, pageSize });
       setProducts(response.data);
       setTotal(response.total);
     } catch (error) {
@@ -54,9 +54,9 @@ export default function CatalogoProductosPage() {
     setIsLoading(true);
     try {
       if (selectedProduct) {
-        await maintenanceService.updateProduct(selectedProduct.id, formData);
+        await updateProduct(selectedProduct.id, formData);
       } else {
-        await maintenanceService.createProduct(formData);
+        await createProduct(formData);
       }
       await loadProducts();
       setShowAddModal(false);
@@ -73,7 +73,7 @@ export default function CatalogoProductosPage() {
     if (!productToDelete) return;
     setIsLoading(true);
     try {
-      await maintenanceService.deleteProduct(productToDelete.id);
+      await deleteProduct(productToDelete.id);
       await loadProducts();
       setProductToDelete(null);
     } catch (error) {
@@ -87,12 +87,6 @@ export default function CatalogoProductosPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.breadcrumb}>
-        <a href="/mantenimiento">Mantenimiento de</a>
-        <ChevronRight size={16} />
-        <span>Catálogo de productos</span>
-      </div>
-
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h1>Catálogo de Productos</h1>

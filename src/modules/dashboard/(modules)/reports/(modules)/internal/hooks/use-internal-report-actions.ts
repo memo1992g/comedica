@@ -14,91 +14,217 @@ import {
   consolidatedReportAction,
   tcReportAction,
 } from '@/actions/reports';
+import type {
+  ActionResult,
+  BackofficeApiPaginatedData,
+} from '@/interfaces/ApiResponse.interface';
+import { buildSummaryRows, getEmptySummaryRows } from '../utils/build-summary-rows';
+import type { SummaryRow } from '../components/ReportsSummaryTable/ReportsSummaryTable';
 
 type ReportTab = 'abonos' | 'cargos' | 'pagos' | 'creditos' | 'consolidado' | 'resumen';
 
 export interface DateFilters {
   fechaDesde?: string;
   fechaHasta?: string;
+  associateNumber?: string;
+  debitCustomerId?: string;
+  customerToCharge?: string;
 }
+
+interface ReportSummary {
+  totalTransactions: number;
+  totalAmount: number;
+}
+
+interface ReportPagination {
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
+type FetchableReportTab = Exclude<ReportTab, 'resumen'>;
+type GenericReportPayload = BackofficeApiPaginatedData<unknown>;
+type ReportAction = (
+  filters: DateFilters,
+  pagination: { page: number; size: number },
+) => Promise<ActionResult<GenericReportPayload>>;
+type ReportMapper = (items: unknown[]) => TransactionData[];
+
+const initialSummary: ReportSummary = {
+  totalTransactions: 0,
+  totalAmount: 0,
+};
+
+const initialPagination: ReportPagination = {
+  totalElements: 0,
+  totalPages: 0,
+  currentPage: 1,
+  pageSize: 100,
+};
+
+const reportActions: Record<FetchableReportTab, ReportAction> = {
+  abonos: paymentAccountReportAction as ReportAction,
+  cargos: debitReportAction as ReportAction,
+  pagos: tcReportAction as ReportAction,
+  creditos: creditReportAction as ReportAction,
+  consolidado: consolidatedReportAction as ReportAction,
+};
+
+const reportMappers: Record<FetchableReportTab, ReportMapper> = {
+  abonos: (items) => mapPaymentAccountItems(items as never[]),
+  cargos: (items) => mapDebitItems(items as never[]),
+  pagos: (items) => mapTcItems(items as never[]),
+  creditos: (items) => mapCreditItems(items as never[]),
+  consolidado: (items) => mapConsolidatedItems(items as never[]),
+};
 
 export function useInternalReportActions() {
   const [data, setData] = useState<TransactionData[]>([]);
+  const [summary, setSummary] = useState<ReportSummary>(initialSummary);
+  const [summaryRows, setSummaryRows] = useState<SummaryRow[]>(getEmptySummaryRows());
+  const [pagination, setPagination] = useState<ReportPagination>(initialPagination);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchReport = useCallback(
-    async (tab: ReportTab, filters: DateFilters = {}, page = 0, size = 100) => {
-      if (tab === 'resumen') return;
-      setIsLoading(true);
-      setError(null);
+  const resetState = useCallback(() => {
+    setData([]);
+    setSummary(initialSummary);
+    setSummaryRows(getEmptySummaryRows());
+    setPagination(initialPagination);
+  }, []);
 
-      try {
-        const pagination = { page, size };
-        let mapped: TransactionData[] = [];
+  const setActionError = useCallback(
+    (message = 'Error al obtener el reporte') => {
+      resetState();
+      setError(message);
+    },
+    [resetState],
+  );
 
-        switch (tab) {
-          case 'abonos': {
-            const res = await paymentAccountReportAction(filters, pagination);
-            if (res && !res.errors && res.data) {
-              mapped = mapPaymentAccountItems(res.data.data);
-            } else {
-              setError(res?.errorMessage || 'Error al obtener el reporte');
-              return;
-            }
-            break;
-          }
-          case 'cargos': {
-            const res = await debitReportAction(filters, pagination);
-            if (res && !res.errors && res.data) {
-              mapped = mapDebitItems(res.data.data);
-            } else {
-              setError(res?.errorMessage || 'Error al obtener el reporte');
-              return;
-            }
-            break;
-          }
-          case 'pagos': {
-            const res = await tcReportAction(filters, pagination);
-            if (res && !res.errors && res.data) {
-              mapped = mapTcItems(res.data.data);
-            } else {
-              setError(res?.errorMessage || 'Error al obtener el reporte');
-              return;
-            }
-            break;
-          }
-          case 'creditos': {
-            const res = await creditReportAction(filters, pagination);
-            if (res && !res.errors && res.data) {
-              mapped = mapCreditItems(res.data.data);
-            } else {
-              setError(res?.errorMessage || 'Error al obtener el reporte');
-              return;
-            }
-            break;
-          }
-          case 'consolidado': {
-            const res = await consolidatedReportAction(filters, pagination);
-            if (res && !res.errors && res.data) {
-              mapped = mapConsolidatedItems(res.data.data);
-            } else {
-              setError(res?.errorMessage || 'Error al obtener el reporte');
-              return;
-            }
-            break;
-          }
-        }
+  const applyServerMetadata = useCallback(
+    (payload: BackofficeApiPaginatedData<unknown>, mapped: TransactionData[]) => {
+      const totalElements = Number(payload.totalElements ?? mapped.length);
+      const totalPages = Number(payload.totalPages ?? 0);
+      const currentPage = Number(payload.currentPage ?? 1);
+      const pageSize = Number(payload.pageSize ?? initialPagination.pageSize);
+      const totalFromExtras = Number(payload.extras?.totalTransacciones);
+      const totalTransactions =
+        Number.isFinite(totalFromExtras) && !Number.isNaN(totalFromExtras)
+          ? totalFromExtras
+          : totalElements;
+      const amountFromExtras = payload.extras?.montoTotal;
+      const computedAmount = mapped.reduce((sum, item) => sum + item.amount, 0);
+      const totalAmount =
+        typeof amountFromExtras === 'number' && !Number.isNaN(amountFromExtras)
+          ? amountFromExtras
+          : computedAmount;
 
-        setData(mapped);
-      } catch {
-        setError('Error inesperado al obtener el reporte');
-      } finally {
-        setIsLoading(false);
-      }
+      setPagination({
+        totalElements,
+        totalPages,
+        currentPage,
+        pageSize,
+      });
+
+      setSummary({
+        totalTransactions,
+        totalAmount,
+      });
     },
     [],
   );
 
-  return { data, isLoading, error, fetchReport };
+  const fetchResumenReport = useCallback(
+    async (filters: DateFilters) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const res = await consolidatedReportAction(filters, {
+          page: 0,
+          size: 10000000,
+        });
+
+        if (!res || res.errors || !res.data) {
+          setActionError(res?.errorMessage || 'Error al obtener el reporte');
+
+          return;
+        }
+
+        const payload = res.data;
+        const items = Array.isArray(payload.data) ? payload.data : [];
+
+        setData([]);
+        setSummary(initialSummary);
+        setPagination(initialPagination);
+        setSummaryRows(buildSummaryRows(items));
+      } catch {
+        setActionError('Error inesperado al obtener el reporte');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [setActionError],
+  );
+
+  const fetchReport = useCallback(
+    async (tab: ReportTab, filters: DateFilters = {}, page = 1, size = 100) => {
+      if (tab === 'resumen') {
+        await fetchResumenReport(filters);
+
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const isClientPaginated = tab === 'pagos';
+        const requestPagination = isClientPaginated
+          ? { page: 0, size: 10000 }
+          : { page: Math.max(page - 1, 0), size };
+        const action = reportActions[tab];
+        const mapper = reportMappers[tab];
+
+        if (!action || !mapper) {
+          setActionError();
+          return;
+        }
+
+        const res = await action(filters, requestPagination);
+
+        if (!res || res.errors || !res.data) {
+          setActionError(res?.errorMessage || 'Error al obtener el reporte');
+          return;
+        }
+
+        const raw = res.data;
+        const items = Array.isArray(raw.data) ? raw.data : [];
+        const rawIsArray = Array.isArray(raw);
+        const dataToMap = rawIsArray ? raw : items;
+        const mapped = mapper(dataToMap as unknown[]);
+        setData(mapped);
+
+        const normalizedPayload: GenericReportPayload = rawIsArray
+          ? {
+              data: raw as unknown[],
+              totalElements: raw.length,
+              totalPages: 1,
+              currentPage: 1,
+              pageSize: size,
+              extras: {},
+            }
+          : raw;
+        applyServerMetadata(normalizedPayload, mapped);
+      } catch {
+        setActionError('Error inesperado al obtener el reporte');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [applyServerMetadata, fetchResumenReport, setActionError],
+  );
+
+  return { data, summary, summaryRows, pagination, isLoading, error, fetchReport };
 }

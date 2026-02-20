@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Building2, Globe, Pencil, Trash2, Plus, Search } from 'lucide-react';
-import { parametersService } from '@/lib/api/parameters.service';
+import { Building2, Globe, Pencil, Trash2, Plus, Search } from 'lucide-react';
+import { getLocalInstitutions, getCARDInstitutions, createLocalInstitution, updateLocalInstitution, deleteLocalInstitution, createCARDInstitution, updateCARDInstitution, deleteCARDInstitution } from '@/lib/api/parameters.service';
 import { LocalInstitutionModal } from '@/components/parametros/LocalInstitutionModal';
 import { CARDInstitutionModal } from '@/components/parametros/CARDInstitutionModal';
 import { ConfirmationModal } from '@/components/parametros/ConfirmationModal';
@@ -51,7 +51,7 @@ export default function RedTransfer365Page() {
 
   const loadLocalInstitutions = async () => {
     try {
-      const response = await parametersService.getLocalInstitutions({
+      const response = await getLocalInstitutions({
         search: searchLocal,
         page: pageLocal,
         pageSize,
@@ -65,7 +65,7 @@ export default function RedTransfer365Page() {
 
   const loadCardInstitutions = async () => {
     try {
-      const response = await parametersService.getCARDInstitutions({
+      const response = await getCARDInstitutions({
         search: searchCard,
         page: pageCard,
         pageSize,
@@ -79,9 +79,9 @@ export default function RedTransfer365Page() {
 
   const handleSaveLocal = async (institution: any) => {
     if (selectedLocal) {
-      await parametersService.updateLocalInstitution(selectedLocal.id, institution);
+      await updateLocalInstitution(selectedLocal.id, institution);
     } else {
-      await parametersService.createLocalInstitution(institution);
+      await createLocalInstitution(institution);
     }
     await loadLocalInstitutions();
     setIsAddingLocal(false);
@@ -91,9 +91,9 @@ export default function RedTransfer365Page() {
 
   const handleSaveCard = async (institution: any) => {
     if (selectedCard) {
-      await parametersService.updateCARDInstitution(selectedCard.id, institution);
+      await updateCARDInstitution(selectedCard.id, institution);
     } else {
-      await parametersService.createCARDInstitution(institution);
+      await createCARDInstitution(institution);
     }
     await loadCardInstitutions();
     setIsAddingCard(false);
@@ -107,10 +107,10 @@ export default function RedTransfer365Page() {
     setIsDeleting(true);
     try {
       if (institutionToDelete.type === 'local') {
-        await parametersService.deleteLocalInstitution(institutionToDelete.data.id);
+        await deleteLocalInstitution(institutionToDelete.data.id);
         await loadLocalInstitutions();
       } else {
-        await parametersService.deleteCARDInstitution(institutionToDelete.data.id);
+        await deleteCARDInstitution(institutionToDelete.data.id);
         await loadCardInstitutions();
       }
       setInstitutionToDelete(null);
@@ -126,13 +126,6 @@ export default function RedTransfer365Page() {
 
   return (
     <div className={styles.container}>
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <a href="/parametros">Parámetros</a>
-        <ChevronRight size={16} />
-        <span>Red Transfer365</span>
-      </div>
-
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>

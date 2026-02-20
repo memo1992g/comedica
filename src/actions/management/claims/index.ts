@@ -4,9 +4,5 @@ export {
   listComplaintTypesAction,
   listComplaintStatusesAction,
   listResolutionsAction,
+  exportXmlReclaimAction,
 } from "./claims.action";
-
-export {
-  createComplaintAction,
-  updateComplaintAction,
-} from "./complaint-mutations.action";

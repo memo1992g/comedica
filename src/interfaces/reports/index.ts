@@ -35,6 +35,9 @@ export type {
   MhReportRequestI,
   MhReportItem,
   MhReportResponseI,
+  FinancialCorrespondentsReportRequestI,
+  FinancialCorrespondentsReportItem,
+  FinancialCorrespondentsReportResponseI,
 } from "./ReportOthers.interface";
 
 export type {

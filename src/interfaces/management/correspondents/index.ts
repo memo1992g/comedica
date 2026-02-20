@@ -1,5 +1,6 @@
 export type {
   CorrespondentI,
+  CorrespondentXmlItemI,
   CreateCorrespondentRequestI,
   UpdateCorrespondentRequestI,
   DeleteCorrespondentRequestI,

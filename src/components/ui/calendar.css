@@ -132,7 +132,17 @@
   font-weight: 500;
 }
 
+.rdp-day_button[aria-selected='true'] {
+  background-color: #23366a;
+  color: #ffffff;
+  font-weight: 500;
+}
+
 .rdp-selected .rdp-day_button:hover {
+  background-color: #1a2850;
+}
+
+.rdp-day_button[aria-selected='true']:hover {
   background-color: #1a2850;
 }
 
@@ -159,10 +169,36 @@
 .rdp-range_end .rdp-day_button {
   background-color: #23366a;
   color: white;
+  border-radius: 6px;
 }
 
 .rdp-range_middle .rdp-day_button {
-  background-color: #e8ebf0;
+  background-color: #d7e1f3;
   color: #23366a;
   border-radius: 0;
+  font-weight: 500;
+}
+
+.rdp-range_start .rdp-day_button[aria-selected='true'],
+.rdp-range_end .rdp-day_button[aria-selected='true'] {
+  background-color: #23366a;
+  color: #ffffff;
+}
+
+.rdp-range_middle .rdp-day_button[aria-selected='true'] {
+  background-color: #d1dcf1;
+  color: #23366a;
+}
+
+.rdp-range_start,
+.rdp-range_end,
+.rdp-range_middle {
+  background-color: #eef3fb;
+}
+
+.rdp-preview_range .rdp-day_button {
+  background-color: #e6ecf8;
+  color: #23366a;
+  border-radius: 0;
+  font-weight: 500;
 }

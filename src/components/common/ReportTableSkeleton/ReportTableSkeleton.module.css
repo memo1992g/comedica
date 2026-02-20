@@ -5,6 +5,7 @@
 }
 
 .statsRow {
+  margin-top: 24px;
   display: flex;
   gap: 16px;
   padding: 16px;

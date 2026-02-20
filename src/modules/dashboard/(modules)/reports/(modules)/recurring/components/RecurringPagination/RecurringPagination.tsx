@@ -18,10 +18,11 @@ interface RecurringPaginationProps {
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
+  dateRange?: { from: Date | null; to: Date | null };
   onPageSizeChange?: (size: number) => void;
   onPageChange: (page: number) => void;
   onSearch?: (query: string) => void;
-  onDateFilter?: (date: Date | null) => void;
+  onDateRangeChange?: (range: { from: Date | null; to: Date | null }) => void;
   onFilterChange?: (value: string) => void;
   searchQuery?: string;
 }
@@ -31,13 +32,14 @@ export default function RecurringPagination({
   totalPages,
   totalItems,
   itemsPerPage,
+  dateRange,
   onPageSizeChange,
   onPageChange,
   onSearch,
-  onDateFilter,
+  onDateRangeChange,
   onFilterChange,
   searchQuery = '',
-}: RecurringPaginationProps) {
+}: Readonly<RecurringPaginationProps>) {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
   const [filterValue, setFilterValue] = useState('all');
@@ -56,11 +58,20 @@ export default function RecurringPagination({
           />
         </div>
         
-        <CustomDatePicker
-          iconOnly
-          className={styles.calendarButton}
-          onChange={(date) => onDateFilter?.(date)}
-        />
+        <div className={styles.dateRangeContainer}>
+          <CustomDatePicker
+            selectionMode="range"
+            disableFutureDates
+            className={styles.dateRangeButton}
+            rangeValue={{
+              from: dateRange?.from ?? undefined,
+              to: dateRange?.to ?? undefined,
+            }}
+            onRangeChange={(range) =>
+              onDateRangeChange?.({ from: range?.from ?? null, to: range?.to ?? null })
+            }
+          />
+        </div>
 
         <Popover>
           <PopoverTrigger asChild>
@@ -95,30 +106,18 @@ export default function RecurringPagination({
 
       <div className={styles.rightSection}>
         <div className={styles.pageInfo}>
-          <span className={styles.pageLabel}>Página</span>
+          <span className={styles.pageLabel}>Items por página</span>
           <Select
             value={String(itemsPerPage)}
             onValueChange={(value) => onPageSizeChange?.(Number(value))}
           >
-            <SelectTrigger className={styles.pageSizeTrigger}>
-              <SelectValue className={styles.pageSizeValue} />
+            <SelectTrigger className={styles.select}>
+              <SelectValue />
             </SelectTrigger>
-            <SelectContent className={styles.pageSizeContent}>
-              <SelectItem className={styles.pageSizeItem} value="5">
-                5
-              </SelectItem>
-              <SelectItem className={styles.pageSizeItem} value="10">
-                10
-              </SelectItem>
-              <SelectItem className={styles.pageSizeItem} value="25">
-                25
-              </SelectItem>
-              <SelectItem className={styles.pageSizeItem} value="50">
-                50
-              </SelectItem>
-              <SelectItem className={styles.pageSizeItem} value="100">
-                100
-              </SelectItem>
+            <SelectContent>
+              {[5, 10, 25, 50, 100].map((size) => (
+                <SelectItem key={size} value={String(size)}>{size}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

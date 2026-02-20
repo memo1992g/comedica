@@ -45,13 +45,13 @@ export function mapPaymentAccountItems(items: PaymentAccountReportItem[]): Trans
     date: item.transactionDate,
     time: '',
     accountOrigin: item.debitAccount,
-    nameOrigin: '',
+    nameOrigin: item.debitAccountHolder ?? '',
     idOrigin: item.debitCustomerId,
     accountDestination: item.creditAccount,
-    nameDestination: '',
+    nameDestination: item.creditAccountHolder ?? '',
     idDestination: item.creditCustomerId,
     amount: item.amount,
-    channel: '',
+    channel: item.channel ?? '',
   }));
 }
 

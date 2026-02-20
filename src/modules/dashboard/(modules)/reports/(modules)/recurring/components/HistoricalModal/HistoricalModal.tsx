@@ -10,9 +10,9 @@ import {
 import CustomTable from '@/components/common/CustomTable/CustomTable';
 import { useCustomTable } from '@/components/common/CustomTable/hooks/use-custom-table';
 import { getCustomTableColumns } from '@/components/common/CustomTable/utils/get-custom-table-columns';
-import { historicalColumns } from './historical-columns';
+import { historicalColumns } from '../../utils/historical-columns';
 import { mockHistoricalExecutions } from '../../data/mock-data';
-import TablePagination from './TablePagination';
+import TablePagination from './components/TablePagination';
 import styles from './HistoricalModal.module.css';
 
 interface HistoricalModalProps {

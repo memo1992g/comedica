@@ -4,9 +4,7 @@ import { APP_COOKIES } from "@/consts/cookies/cookies.consts";
 import type { BackofficeApiResponse } from "@/interfaces/ApiResponse.interface";
 import type {
   CorrespondentI,
-  CreateCorrespondentRequestI,
-  UpdateCorrespondentRequestI,
-  DeleteCorrespondentRequestI,
+  CorrespondentXmlItemI,
 } from "@/interfaces/management/correspondents";
 import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
 import { cookies } from "next/headers";
@@ -52,46 +50,26 @@ export const listCorrespondentsService = async (): Promise<
 };
 
 /**
- * POST /create — Create a new correspondent
+ * POST /reportes/correspondent/exportar-xml — Export XML for correspondents
  */
-export const createCorrespondentService = async (
-  data: CreateCorrespondentRequestI,
-): Promise<BackofficeApiResponse<CorrespondentI>> => {
+export const exportXmlCorrespondentService = async (
+  items: CorrespondentXmlItemI[],
+): Promise<Blob> => {
   const headers = getAuthHeaders();
+  const body = {
+    request: { data: items },
+    requestId: "0000",
+    uuid: crypto.randomUUID(),
+    pageId: 1,
+    channel: "WEB",
+  };
 
-  return customAuthFetch(`${API_URL}/create`, {
+  const res = await fetch(`${API_URL}/reportes/correspondent/exportar-xml`, {
     method: "POST",
-    body: JSON.stringify(buildRequestBody(data)),
-    headers,
+    body: JSON.stringify(body),
+    headers: { ...headers, "Content-Type": "application/json" },
   });
-};
 
-/**
- * PUT /update — Update an existing correspondent
- */
-export const updateCorrespondentService = async (
-  data: UpdateCorrespondentRequestI,
-): Promise<BackofficeApiResponse<CorrespondentI>> => {
-  const headers = getAuthHeaders();
-
-  return customAuthFetch(`${API_URL}/update`, {
-    method: "PUT",
-    body: JSON.stringify(buildRequestBody(data)),
-    headers,
-  });
-};
-
-/**
- * DELETE /delete — Delete a correspondent
- */
-export const deleteCorrespondentService = async (
-  data: DeleteCorrespondentRequestI,
-): Promise<BackofficeApiResponse<null>> => {
-  const headers = getAuthHeaders();
-
-  return customAuthFetch(`${API_URL}/delete`, {
-    method: "DELETE",
-    body: JSON.stringify(buildRequestBody(data)),
-    headers,
-  });
+  if (!res.ok) throw new Error(`Error exportando XML corresponsal: ${res.status}`);
+  return res.blob();
 };

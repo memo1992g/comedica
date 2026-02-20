@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Search, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import {
   Select,
@@ -13,17 +13,24 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CustomDatePicker } from '@/components/common/CustomDatePicker/CustomDatePicker';
 import styles from './styles/ReportsPagination.module.css';
 
+interface DateRangeFilter {
+  from: Date | null;
+  to: Date | null;
+}
+
 interface ReportsPaginationProps {
   currentPage: number;
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
+  dateRange?: DateRangeFilter;
   onPageSizeChange?: (size: number) => void;
   onPageChange: (page: number) => void;
   onSearch?: (query: string) => void;
-  onDateFilter?: (date: Date | null) => void;
+  onDateFilter?: (range: DateRangeFilter) => void;
   onFilterChange?: (value: string) => void;
   searchQuery?: string;
+  searchPlaceholder?: string;
 }
 
 export default function ReportsPagination({
@@ -31,16 +38,26 @@ export default function ReportsPagination({
   totalPages,
   totalItems,
   itemsPerPage,
+  dateRange,
   onPageSizeChange,
   onPageChange,
   onSearch,
   onDateFilter,
   onFilterChange,
   searchQuery = '',
-}: ReportsPaginationProps) {
+  searchPlaceholder = 'Buscar...',
+}: Readonly<ReportsPaginationProps>) {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
   const [filterValue, setFilterValue] = useState('all');
+  const effectiveDateRange = useMemo(
+    () => dateRange ?? { from: null, to: null },
+    [dateRange],
+  );
+
+  const handleDateRangeChange = (range: DateRangeFilter) => {
+    onDateFilter?.(range);
+  };
 
   return (
     <div className={styles.paginationContainer}>
@@ -49,18 +66,30 @@ export default function ReportsPagination({
           <Search size={16} className={styles.searchIcon} />
           <input
             type="text"
-            placeholder="Buscar..."
+            placeholder={searchPlaceholder}
             className={styles.searchInput}
             value={searchQuery}
             onChange={(e) => onSearch?.(e.target.value)}
           />
         </div>
         
-        <CustomDatePicker
-          iconOnly
-          className={styles.calendarButton}
-          onChange={(date) => onDateFilter?.(date)}
-        />
+        <div className={styles.dateRangeContainer}>
+          <CustomDatePicker
+            className={styles.dateRangeButton}
+            selectionMode="range"            
+            disableFutureDates
+            rangeValue={{
+              from: effectiveDateRange.from ?? undefined,
+              to: effectiveDateRange.to ?? undefined,
+            }}
+            onRangeChange={(range) =>
+              handleDateRangeChange({
+                from: range?.from ?? null,
+                to: range?.to ?? null,
+              })
+            }
+          />
+        </div>
 
         <Popover>
           <PopoverTrigger asChild>
@@ -95,7 +124,7 @@ export default function ReportsPagination({
 
       <div className={styles.rightSection}>
         <div className={styles.pageInfo}>
-          <span className={styles.pageLabel}>Página</span>
+          <span className={styles.pageLabel}>Items por página</span>
           <Select
             value={String(itemsPerPage)}
             onValueChange={(value) => onPageSizeChange?.(Number(value))}

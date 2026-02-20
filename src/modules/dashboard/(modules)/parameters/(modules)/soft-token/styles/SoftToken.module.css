@@ -1,0 +1,340 @@
+/* Outer wrapper (matches ReportsInternal .container) */
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* White card container (matches ReportsInternal .content) */
+.wrapper {
+  width: 100%;
+  background-color: white;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 125px);
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+  color: #23366a;
+  margin: 0;
+}
+
+.header p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #bbb;
+  margin: 0;
+}
+
+/* Main layout: left content + right sidebar */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  height: 100%;
+  padding-right: 16px;
+  padding-bottom: 96px;
+}
+
+/* Section block */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Section label (e.g. "Operaciones Transaccionales:") */
+.sectionLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #4a4a4c;
+  margin: 0;
+}
+
+/* Cards Grid — 2 columns */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* Individual Card */
+.card {
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  color: #23366a;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.cardFields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Field group (label + input/select) */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.33px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4a4a4c;
+}
+
+.fieldInput {
+  height: 32px;
+  padding: 4px 16px;
+  background: #f2f2f7;
+  border: 1px solid #d1d1d6;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: #23366a;
+  outline: none;
+  width: 100%;
+}
+
+.fieldInput:focus {
+  border-color: #23366a;
+}
+
+/* Select trigger override to match Figma input style */
+.selectTrigger {
+  height: 36px;
+  padding: 1px 13px;
+  background: #f2f2f7 !important;
+  border: 1px solid #d1d1d6 !important;
+  border-radius: 4px !important;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+  color: #000;
+}
+
+/* ====== Sidebar ====== */
+.sidebar {
+  width: 320px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  height: 100%;
+  flex-shrink: 0;
+  border-left: 1px solid #e8e8e8;
+  padding-left: 31px;
+}
+
+/* Buttons */
+.sidebarActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.btn {
+  height: 40px;
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.25px;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnPrimary {
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  background: white;
+  color: #23366a;
+  border: 1px solid #23366a;
+}
+
+.btnSecondary:hover {
+  background: #f2f2f7;
+}
+
+/* ====== Audit History ====== */
+.auditTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  color: #23366a;
+  margin: 0 0 16px 0;
+}
+
+.auditList {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Single audit entry */
+.auditEntry {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.auditEntry + .auditEntry {
+  padding-top: 16px;
+}
+
+.auditUser {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #000;
+  margin: 0;
+}
+
+.auditDate {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16.5px;
+  color: #bbb;
+  margin: 0;
+}
+
+.auditAction {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16.5px;
+  color: #000;
+  margin: 0;
+}
+
+/* Changes box inside audit entry */
+.changesBox {
+  background: #f2f2f7;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.changeLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.changeLabel {
+  color: #bbb;
+}
+
+.changeOld {
+  text-decoration: line-through;
+  color: #4a4a4c;
+  opacity: 0.6;
+}
+
+.changeNew {
+  color: #4a4a4c;
+}
+
+.emptyAudit {
+  text-align: center;
+  padding: 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #e8e8e8;
+    padding-left: 0;
+    padding-top: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 16px;
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+}

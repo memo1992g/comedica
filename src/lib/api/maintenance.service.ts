@@ -1,4 +1,46 @@
-import apiClient, { getErrorMessage } from './client';
+"use server";
+
+import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
+import { cookies } from "next/headers";
+import { APP_COOKIES } from "@/consts/cookies/cookies.consts";
+
+export type {
+  SupportReason,
+  SecurityQuestion,
+  SecurityImage,
+  Product,
+  MaintenanceAuditLog,
+} from './types/maintenance.types';
+
+import type {
+  SupportReason,
+  SecurityQuestion,
+  SecurityImage,
+  Product,
+  MaintenanceAuditLog,
+} from './types/maintenance.types';
+
+const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+
+function getAuthHeaders(): Record<string, string> {
+  const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
+  const accessToken = clientTokenJSON
+    ? JSON.parse(clientTokenJSON)?.accessToken
+    : null;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return headers;
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return 'Error desconocido';
+}
 
 interface BackofficeContextRequest {
   uuid: string;
@@ -24,73 +66,6 @@ interface BackofficeEnvelope<T> {
   metadata?: BackofficeMetadata;
   data?: T;
   errors?: unknown;
-}
-
-export interface SupportReason {
-  id: string;
-  code: string;
-  description: string;
-  hasQuestionnaire: boolean;
-  questions: number;
-  failures: number;
-  status: 'Activo' | 'Inactivo';
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string;
-  updatedBy: string;
-}
-
-export interface SecurityQuestion {
-  id: string;
-  code: string;
-  question: string;
-  fields: string;
-  status: 'Activo' | 'Inactivo';
-  createdBy: string;
-  createdAt: string;
-  modifiedBy: string;
-  modifiedAt: string;
-}
-
-export interface SecurityImage {
-  id: string;
-  name: string;
-  type: 'mobile' | 'desktop';
-  filename: string;
-  uploadedAt: string;
-  uploadedBy: string;
-  size: string;
-  dimensions: string;
-  url: string;
-}
-
-export interface Product {
-  id: string;
-  code: string;
-  name: string;
-  description: string;
-  status: 'Activo' | 'Inactivo';
-  category: string;
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string;
-  updatedBy: string;
-}
-
-export interface MaintenanceAuditLog {
-  id: string;
-  userId: string;
-  userName: string;
-  userRole: string;
-  action: string;
-  module: string;
-  details: string;
-  changes: Array<{
-    field: string;
-    oldValue: string | number;
-    newValue: string | number;
-  }>;
-  timestamp: string;
 }
 
 function buildContext(channel: BackofficeContextRequest['channel'] = 'W'): BackofficeContextRequest {
@@ -212,110 +187,141 @@ function getPagedResult<T>(items: T[], page = 1, pageSize = 20) {
 }
 
 async function fetchProductsByModule(module: 'AH' | 'TC') {
-  const response = await apiClient.post<BackofficeEnvelope<any[]>>('/products', {
-    ...buildContext('E'),
-    module,
-  });
+  const headers = getAuthHeaders();
+  const response = await customAuthFetch<BackofficeEnvelope<any[]>>(
+    `${API_URL}/products`,
+    {
+      method: "POST",
+      body: JSON.stringify({ ...buildContext('E'), module }),
+      headers,
+    },
+  );
 
-  const data = assertProxySuccess(response.data, `Error al obtener catálogo (${module})`);
+  const data = assertProxySuccess(response, `Error al obtener catálogo (${module})`);
   return data.map((item) => normalizeProduct(item, module));
 }
 
 async function fetchImagesByTypeAndClazz(type: 'mobile' | 'desktop', clazz: 'P' | 'I') {
+  const headers = getAuthHeaders();
   const module = type === 'desktop' ? 'TC' : 'AH';
   const defaultProduct = type === 'desktop' ? 'TARJETAS' : 'AHORRO PERSONAL';
-  const response = await apiClient.get<any[]>('/get-pimage', {
-    params: {
-      module,
-      clazz,
-      productType: defaultProduct,
-    },
-  });
+  const params = new URLSearchParams({ module, clazz, productType: defaultProduct });
 
-  return (response.data || []).map((item) => normalizeSecurityImage(item, type, clazz));
+  const response = await customAuthFetch<any[]>(
+    `${API_URL}/get-pimage?${params.toString()}`,
+    { method: "GET", headers },
+  );
+
+  return (response || []).map((item) => normalizeSecurityImage(item, type, clazz));
 }
 
-export const maintenanceService = {
-  async getSupportReasons(params?: {
-    search?: string;
-    page?: number;
-    pageSize?: number;
-  }): Promise<{ data: SupportReason[]; total: number }> {
-    try {
-      const response = await apiClient.get<any[]>('/list-support-catalog');
-      const normalized = (response.data || []).map(normalizeSupportReason);
-      const filtered = params?.search
-        ? normalized.filter(
-            (item) =>
-              item.code.toLowerCase().includes(params.search!.toLowerCase()) ||
-              item.description.toLowerCase().includes(params.search!.toLowerCase())
-          )
-        : normalized;
+export async function getSupportReasons(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ data: SupportReason[]; total: number }> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<any[]>(
+      `${API_URL}/list-support-catalog`,
+      { method: "GET", headers },
+    );
+    const normalized = (response || []).map(normalizeSupportReason);
+    const filtered = params?.search
+      ? normalized.filter(
+          (item) =>
+            item.code.toLowerCase().includes(params.search!.toLowerCase()) ||
+            item.description.toLowerCase().includes(params.search!.toLowerCase())
+        )
+      : normalized;
 
-      return getPagedResult(filtered, params?.page, params?.pageSize);
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+    return getPagedResult(filtered, params?.page, params?.pageSize);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async createSupportReason(reason: Partial<SupportReason>): Promise<void> {
-    try {
-      await apiClient.post('/create-support-catalog', {
+export async function createSupportReason(reason: Partial<SupportReason>): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/create-support-catalog`, {
+      method: "POST",
+      body: JSON.stringify({
         request: buildContext('WEB'),
         data: {
           code: reason.code,
           description: reason.description,
           status: statusToNumber(reason.status),
         },
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+      }),
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async updateSupportReason(id: string, reason: Partial<SupportReason>): Promise<void> {
-    try {
-      await apiClient.put(`/update-support-catalog/${id}`, {
+export async function updateSupportReason(id: string, reason: Partial<SupportReason>): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/update-support-catalog/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
         requiresQuestionnaire: reason.hasQuestionnaire ? 1 : 0,
         questionCount: reason.questions ?? 0,
         failureCount: reason.failures ?? 0,
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+      }),
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async deleteSupportReason(id: string): Promise<void> {
-    try {
-      await apiClient.delete(`/delete-support-catalog/${id}`);
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+export async function deleteSupportReason(id: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/delete-support-catalog/${id}`, {
+      method: "DELETE",
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async getSecurityQuestions(params?: {
-    search?: string;
-    page?: number;
-    pageSize?: number;
-  }): Promise<{ data: SecurityQuestion[]; total: number }> {
-    try {
-      const response = await apiClient.get<BackofficeEnvelope<any[]>>('/list-security-questions', {
-        data: buildContext('WEB'),
-      });
-      const questions = assertProxySuccess(response.data, 'Error al obtener preguntas de seguridad').map(normalizeSecurityQuestion);
-      const filtered = params?.search
-        ? questions.filter((item) => item.question.toLowerCase().includes(params.search!.toLowerCase()))
-        : questions;
+export async function getSecurityQuestions(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ data: SecurityQuestion[]; total: number }> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<BackofficeEnvelope<any[]>>(
+      `${API_URL}/list-security-questions`,
+      {
+        method: "POST",
+        body: JSON.stringify(buildContext('WEB')),
+        headers,
+      },
+    );
+    const questions = assertProxySuccess(response, 'Error al obtener preguntas de seguridad').map(normalizeSecurityQuestion);
+    const filtered = params?.search
+      ? questions.filter((item) => item.question.toLowerCase().includes(params.search!.toLowerCase()))
+      : questions;
 
-      return getPagedResult(filtered, params?.page, params?.pageSize);
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+    return getPagedResult(filtered, params?.page, params?.pageSize);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async createSecurityQuestion(question: Partial<SecurityQuestion>): Promise<void> {
-    try {
-      await apiClient.post('/create-security-question', {
+export async function createSecurityQuestion(question: Partial<SecurityQuestion>): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/create-security-question`, {
+      method: "POST",
+      body: JSON.stringify({
         ...buildContext('WEB'),
         data: {
           questionText: question.question,
@@ -323,15 +329,20 @@ export const maintenanceService = {
           fields: question.fields || 'texto',
           status: statusToNumber(question.status),
         },
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+      }),
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async updateSecurityQuestion(id: string, question: Partial<SecurityQuestion>): Promise<void> {
-    try {
-      await apiClient.put(`/update-security-question/${id}`, {
+export async function updateSecurityQuestion(id: string, question: Partial<SecurityQuestion>): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/update-security-question/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
         ...buildContext('WEB'),
         data: {
           questionText: question.question,
@@ -339,117 +350,129 @@ export const maintenanceService = {
           fields: question.fields || 'texto',
           status: statusToNumber(question.status),
         },
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+      }),
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async deleteSecurityQuestion(id: string): Promise<void> {
-    try {
-      await apiClient.delete(`/delete-security-question/${id}`, {
-        data: buildContext('WEB'),
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+export async function deleteSecurityQuestion(id: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch(`${API_URL}/delete-security-question/${id}`, {
+      method: "DELETE",
+      body: JSON.stringify(buildContext('WEB')),
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async getSecurityImages(type?: 'mobile' | 'desktop'): Promise<SecurityImage[]> {
-    try {
-      if (type) {
-        const [security, login] = await Promise.all([
-          fetchImagesByTypeAndClazz(type, 'P'),
-          fetchImagesByTypeAndClazz(type, 'I'),
-        ]);
-        return [...security, ...login];
-      }
-
-      const [mobileSecurity, mobileLogin, desktopSecurity, desktopLogin] = await Promise.all([
-        fetchImagesByTypeAndClazz('mobile', 'P'),
-        fetchImagesByTypeAndClazz('mobile', 'I'),
-        fetchImagesByTypeAndClazz('desktop', 'P'),
-        fetchImagesByTypeAndClazz('desktop', 'I'),
+export async function getSecurityImages(type?: 'mobile' | 'desktop'): Promise<SecurityImage[]> {
+  try {
+    if (type) {
+      const [security, login] = await Promise.all([
+        fetchImagesByTypeAndClazz(type, 'P'),
+        fetchImagesByTypeAndClazz(type, 'I'),
       ]);
-
-      return [...mobileSecurity, ...mobileLogin, ...desktopSecurity, ...desktopLogin];
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
+      return [...security, ...login];
     }
-  },
 
-  async uploadSecurityImage(image: Partial<SecurityImage>): Promise<void> {
-    try {
-      await apiClient.post('/update-pimage', null, {
-        params: {
-          module: image.type === 'desktop' ? 'TC' : 'AH',
-          clazz: image.type === 'desktop' ? 'I' : 'P',
-          productType: image.name,
-        },
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+    const [mobileSecurity, mobileLogin, desktopSecurity, desktopLogin] = await Promise.all([
+      fetchImagesByTypeAndClazz('mobile', 'P'),
+      fetchImagesByTypeAndClazz('mobile', 'I'),
+      fetchImagesByTypeAndClazz('desktop', 'P'),
+      fetchImagesByTypeAndClazz('desktop', 'I'),
+    ]);
 
-  async deleteSecurityImage(id: string): Promise<void> {
-    try {
-      await apiClient.delete('/delete-pimage', {
-        params: {
-          module: 'AH',
-          clazz: 'I',
-          productType: id,
-        },
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+    return [...mobileSecurity, ...mobileLogin, ...desktopSecurity, ...desktopLogin];
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async getProductCatalog(params?: {
-    search?: string;
-    page?: number;
-    pageSize?: number;
-  }): Promise<{ data: Product[]; total: number }> {
-    try {
-      const [ahProducts, tcProducts] = await Promise.all([
-        fetchProductsByModule('AH'),
-        fetchProductsByModule('TC'),
-      ]);
+export async function uploadSecurityImage(image: Partial<SecurityImage>): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    const params = new URLSearchParams({
+      module: image.type === 'desktop' ? 'TC' : 'AH',
+      clazz: image.type === 'desktop' ? 'I' : 'P',
+      productType: image.name || '',
+    });
 
-      const catalog = [...ahProducts, ...tcProducts];
-      const filtered = params?.search
-        ? catalog.filter(
-            (item) =>
-              item.code.toLowerCase().includes(params.search!.toLowerCase()) ||
-              item.name.toLowerCase().includes(params.search!.toLowerCase()) ||
-              item.description.toLowerCase().includes(params.search!.toLowerCase()) ||
-              item.category.toLowerCase().includes(params.search!.toLowerCase())
-          )
-        : catalog;
+    await customAuthFetch(`${API_URL}/update-pimage?${params.toString()}`, {
+      method: "POST",
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-      return getPagedResult(filtered, params?.page, params?.pageSize);
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+export async function deleteSecurityImage(id: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    const params = new URLSearchParams({
+      module: 'AH',
+      clazz: 'I',
+      productType: id,
+    });
 
-  async createProduct(_product: Partial<Product>): Promise<void> {
-    throw new Error('La colección actual no incluye endpoint para crear productos.');
-  },
+    await customAuthFetch(`${API_URL}/delete-pimage?${params.toString()}`, {
+      method: "DELETE",
+      headers,
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async updateProduct(_id: string, _product: Partial<Product>): Promise<void> {
-    throw new Error('La colección actual no incluye endpoint para actualizar productos.');
-  },
+export async function getProductCatalog(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ data: Product[]; total: number }> {
+  try {
+    const [ahProducts, tcProducts] = await Promise.all([
+      fetchProductsByModule('AH'),
+      fetchProductsByModule('TC'),
+    ]);
 
-  async deleteProduct(_id: string): Promise<void> {
-    throw new Error('La colección actual no incluye endpoint para eliminar productos.');
-  },
+    const catalog = [...ahProducts, ...tcProducts];
+    const filtered = params?.search
+      ? catalog.filter(
+          (item) =>
+            item.code.toLowerCase().includes(params.search!.toLowerCase()) ||
+            item.name.toLowerCase().includes(params.search!.toLowerCase()) ||
+            item.description.toLowerCase().includes(params.search!.toLowerCase()) ||
+            item.category.toLowerCase().includes(params.search!.toLowerCase())
+        )
+      : catalog;
 
-  async getAuditLog(): Promise<{ data: MaintenanceAuditLog[]; total: number }> {
-    return {
-      data: [],
-      total: 0,
-    };
-  },
-};
+    return getPagedResult(filtered, params?.page, params?.pageSize);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function createProduct(_product: Partial<Product>): Promise<void> {
+  throw new Error('La colección actual no incluye endpoint para crear productos.');
+}
+
+export async function updateProduct(_id: string, _product: Partial<Product>): Promise<void> {
+  throw new Error('La colección actual no incluye endpoint para actualizar productos.');
+}
+
+export async function deleteProduct(_id: string): Promise<void> {
+  throw new Error('La colección actual no incluye endpoint para eliminar productos.');
+}
+
+export async function getAuditLog(): Promise<{ data: MaintenanceAuditLog[]; total: number }> {
+  return {
+    data: [],
+    total: 0,
+  };
+}

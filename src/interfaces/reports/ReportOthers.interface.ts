@@ -26,6 +26,7 @@ export type ServicesReportResponseI =
 export interface EventsReportRequestI {
   fechaDesde?: string;
   fechaHasta?: string;
+  nombre?: string;
 }
 
 export interface EventsReportItem {
@@ -52,9 +53,14 @@ export interface InsuranceReportRequestI {
 
 export interface InsuranceReportItem {
   fecha: string;
-  poliza: string;
+  nombre: string;
   numeroAsociado: string;
-  monto: number;
+  cuentaOrigen: string;
+  tipoCuenta: string;
+  valorPagado: number;
+  tipoPoliza: string;
+  poliza: string;
+  referencia: string;
 }
 
 export type InsuranceReportResponseI =
@@ -85,3 +91,22 @@ export interface MhReportItem {
 
 export type MhReportResponseI =
   BackofficeApiPaginatedData<MhReportItem>;
+
+/** Financial Correspondents Report */
+export interface FinancialCorrespondentsReportRequestI {
+  fechaDesde?: string;
+  fechaHasta?: string;
+}
+
+export interface FinancialCorrespondentsReportItem {
+  fecha: string;
+  numAsociado: string;
+  nombre: string;
+  monto: number;
+  cuenta: string;
+  referencia: string;
+  tipo: string;
+}
+
+export type FinancialCorrespondentsReportResponseI =
+  FinancialCorrespondentsReportItem[];

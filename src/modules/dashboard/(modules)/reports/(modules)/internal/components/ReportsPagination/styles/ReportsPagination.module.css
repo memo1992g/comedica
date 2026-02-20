@@ -71,6 +71,29 @@
   color: #bbbbbb;
 }
 
+.dateRangeContainer {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.dateRangeButton {
+  height: 36px;
+  min-width: 165px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  color: #bbbbbb;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.dateRangeButton:hover {
+  background: #f2f2f7;
+  border-color: #d1d1d6;
+}
+
 .rightSection {
   display: flex;
   align-items: center;

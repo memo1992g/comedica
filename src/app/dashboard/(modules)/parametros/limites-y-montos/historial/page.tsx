@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, ChevronRight, FileText } from 'lucide-react';
-import { parametersService } from '@/lib/api/parameters.service';
+import { ArrowLeft, Calendar, FileText } from 'lucide-react';
+import { getAuditLog } from '@/lib/api/parameters.service';
 import { AuditLog } from '@/types';
 import styles from './page.module.css';
 
@@ -21,7 +21,7 @@ export default function HistorialAuditoriaPage() {
 
   const loadAuditLogs = async () => {
     try {
-      const response = await parametersService.getAuditLog({
+      const response = await getAuditLog({
         search: searchQuery,
         page: currentPage,
         pageSize,
@@ -63,15 +63,6 @@ export default function HistorialAuditoriaPage() {
 
   return (
     <div className={styles.container}>
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <a href="/parametros">Parámetros</a>
-        <ChevronRight size={16} />
-        <a href="/parametros/limites-y-montos">Límites y Montos</a>
-        <ChevronRight size={16} />
-        <span>Historial completo de auditoría</span>
-      </div>
-
       {/* Header */}
       <div className={styles.header}>
         <button 

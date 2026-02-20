@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Plus, Pencil, Trash2, Search } from 'lucide-react';
-import { maintenanceService, SecurityQuestion } from '@/lib/api/maintenance.service';
+import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { getSecurityQuestions, createSecurityQuestion, updateSecurityQuestion, deleteSecurityQuestion, type SecurityQuestion } from '@/lib/api/maintenance.service';
 import { Modal, ModalBody, ModalFooter } from '@/components/parametros/Modal';
 import { ConfirmationModal } from '@/components/parametros/ConfirmationModal';
 import modalStyles from '@/components/parametros/Modal.module.css';
@@ -31,7 +31,7 @@ export default function CuestionarioSeguridadPage() {
 
   const loadQuestions = async () => {
     try {
-      const response = await maintenanceService.getSecurityQuestions({ search: searchQuery, page: currentPage, pageSize });
+      const response = await getSecurityQuestions({ search: searchQuery, page: currentPage, pageSize });
       setQuestions(response.data);
       setTotal(response.total);
     } catch (error) {
@@ -54,9 +54,9 @@ export default function CuestionarioSeguridadPage() {
     setIsLoading(true);
     try {
       if (selectedQuestion) {
-        await maintenanceService.updateSecurityQuestion(selectedQuestion.id, formData);
+        await updateSecurityQuestion(selectedQuestion.id, formData);
       } else {
-        await maintenanceService.createSecurityQuestion(formData);
+        await createSecurityQuestion(formData);
       }
       await loadQuestions();
       setShowAddModal(false);
@@ -73,7 +73,7 @@ export default function CuestionarioSeguridadPage() {
     if (!questionToDelete) return;
     setIsLoading(true);
     try {
-      await maintenanceService.deleteSecurityQuestion(questionToDelete.id);
+      await deleteSecurityQuestion(questionToDelete.id);
       await loadQuestions();
       setQuestionToDelete(null);
     } catch (error) {
@@ -91,12 +91,6 @@ export default function CuestionarioSeguridadPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.breadcrumb}>
-        <a href="/mantenimiento">Mantenimiento de</a>
-        <ChevronRight size={16} />
-        <span>Cuestionario de Seguridad para Soporte Telefónico</span>
-      </div>
-
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h1>Cuestionario de Seguridad para Soporte Telefónico</h1>

@@ -37,6 +37,10 @@ export const sidebarItems: Item[] = [
         label: "Configuraciones de Seguridad",
         href: "/dashboard/parametros/seguridad",
       },
+      {
+        label: "Solicitud de Soft Token",
+        href: "/dashboard/parametros/solicitud-soft-token",
+      },
       { label: "Red Transfer365", href: "/dashboard/parametros/transfer365" },
     ],
   },

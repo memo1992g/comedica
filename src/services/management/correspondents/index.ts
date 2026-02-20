@@ -1,6 +1,4 @@
 export {
   listCorrespondentsService,
-  createCorrespondentService,
-  updateCorrespondentService,
-  deleteCorrespondentService,
+  exportXmlCorrespondentService,
 } from "./correspondents.service";

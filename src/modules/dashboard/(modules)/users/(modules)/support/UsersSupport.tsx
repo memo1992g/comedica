@@ -13,7 +13,8 @@ import {
   type SupportUser, type AttentionType,
 } from './data/mock-data';
 import styles from './styles/users-support.module.css';
-import { userManagementService } from '@/lib/api/user-management.service';
+import { consultUser, blockUser, unblockUser, inactivateUser } from '@/lib/api/user-management.service';
+import { toSupportUser } from '@/lib/api/types/user-management.types';
 
 type SubTab = 'tipos' | 'gestiones';
 type View = 'main' | 'history-table';
@@ -56,8 +57,8 @@ export default function UsersSupport() {
 
     try {
       setQueryError(null);
-      const profile = await userManagementService.consultUser(Number(trimmed));
-      setSelectedUser(userManagementService.toSupportUser(profile));
+      const profile = await consultUser(Number(trimmed));
+      setSelectedUser(toSupportUser(profile));
     } catch (error) {
       setSelectedUser(localMatch ?? null);
       setQueryError(error instanceof Error ? error.message : 'No fue posible consultar el usuario');
@@ -90,11 +91,11 @@ export default function UsersSupport() {
 
     try {
       if (action === 'block') {
-        await userManagementService.blockUser(selectedUser.username);
+        await blockUser(selectedUser.username);
       } else if (action === 'unblock') {
-        await userManagementService.unblockUser(selectedUser.username);
+        await unblockUser(selectedUser.username);
       } else {
-        await userManagementService.inactivateUser(selectedUser.username);
+        await inactivateUser(selectedUser.username);
       }
 
       setShowConfirmationModal(false);

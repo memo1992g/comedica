@@ -8,8 +8,8 @@ const ENCRYPT = !!process.env.AES_KEY_BASE64;
  */
 async function encryptRequestBody(options: RequestInit): Promise<RequestInit> {
   if (!ENCRYPT) return options;
-  // Solo encriptar el body si la petición no es GET y tiene un body
-  if (options.method !== 'GET' && options.body) {
+  // Solo encriptar el body si la petición no es GET, tiene un body y NO es FormData
+  if (options.method !== 'GET' && options.body && !(options.body instanceof FormData)) {
     try {
       // Parseo del body si es un string
       const bodyData = typeof options.body === 'string'

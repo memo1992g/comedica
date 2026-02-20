@@ -14,17 +14,16 @@ export interface ComplaintListRequestI {
 }
 
 export interface ComplaintI {
-  id: number;
-  idChannelCoreUser: number;
-  idTipoReclamo: number;
+  idReclamo: number;
+  canal: string;
+  tipo: string;
   dui: string;
   nombreCliente: string;
-  monto: number;
+  fechaPresenta: string;
   descripcion: string;
-  idEstadoReclamo: number;
-  idEstadoResolucion: number | null;
-  fechaCreacion: string;
-  fechaActualizacion: string;
+  monto: number;
+  estadoReclamo: string;
+  estadoResolucion: string;
 }
 
 export interface CreateComplaintRequestI {
@@ -45,4 +44,20 @@ export interface CatalogItemI {
   id: number;
   name: string;
   description?: string;
+}
+
+export interface ReclaimXmlItemI {
+  codigoCorresponsal: string;
+  administrador: string;
+  tipoTransaccion: string;
+  numeroControl: string;
+  fecha: string;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  motivo: string;
+  descripcion: string;
+  estado: string;
+  resultadoResolucion: string;
+  fechaResolucion: string;
+  montoReclamado: number;
 }

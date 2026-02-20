@@ -7,21 +7,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import CustomTable from '@/components/common/CustomTable/CustomTable';
 import { useCustomTable } from '@/components/common/CustomTable/hooks/use-custom-table';
 import { getCustomTableColumns } from '@/components/common/CustomTable/utils/get-custom-table-columns';
-import { ReportRow, reportColumns } from '../utils/report-columns';
+import type { ColumnDef } from '@tanstack/react-table';
 import ManagementTableSkeleton from '@/components/common/ManagementTableSkeleton/ManagementTableSkeleton';
 import styles from '../styles/management-report.module.css';
 import '../styles/CustomTableOverrides.css';
 
-interface ManagementReportProps {
-  title: string;
-  subtitle: string;
-  xmlButtonLabel: string;
-  data: ReportRow[];
-  onSearch?: (month: number) => Promise<void>;
-  onExportXml?: (month: number) => Promise<void>;
-  isSearching?: boolean;
-  isExporting?: boolean;
-  error?: string | null;
+interface ManagementReportProps<TData> {
+  readonly title: string;
+  readonly subtitle: string;
+  readonly xmlButtonLabel: string;
+  readonly data: TData[];
+  readonly columns: ColumnDef<TData>[];
+  readonly onSearch?: (month: number) => Promise<void>;
+  readonly onExportXml?: (month: number) => Promise<void>;
+  readonly isSearching?: boolean;
+  readonly isExporting?: boolean;
+  readonly error?: string | null;
+  readonly extraXmlButtons?: {
+    label: string;
+    onExport: (month: number) => Promise<void>;
+    isExporting?: boolean;
+    disabled?: boolean;
+  }[];
 }
 
 const MONTHS = [
@@ -29,10 +36,10 @@ const MONTHS = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ];
 
-export default function ManagementReport({
-  title, subtitle, xmlButtonLabel, data,
-  onSearch, onExportXml, isSearching, isExporting, error,
-}: ManagementReportProps) {
+export default function ManagementReport<TData>({
+  title, subtitle, xmlButtonLabel, data, columns,
+  onSearch, onExportXml, isSearching, isExporting, error, extraXmlButtons,
+}: ManagementReportProps<TData>) {
   const [selectedMonth, setSelectedMonth] = useState(String(new Date().getMonth()));
   const [hasSearched, setHasSearched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,14 +50,14 @@ export default function ManagementReport({
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
-  const columns = useMemo(
-    () => getCustomTableColumns({ columns: reportColumns }),
-    []
+  const processedColumns = useMemo(
+    () => getCustomTableColumns({ columns }),
+    [columns]
   );
 
   const { table } = useCustomTable({
     data: hasSearched ? data : [],
-    columns,
+    columns: processedColumns,
     manualPagination: false,
     pageIndex: currentPage - 1,
     pageSize: itemsPerPage,
@@ -58,7 +65,7 @@ export default function ManagementReport({
 
   const renderContent = () => {
     if (isSearching) {
-      return <ManagementTableSkeleton rows={8} columns={5} />;
+      return <ManagementTableSkeleton rows={8} columns={8} />;
     }
     if (hasSearched) {
       return (
@@ -154,6 +161,20 @@ export default function ManagementReport({
                   {xmlButtonLabel}
                 </Button>
               )}
+              {hasSearched && extraXmlButtons?.map(({ label, onExport, isExporting: isExp, disabled }) => (
+                <Button
+                  key={label}
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<FileText size={12} />}
+                  className={styles.xmlButton}
+                  disabled={isExp || disabled}
+                  isLoading={isExp}
+                  onClick={async () => onExport(Number(selectedMonth))}
+                >
+                  {label}
+                </Button>
+              ))}
             </div>
             {hasSearched && (
               <div className={styles.paginationInfo}>

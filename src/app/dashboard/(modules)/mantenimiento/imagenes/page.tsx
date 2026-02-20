@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Plus, Trash2, Image as ImageIcon, Monitor, Smartphone } from 'lucide-react';
-import { maintenanceService, SecurityImage } from '@/lib/api/maintenance.service';
+import { Plus, Trash2, Image as ImageIcon, Monitor, Smartphone } from 'lucide-react';
+import { getSecurityImages, uploadSecurityImage, deleteSecurityImage, type SecurityImage } from '@/lib/api/maintenance.service';
 import { Modal, ModalBody, ModalFooter } from '@/components/parametros/Modal';
 import { ConfirmationModal } from '@/components/parametros/ConfirmationModal';
 import modalStyles from '@/components/parametros/Modal.module.css';
@@ -24,7 +24,7 @@ export default function ImagenesPage() {
 
   const loadImages = async () => {
     try {
-      const data = await maintenanceService.getSecurityImages();
+      const data = await getSecurityImages();
       setImages(data);
     } catch (error) {
       console.error('Error:', error);
@@ -39,7 +39,7 @@ export default function ImagenesPage() {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      await maintenanceService.uploadSecurityImage(formData);
+      await uploadSecurityImage(formData);
       await loadImages();
       setShowAddModal(false);
     } catch (error) {
@@ -53,7 +53,7 @@ export default function ImagenesPage() {
     if (!imageToDelete) return;
     setIsLoading(true);
     try {
-      await maintenanceService.deleteSecurityImage(imageToDelete.id);
+      await deleteSecurityImage(imageToDelete.id);
       await loadImages();
       setImageToDelete(null);
     } catch (error) {
@@ -72,12 +72,6 @@ export default function ImagenesPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.breadcrumb}>
-        <a href="/mantenimiento">Mantenimiento de</a>
-        <ChevronRight size={16} />
-        <span>Imágenes de seguridad</span>
-      </div>
-
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h1>Imágenes de Seguridad</h1>

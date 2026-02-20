@@ -34,13 +34,13 @@ export default function Transfer365Tabs({ activeTab, onTabChange }: Transfer365T
         Cuadre Transfer365
         {activeTab === 'cuadre' && <div className={styles.tabIndicator} />}
       </button>
-      <button
+      {/* <button
         className={`${styles.tab} ${activeTab === 'cuadre-card' ? styles.tabActive : ''}`}
         onClick={() => onTabChange('cuadre-card')}
       >
         Cuadre CA-RD
         {activeTab === 'cuadre-card' && <div className={styles.tabIndicator} />}
-      </button>
+      </button> */}
     </div>
   );
 }

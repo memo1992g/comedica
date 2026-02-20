@@ -1,22 +1,36 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, ChevronLeft, ChevronRight, ChevronDown, Filter } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { CustomDatePicker } from '@/components/common/CustomDatePicker/CustomDatePicker';
 import styles from './ServicesPagination.module.css';
+
+interface DateRangeFilter {
+  from: Date | null;
+  to: Date | null;
+}
 
 interface ServicesPaginationProps {
   currentPage: number;
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
+  dateRange?: DateRangeFilter;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
   onSearch: (query: string) => void;
-  onDateFilter: (date: Date | null) => void;
+  onDateFilter: (range: DateRangeFilter) => void;
   onFilterChange?: (value: string) => void;
   searchQuery: string;
+  searchPlaceholder?: string;
 }
 
 export default function ServicesPagination({
@@ -24,13 +38,15 @@ export default function ServicesPagination({
   totalPages,
   totalItems,
   itemsPerPage,
+  dateRange,
   onPageChange,
   onPageSizeChange,
   onSearch,
   onDateFilter,
   onFilterChange,
   searchQuery,
-}: ServicesPaginationProps) {
+  searchPlaceholder = 'Buscar...',
+}: Readonly<ServicesPaginationProps>) {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
   const [filterValue, setFilterValue] = useState('all');
@@ -38,22 +54,34 @@ export default function ServicesPagination({
   return (
     <div className={styles.paginationContainer}>
       <div className={styles.leftSection}>
-        <div className={styles.searchWrapper}>
+        <div className={styles.searchBar}>
           <Search size={16} className={styles.searchIcon} />
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Buscar..."
+            placeholder={searchPlaceholder}
             value={searchQuery}
-            onChange={e => onSearch(e.target.value)}
+            onChange={(e) => onSearch(e.target.value)}
           />
         </div>
-        
-        <CustomDatePicker
-          iconOnly
-          className={styles.calendarButton}
-          onChange={(date) => onDateFilter(date)}
-        />
+
+        <div className={styles.dateRangeContainer}>
+          <CustomDatePicker
+            selectionMode="range"
+            disableFutureDates
+            className={styles.dateRangeButton}
+            rangeValue={{
+              from: dateRange?.from ?? undefined,
+              to: dateRange?.to ?? undefined,
+            }}
+            onRangeChange={(range) =>
+              onDateFilter({
+                from: range?.from ?? null,
+                to: range?.to ?? null,
+              })
+            }
+          />
+        </div>
 
         <Popover>
           <PopoverTrigger asChild>
@@ -88,16 +116,27 @@ export default function ServicesPagination({
 
       <div className={styles.rightSection}>
         <div className={styles.pageSelector}>
-          <span className={styles.pageLabel}>Página</span>
-          <div className={styles.pageDropdown}>
-            <span>{currentPage}</span>
-            <ChevronDown size={16} />
-          </div>
+          <span className={styles.label}>Items por página</span>
+          <Select
+            value={String(itemsPerPage)}
+            onValueChange={(value) => onPageSizeChange(Number(value))}
+          >
+            <SelectTrigger className={styles.select}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[5, 10, 25, 50, 100].map((size) => (
+                <SelectItem key={size} value={String(size)}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        <span className={styles.itemsInfo}>
-          {startItem}-{endItem} de {totalItems}
-        </span>
+        <div className={styles.itemsInfo}>
+          {totalItems === 0 ? 0 : startItem}-{endItem} de {totalItems}
+        </div>
 
         <div className={styles.navigationButtons}>
           <button

@@ -1,4 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/utils';
 import {
   ServicioTransaction,
@@ -7,15 +8,26 @@ import {
   MinisterioTransaction,
 } from '../types/service-types';
 
+function formatDateCell(value: string): string {
+  if (!value) return '---';
+  try {
+    return format(new Date(value), 'dd/MM/yyyy - h:mm a');
+  } catch {
+    return value;
+  }
+}
+
 // Servicios columns
 export const serviciosColumns: ColumnDef<ServicioTransaction>[] = [
   {
     accessorKey: 'fecha',
     header: 'Fecha',
     cell: ({ row }) => (
-      <span style={{ fontWeight: 500, color: '#6b7280' }}>{row.getValue('fecha')}</span>
+      <span style={{ fontSize: '11px', color: '#4a4a4c' }}>
+        {formatDateCell(row.getValue('fecha'))}
+      </span>
     ),
-    size: 120,
+    size: 170,
   },
   {
     accessorKey: 'numeroAsociado',
@@ -69,9 +81,11 @@ export const eventosColumns: ColumnDef<EventoTransaction>[] = [
     accessorKey: 'fecha',
     header: 'Fecha',
     cell: ({ row }) => (
-      <span style={{ fontWeight: 500, color: '#6b7280' }}>{row.getValue('fecha')}</span>
+      <span style={{ fontSize: '11px', color: '#4a4a4c' }}>
+        {formatDateCell(row.getValue('fecha'))}
+      </span>
     ),
-    size: 120,
+    size: 170,
   },
   {
     accessorKey: 'numeroAsociado',
@@ -115,16 +129,6 @@ export const eventosColumns: ColumnDef<EventoTransaction>[] = [
     ),
     size: 180,
   },
-  {
-    accessorKey: 'numeroAsociadoParticipante',
-    header: 'N° asociado',
-    cell: ({ row }) => (
-      <span style={{ color: '#4a4a4c' }}>
-        {row.getValue('numeroAsociadoParticipante')}
-      </span>
-    ),
-    size: 120,
-  },
 ];
 
 // Seguros Comédica columns
@@ -133,9 +137,11 @@ export const segurosColumns: ColumnDef<SeguroTransaction>[] = [
     accessorKey: 'fecha',
     header: 'Fecha',
     cell: ({ row }) => (
-      <span style={{ fontWeight: 500, color: '#6b7280' }}>{row.getValue('fecha')}</span>
+      <span style={{ fontSize: '11px', color: '#4a4a4c' }}>
+        {formatDateCell(row.getValue('fecha'))}
+      </span>
     ),
-    size: 120,
+    size: 170,
   },
   {
     accessorKey: 'numeroAsociado',
@@ -143,43 +149,51 @@ export const segurosColumns: ColumnDef<SeguroTransaction>[] = [
     cell: ({ row }) => (
       <span style={{ color: '#4a4a4c' }}>{row.getValue('numeroAsociado')}</span>
     ),
-    size: 120,
+    size: 100,
   },
   {
-    accessorKey: 'asegurado',
+    accessorKey: 'nombre',
     header: 'Asegurado',
     cell: ({ row }) => (
-      <span style={{ color: '#23366a' }}>{row.getValue('asegurado')}</span>
+      <span style={{ color: '#23366a' }}>{row.getValue('nombre')}</span>
     ),
     size: 180,
   },
   {
-    accessorKey: 'monto',
-    header: 'Monto',
+    accessorKey: 'valorPagado',
+    header: 'Valor Pagado',
     cell: ({ row }) => (
       <span style={{ color: '#23366a', textAlign: 'right', display: 'block' }}>
-        {formatCurrency(row.getValue('monto'))}
+        {formatCurrency(row.getValue('valorPagado'))}
       </span>
     ),
     size: 120,
   },
   {
-    accessorKey: 'numeroPoliza',
-    header: 'N° Póliza',
+    accessorKey: 'poliza',
+    header: 'Póliza',
     cell: ({ row }) => (
       <span style={{ fontFamily: 'Cousine, monospace', color: '#6b7280' }}>
-        {row.getValue('numeroPoliza')}
+        {row.getValue('poliza')}
       </span>
     ),
-    size: 150,
+    size: 120,
   },
   {
-    accessorKey: 'tipoSeguro',
-    header: 'Tipo Seguro',
+    accessorKey: 'tipoPoliza',
+    header: 'Tipo Póliza',
     cell: ({ row }) => (
-      <span style={{ fontWeight: 500, color: '#6b7280' }}>{row.getValue('tipoSeguro')}</span>
+      <span style={{ fontWeight: 500, color: '#6b7280' }}>{row.getValue('tipoPoliza')}</span>
     ),
-    size: 150,
+    size: 100,
+  },
+  {
+    accessorKey: 'tipoCuenta',
+    header: 'Tipo Cuenta',
+    cell: ({ row }) => (
+      <span style={{ color: '#6b7280' }}>{row.getValue('tipoCuenta')}</span>
+    ),
+    size: 140,
   },
 ];
 
@@ -189,9 +203,19 @@ export const ministerioColumns: ColumnDef<MinisterioTransaction>[] = [
     accessorKey: 'fecha',
     header: 'Fecha',
     cell: ({ row }) => (
-      <span style={{ fontWeight: 500, color: '#6b7280' }}>{row.getValue('fecha')}</span>
+      <span style={{ fontSize: '11px', color: '#4a4a4c' }}>
+        {formatDateCell(row.getValue('fecha'))}
+      </span>
     ),
-    size: 120,
+    size: 170,
+  },
+  {
+    accessorKey: 'nombre',
+    header: 'Nombre',
+    cell: ({ row }) => (
+      <span style={{ color: '#23366a' }}>{row.getValue('nombre')}</span>
+    ),
+    size: 200,
   },
   {
     accessorKey: 'numeroAsociado',
@@ -199,7 +223,22 @@ export const ministerioColumns: ColumnDef<MinisterioTransaction>[] = [
     cell: ({ row }) => (
       <span style={{ color: '#4a4a4c' }}>{row.getValue('numeroAsociado')}</span>
     ),
-    size: 120,
+    size: 100,
+  },
+  {
+    accessorKey: 'cuentaOrigen',
+    header: 'Cuenta Origen',
+    cell: ({ row }) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <span style={{ fontSize: '11px', color: '#23366a' }}>
+          {row.getValue('cuentaOrigen')}
+        </span>
+        <span style={{ fontSize: '9px', color: '#6a7282' }}>
+          {row.original.tipoCuenta}
+        </span>
+      </div>
+    ),
+    size: 140,
   },
   {
     accessorKey: 'monto',
@@ -212,16 +251,6 @@ export const ministerioColumns: ColumnDef<MinisterioTransaction>[] = [
     size: 120,
   },
   {
-    accessorKey: 'nitDui',
-    header: 'NIT/DUI',
-    cell: ({ row }) => (
-      <span style={{ fontFamily: 'Cousine, monospace', color: '#6b7280' }}>
-        {row.getValue('nitDui')}
-      </span>
-    ),
-    size: 150,
-  },
-  {
     accessorKey: 'mandamientoNpe',
     header: 'Mandamiento (NPE)',
     cell: ({ row }) => (
@@ -229,14 +258,14 @@ export const ministerioColumns: ColumnDef<MinisterioTransaction>[] = [
         {row.getValue('mandamientoNpe')}
       </span>
     ),
-    size: 161,
+    size: 160,
   },
   {
-    accessorKey: 'tipoImpuesto',
-    header: 'Tipo Impuesto',
+    accessorKey: 'canal',
+    header: 'Canal',
     cell: ({ row }) => (
-      <span style={{ fontWeight: 500, color: '#6b7280' }}>{row.getValue('tipoImpuesto')}</span>
+      <span style={{ fontWeight: 500, color: '#6b7280' }}>{row.getValue('canal')}</span>
     ),
-    size: 150,
+    size: 80,
   },
 ];

@@ -1,4 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { FinancialCorrespondentTransaction } from '../types/FinancialCorrespondent.type';
 
 const formatCurrency = (value: number): string => {
@@ -10,6 +11,14 @@ const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
+const formatDateCell = (value: string): string => {
+  try {
+    return format(new Date(value), 'dd/MM/yyyy - h:mm a');
+  } catch {
+    return value;
+  }
+};
+
 export const financialCorrespondentsColumns: ColumnDef<FinancialCorrespondentTransaction>[] = [
   {
     accessorKey: 'fecha',
@@ -17,7 +26,7 @@ export const financialCorrespondentsColumns: ColumnDef<FinancialCorrespondentTra
     cell: ({ row }) => {
       return (
         <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>
-          {row.original.fecha}
+          {formatDateCell(row.original.fecha)}
         </div>
       );
     },

@@ -19,21 +19,27 @@ export interface EventoTransaction extends BaseTransaction {
   codEvento: string;
   nombreEvento: string;
   nombreParticipante: string;
-  numeroAsociadoParticipante: string;
 }
 
 // Seguros Comédica (Insurance) tab
 export interface SeguroTransaction extends BaseTransaction {
-  asegurado: string;
-  numeroPoliza: string;
-  tipoSeguro: string;
+  nombre: string;
+  cuentaOrigen: string;
+  tipoCuenta: string;
+  valorPagado: number;
+  tipoPoliza: string;
+  poliza: string;
+  referencia: string;
 }
 
 // Ministerio de Hacienda (Treasury) tab
 export interface MinisterioTransaction extends BaseTransaction {
-  nitDui: string;
+  nombre: string;
+  cuentaOrigen: string;
+  tipoCuenta: string;
   mandamientoNpe: string;
-  tipoImpuesto: string;
+  referencia: string;
+  canal: string;
 }
 
 export type ServiceTransaction = 

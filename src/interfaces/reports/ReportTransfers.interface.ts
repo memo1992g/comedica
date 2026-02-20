@@ -15,10 +15,15 @@ export interface PaymentAccountReportRequestI {
 export interface PaymentAccountReportItem {
   transactionDate: string;
   creditCustomerId: string;
-  debitCustomerId: string;
   creditAccount: string;
+  creditAccountHolder: string;
+  debitCustomerId: string;
   debitAccount: string;
+  debitAccountHolder: string;
   amount: number;
+  channel: string;
+  transactionConcept: string;
+  transactionType: string;
 }
 
 export type PaymentAccountReportResponseI =
@@ -28,6 +33,7 @@ export type PaymentAccountReportResponseI =
 export interface Transfer365CardReportRequestI {
   fechaDesde?: string;
   fechaHasta?: string;
+  cuentaOrigen?: string;
   tipoTransferencia?: string;
   codigo?: string;
   bancoOrigen?: string;

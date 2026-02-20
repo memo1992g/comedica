@@ -1,9 +1,15 @@
 "use server";
 
 import type { ActionResult } from "@/interfaces/ApiResponse.interface";
-import type { CorrespondentI } from "@/interfaces/management/correspondents";
+import type {
+  CorrespondentI,
+  CorrespondentXmlItemI,
+} from "@/interfaces/management/correspondents";
 import { throwActionError } from "@/lib/error-handle";
-import { listCorrespondentsService } from "@/services/management/correspondents";
+import {
+  listCorrespondentsService,
+  exportXmlCorrespondentService,
+} from "@/services/management/correspondents";
 
 /**
  * Action: List all correspondents
@@ -23,6 +29,33 @@ export const listCorrespondentsAction = async (): Promise<
       errors: true,
       errorMessage: res.result?.message || "Error al obtener corresponsales",
     };
+  } catch (error: unknown) {
+    return throwActionError(error);
+  }
+};
+
+/**
+ * Action: Export XML for correspondents
+ * Returns base64-encoded XML; reconstruct Blob on the client.
+ */
+export const exportXmlCorrespondentAction = async (
+  correspondents: CorrespondentI[],
+): Promise<ActionResult<string>> => {
+  try {
+    const items: CorrespondentXmlItemI[] = correspondents.map((c) => ({
+      codigoCorresponsal: c.codeSsf,
+      codigoInterno: c.internalCode,
+      administrador: "1",
+      fechaContratacion: c.assignmentDate,
+      fechaInicio: c.assignmentDate,
+      estado: c.status,
+      fechaFinContrato: c.terminationDate ?? "",
+      causaTerminacion: c.terminationFlow ?? "",
+    }));
+
+    const blob = await exportXmlCorrespondentService(items);
+    const buffer = Buffer.from(await blob.arrayBuffer());
+    return { data: buffer.toString("base64"), errors: false };
   } catch (error: unknown) {
     return throwActionError(error);
   }

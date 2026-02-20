@@ -51,18 +51,26 @@
   color: #bbbbbb;
 }
 
-.dateButton {
+.dateRangeContainer {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
+}
+
+.dateRangeButton {
   height: 36px;
+  min-width: 165px;
   border: 0.8px solid #d1d1d6;
   border-radius: 4px;
   background: #f2f2f7;
   color: #bbbbbb;
-  cursor: pointer;
-  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.dateRangeButton:hover {
+  background: #f2f2f7;
+  border-color: #d1d1d6;
 }
 
 .filterButton {
@@ -140,8 +148,9 @@
 }
 
 .select {
+  width: 70px;
   height: 36px;
-  padding: 0 12.8px;
+  padding: 0 12px;
   background: white;
   border: 0.8px solid white;
   border-radius: 14px;
@@ -149,7 +158,8 @@
   font-size: 16px;
   color: black;
   cursor: pointer;
-  width: 70px;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .pageInfo {

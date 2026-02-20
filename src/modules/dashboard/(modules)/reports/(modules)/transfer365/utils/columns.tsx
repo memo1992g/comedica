@@ -1,4 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 
 export interface Transfer365Transaction {
   id: string;
@@ -25,7 +26,7 @@ const formatCurrency = (value: number): string => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(Math.abs(value));
-  
+
   return value < 0 ? `-${formatted}` : `+${formatted}`;
 };
 
@@ -36,7 +37,7 @@ export const transfer365Columns: ColumnDef<Transfer365Transaction>[] = [
     cell: ({ row }) => {
       return (
         <div style={{ fontSize: '11px', color: '#4a4a4c' }}>
-          {row.original.date} {row.original.time}
+          {row.original.date ? format(new Date(row.original.date), 'dd/MM/yyyy - h:mm a') : '---'}
         </div>
       );
     },
@@ -83,17 +84,14 @@ export const transfer365Columns: ColumnDef<Transfer365Transaction>[] = [
       const isPositive = amount >= 0;
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <div 
-            style={{ 
-              fontSize: '11px', 
+          <div
+            style={{
+              fontSize: '11px',
               color: isPositive ? '#00a63e' : '#23366a',
-              fontWeight: 400 
+              fontWeight: 400
             }}
           >
             {formatCurrency(amount)}
-          </div>
-          <div style={{ fontSize: '9px', color: '#6a7282' }}>
-            {row.original.type}
           </div>
         </div>
       );
@@ -133,14 +131,14 @@ export const transfer365Columns: ColumnDef<Transfer365Transaction>[] = [
       const code = row.original.code;
       const isSuccess = code === '00';
       return (
-        <div 
-          style={{ 
-            fontSize: '11px', 
+        <div
+          style={{
+            fontSize: '11px',
             color: isSuccess ? '#00a63e' : '#e7000b',
-            fontWeight: 400 
+            fontWeight: 400
           }}
         >
-          {code}
+          {code || '---'}
         </div>
       );
     },

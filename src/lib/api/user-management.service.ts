@@ -1,4 +1,13 @@
-import apiClient, { getErrorMessage } from './client';
+"use server";
+
+import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
+import { cookies } from "next/headers";
+import { APP_COOKIES } from "@/consts/cookies/cookies.consts";
+
+export type { UserManagementProfile } from './types/user-management.types';
+import type { UserManagementProfile } from './types/user-management.types';
+
+const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
 
 interface BackofficeResult {
   code: number;
@@ -8,10 +17,6 @@ interface BackofficeResult {
 interface BackofficeEnvelope<T> {
   result?: BackofficeResult;
   data?: T;
-}
-
-interface UserManagementConsultRequest {
-  associatedNumber: number;
 }
 
 interface UserManagementUser {
@@ -27,15 +32,24 @@ interface UserManagementUser {
   username?: string;
 }
 
-export interface UserManagementProfile {
-  id: string;
-  associatedNumber: string;
-  name: string;
-  dui: string;
-  phone: string;
-  email: string;
-  username: string;
-  status: 'Activo' | 'Inactivo' | 'Bloqueado';
+function getAuthHeaders(): Record<string, string> {
+  const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
+  const accessToken = clientTokenJSON
+    ? JSON.parse(clientTokenJSON)?.accessToken
+    : null;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return headers;
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return 'Error desconocido';
 }
 
 function buildContext() {
@@ -70,15 +84,6 @@ function normalizeStatus(status?: string): 'Activo' | 'Inactivo' | 'Bloqueado' {
   return 'Activo';
 }
 
-function initialsFromName(name: string) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join('');
-}
-
 function normalizeProfile(raw: UserManagementUser): UserManagementProfile {
   const name = raw.fullName || [raw.firstName, raw.lastName].filter(Boolean).join(' ').trim() || 'Sin nombre';
 
@@ -94,81 +99,81 @@ function normalizeProfile(raw: UserManagementUser): UserManagementProfile {
   };
 }
 
-export const userManagementService = {
-  async consultUser(associatedNumber: number): Promise<UserManagementProfile> {
-    try {
-      const response = await apiClient.post<BackofficeEnvelope<UserManagementUser>>('/user-management/consult', {
-        ...buildContext(),
-        request: { associatedNumber } satisfies UserManagementConsultRequest,
-      });
+export async function consultUser(associatedNumber: number): Promise<UserManagementProfile> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<BackofficeEnvelope<UserManagementUser>>(
+      `${API_URL}/user-management/consult`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          ...buildContext(),
+          request: { associatedNumber },
+        }),
+        headers,
+      },
+    );
 
-      const data = assertSuccess(response.data, 'No se encontró información del usuario');
-      return normalizeProfile(data);
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+    const data = assertSuccess(response, 'No se encontró información del usuario');
+    return normalizeProfile(data);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async blockUser(username: string): Promise<void> {
-    try {
-      await apiClient.post<BackofficeEnvelope<string>>('/user-management/block', {
-        ...buildContext(),
-        request: { username },
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+export async function blockUser(username: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch<BackofficeEnvelope<string>>(
+      `${API_URL}/user-management/block`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          ...buildContext(),
+          request: { username },
+        }),
+        headers,
+      },
+    );
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async unblockUser(username: string): Promise<void> {
-    try {
-      await apiClient.post<BackofficeEnvelope<string>>('/user-management/unblock', {
-        ...buildContext(),
-        request: { username },
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
+export async function unblockUser(username: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch<BackofficeEnvelope<string>>(
+      `${API_URL}/user-management/unblock`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          ...buildContext(),
+          request: { username },
+        }),
+        headers,
+      },
+    );
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
-  async inactivateUser(username: string): Promise<void> {
-    try {
-      await apiClient.post<BackofficeEnvelope<string>>('/user-management/inactivate', {
-        ...buildContext(),
-        request: { username },
-      });
-    } catch (error) {
-      throw new Error(getErrorMessage(error));
-    }
-  },
-
-  toConsultationUser(profile: UserManagementProfile) {
-    const initials = initialsFromName(profile.name);
-
-    return {
-      id: profile.associatedNumber || profile.id,
-      name: profile.name,
-      dui: profile.dui,
-      phone: profile.phone,
-      email: profile.email,
-      username: profile.username,
-      status: profile.status,
-      notificationMode: 'Email',
-      initials,
-      avatarColor: '#23366a',
-    };
-  },
-
-  toSupportUser(profile: UserManagementProfile) {
-    const initials = initialsFromName(profile.name);
-
-    return {
-      id: profile.associatedNumber || profile.id,
-      name: profile.name,
-      dui: profile.dui,
-      initials,
-      status: profile.status,
-      username: profile.username,
-    };
-  },
-};
+export async function inactivateUser(username: string): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    await customAuthFetch<BackofficeEnvelope<string>>(
+      `${API_URL}/user-management/inactivate`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          ...buildContext(),
+          request: { username },
+        }),
+        headers,
+      },
+    );
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}

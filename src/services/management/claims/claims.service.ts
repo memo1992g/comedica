@@ -6,8 +6,7 @@ import type {
   ComplaintI,
   ComplaintListRequestI,
   CatalogItemI,
-  CreateComplaintRequestI,
-  UpdateComplaintRequestI,
+  ReclaimXmlItemI,
 } from "@/interfaces/management/claims";
 import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
 import { cookies } from "next/headers";
@@ -115,34 +114,29 @@ export const listResolutionsService = async (): Promise<
 };
 
 /**
- * POST /create-complaint — Create a new complaint
+ * POST /reportes/reclaim/exportar-xml — Export XML for claims
  */
-export const createComplaintService = async (
-  data: CreateComplaintRequestI,
-): Promise<BackofficeApiResponse<ComplaintI>> => {
+export const exportXmlReclaimService = async (
+  items: ReclaimXmlItemI[],
+): Promise<Blob> => {
   const headers = getAuthHeaders();
-  const body = { context: buildContext(), data };
+  const body = {
+    request: { data: items },
+    requestId: "0000",
+    uuid: crypto.randomUUID(),
+    pageId: 1,
+    channel: "WEB",
+  };
 
-  return customAuthFetch(`${API_URL}/create-complaint`, {
+  const url = `${API_URL}/reportes/reclaim/exportar-xml`;
+  console.log(`Exporting XML to ${url} with body:`, body);
+
+  const res = await fetch(url, {
     method: "POST",
     body: JSON.stringify(body),
-    headers,
+    headers: { ...headers, "Content-Type": "application/json" },
   });
-};
 
-/**
- * POST /update-complaint/:id — Update complaint status/resolution
- */
-export const updateComplaintService = async (
-  id: number,
-  data: UpdateComplaintRequestI,
-): Promise<BackofficeApiResponse<ComplaintI>> => {
-  const headers = getAuthHeaders();
-  const body = { context: buildContext(), data };
-
-  return customAuthFetch(`${API_URL}/update-complaint/${id}`, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers,
-  });
+  if (!res.ok) throw new Error(`Error exportando XML reclamos: ${res.status}`);
+  return res.blob();
 };

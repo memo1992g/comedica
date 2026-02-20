@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
-import { parametersService } from '@/lib/api/parameters.service';
+import { getSecurityConfig, getRecentAudit, updateSecurityConfig } from '@/lib/api/parameters.service';
 import { AuditLog } from '@/types';
 import { ConfirmationModal } from '@/components/parametros/ConfirmationModal';
 import styles from './page.module.css';
@@ -42,7 +41,7 @@ export default function ConfiguracionesSeguridadPage() {
 
   const loadConfig = async () => {
     try {
-      const data = await parametersService.getSecurityConfig();
+      const data = await getSecurityConfig();
       setConfig(data);
       setEditedConfig(data);
     } catch (error) {
@@ -52,7 +51,7 @@ export default function ConfiguracionesSeguridadPage() {
 
   const loadRecentAudit = async () => {
     try {
-      const data = await parametersService.getRecentAudit(5);
+      const data = await getRecentAudit(5);
       setRecentAudit(data);
     } catch (error) {
       console.error('Error al cargar auditoría:', error);
@@ -110,7 +109,7 @@ export default function ConfiguracionesSeguridadPage() {
     
     setIsLoading(true);
     try {
-      await parametersService.updateSecurityConfig(editedConfig);
+      await updateSecurityConfig(editedConfig);
       await loadConfig();
       await loadRecentAudit();
       setShowConfirmation(false);
@@ -167,13 +166,6 @@ export default function ConfiguracionesSeguridadPage() {
 
   return (
     <div className={styles.container}>
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <a href="/parametros">Parámetros</a>
-        <ChevronRight size={16} />
-        <span>Configuraciones de Seguridad</span>
-      </div>
-
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>

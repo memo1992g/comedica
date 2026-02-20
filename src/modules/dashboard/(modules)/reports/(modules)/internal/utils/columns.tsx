@@ -1,5 +1,6 @@
 'use client';
 
+import { format } from 'date-fns'
 import { ColumnDef } from '@tanstack/react-table';
 import { formatCurrency } from '@/lib/utils';
 
@@ -24,7 +25,7 @@ export const reportColumns: ColumnDef<TransactionData>[] = [
         header: () => <span className='tableHeaderTitle'>Fecha/Hora</span>,
         cell: ({ row }) => (
             <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', lineHeight: '16.5px', color: '#4a4a4c' }}>
-                {row.original.date} {row.original.time}
+                {format(new Date(`${row.original.date}`), 'dd/MM/yyyy h:mm a')}
             </span>
         ),
         size: 120,
@@ -46,7 +47,7 @@ export const reportColumns: ColumnDef<TransactionData>[] = [
         cell: ({ row }) => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                 <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', lineHeight: '16.5px', color: '#4a4a4c' }}>
-                    {row.original.nameOrigin}
+                    {row.original.nameOrigin || '---'}
                 </span>
                 <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '8px', lineHeight: '12px', color: '#6a7282' }}>
                     ID {row.original.idOrigin}
@@ -72,11 +73,8 @@ export const reportColumns: ColumnDef<TransactionData>[] = [
         cell: ({ row }) => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                 <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', lineHeight: '16.5px', color: '#4a4a4c' }}>
-                    {row.original.nameDestination}
-                </span>
-                <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '8px', lineHeight: '12px', color: '#6a7282' }}>
-                    ID {row.original.idDestination}
-                </span>
+                    {row.original.nameDestination || '---'}
+                </span>             
             </div>
         ),
         size: 150,
@@ -96,7 +94,7 @@ export const reportColumns: ColumnDef<TransactionData>[] = [
         header: () => <span className='tableHeaderTitle'>Canal</span>,
         cell: ({ getValue }) => (
             <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', lineHeight: '16.5px', color: '#4a4a4c' }}>
-                {getValue() as string}
+                {getValue() as string || '---'}
             </span>
         ),
         size: 120,
