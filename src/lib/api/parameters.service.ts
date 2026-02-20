@@ -131,6 +131,16 @@ function assertProxySuccess<T>(response: ParamsProxyResponse<T>): T {
   return response.data;
 }
 
+
+function normalizeParamsItem(item: any): ParamsProxyItem {
+  return {
+    name: String(item?.name ?? item?.paramName ?? ''),
+    value: item?.value ?? item?.paramValue ?? null,
+    description: item?.description ?? item?.paramDescription ?? null,
+    status: item?.status ?? null,
+  };
+}
+
 function assertT365Success<T>(response: T365Envelope<T>): T {
   if (response?.result && response.result.code !== 0) {
     throw new Error(response.result.message || 'Error consumiendo servicio Transfer365');
@@ -197,7 +207,7 @@ function paginate<T>(data: T[], page = 1, pageSize = 20): { data: T[]; total: nu
 
 function findParamValue(items: ParamsProxyItem[], names: string[], fallback: number): number {
   const normalizedNames = new Set(names.map((name) => name.toLowerCase()));
-  const match = items.find((item) => normalizedNames.has(item.name.toLowerCase()));
+  const match = items.find((item) => normalizedNames.has(String(item?.name ?? '').toLowerCase()));
   const value = Number(match?.value);
   return Number.isFinite(value) ? value : fallback;
 }
@@ -235,7 +245,7 @@ export async function getParams(request?: Partial<ParamsProxyItem>): Promise<Par
       },
     );
 
-    return assertProxySuccess(response);
+    return assertProxySuccess(response).map((item) => normalizeParamsItem(item));
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }
