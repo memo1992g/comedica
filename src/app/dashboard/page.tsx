@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { getErrorMessage } from '@/lib/api/client';
 import apiClient from '@/lib/api/client';
 import styles from './styles/dashboardPage.module.css';
 
@@ -37,17 +38,45 @@ export default function DashboardPage() {
   const [tx, setTx] = useState<{ data: TxRow[]; total: number }>({ data: [], total: 0 });
   const [dist, setDist] = useState<DistributionItem[]>([]);
   const [vol, setVol] = useState<VolumeItem[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    apiClient.get('/dashboard/overview').then((res) => setOverview(res.data.data));
-    apiClient.get('/dashboard/distribution').then((res) => setDist(res.data.data));
-    apiClient.get('/dashboard/volume').then((res) => setVol(res.data.data));
+    const loadDashboard = async () => {
+      try {
+        setLoadError(null);
+        const [overviewRes, distRes, volRes] = await Promise.all([
+          apiClient.get('/dashboard/overview'),
+          apiClient.get('/dashboard/distribution'),
+          apiClient.get('/dashboard/volume'),
+        ]);
+
+        setOverview(overviewRes.data.data);
+        setDist(distRes.data.data);
+        setVol(volRes.data.data);
+      } catch (error) {
+        setOverview(null);
+        setDist([]);
+        setVol([]);
+        setLoadError(getErrorMessage(error));
+      }
+    };
+
+    void loadDashboard();
   }, []);
 
   useEffect(() => {
-    apiClient
-      .get('/dashboard/transactions', { params: { search, page, pageSize } })
-      .then((res) => setTx(res.data.data));
+    const loadTransactions = async () => {
+      try {
+        setLoadError(null);
+        const res = await apiClient.get('/dashboard/transactions', { params: { search, page, pageSize } });
+        setTx(res.data.data);
+      } catch (error) {
+        setTx({ data: [], total: 0 });
+        setLoadError(getErrorMessage(error));
+      }
+    };
+
+    void loadTransactions();
   }, [search, page]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(tx.total / pageSize)), [tx.total]);
@@ -60,6 +89,8 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.wrap}>
+      {loadError && <p className={styles.cardSub}>No se pudo cargar dashboard: {loadError}</p>}
+
       {/* Top cards */}
       <div className={styles.cardsRow}>
         <div className={styles.cardGradient}>
