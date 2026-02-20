@@ -321,14 +321,20 @@ export async function getSecurityQuestions(params?: {
 
     let rawQuestions: any[] = [];
     try {
-      const getResponse = await customAuthFetch<any[]>(
+      const getResponse = await customAuthFetch<any[] | BackofficeEnvelope<any[]>>(
         `${API_URL}/list-security-questions`,
         {
           method: "GET",
           headers,
         },
       );
-      rawQuestions = getResponse || [];
+      if (Array.isArray(getResponse)) {
+        rawQuestions = getResponse;
+      } else if (Array.isArray(getResponse?.data)) {
+        rawQuestions = getResponse.data;
+      } else {
+        rawQuestions = [];
+      }
     } catch {
       const postResponse = await customAuthFetch<BackofficeEnvelope<any[]>>(
         `${API_URL}/list-security-questions`,
