@@ -12,7 +12,7 @@ import {
 export type { ParamsProxyItem } from './types/parameters.types';
 import type { ParamsProxyItem } from './types/parameters.types';
 
-const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+const API_URL = 'https://bo-comedica-service-dev.echotechs.net/api';
 
 function getAuthHeaders(): Record<string, string> {
   const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
@@ -129,6 +129,16 @@ function assertProxySuccess<T>(response: ParamsProxyResponse<T>): T {
   return response.data;
 }
 
+
+function normalizeParamsItem(item: any): ParamsProxyItem {
+  return {
+    name: String(item?.name ?? item?.paramName ?? ''),
+    value: item?.value ?? item?.paramValue ?? null,
+    description: item?.description ?? item?.paramDescription ?? null,
+    status: item?.status ?? null,
+  };
+}
+
 function assertT365Success<T>(response: T365Envelope<T>): T {
   if (response?.result && response.result.code !== 0) {
     throw new Error(response.result.message || 'Error consumiendo servicio Transfer365');
@@ -195,7 +205,7 @@ function paginate<T>(data: T[], page = 1, pageSize = 20): { data: T[]; total: nu
 
 function findParamValue(items: ParamsProxyItem[], names: string[], fallback: number): number {
   const normalizedNames = new Set(names.map((name) => name.toLowerCase()));
-  const match = items.find((item) => normalizedNames.has(item.name.toLowerCase()));
+  const match = items.find((item) => normalizedNames.has(String(item?.name ?? '').toLowerCase()));
   const value = Number(match?.value);
   return Number.isFinite(value) ? value : fallback;
 }
@@ -233,7 +243,7 @@ export async function getParams(request?: Partial<ParamsProxyItem>): Promise<Par
       },
     );
 
-    return assertProxySuccess(response);
+    return assertProxySuccess(response).map((item) => normalizeParamsItem(item));
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }
@@ -422,7 +432,34 @@ export async function deleteUserLimits(userId: string): Promise<void> {
   }
 }
 
-// Obtener historial de auditoría (sin endpoint real identificado para estos módulos)
+
+function normalizeAuditLog(item: any, index: number): AuditLog {
+  return {
+    id: String(item?.id ?? item?.auditId ?? `audit-${index}`),
+    userId: String(item?.userId ?? item?.user ?? '-'),
+    userName: item?.userName ?? item?.usuario ?? item?.user ?? 'Sistema',
+    userRole: item?.userRole ?? item?.role ?? 'N/A',
+    affectedUser: item?.affectedUser ?? item?.affectedUserName,
+    action: item?.action ?? item?.accion ?? 'ACTUALIZACIÓN',
+    module: item?.module ?? item?.modulo ?? 'LÍMITES Y MONTOS',
+    details: item?.details ?? item?.descripcion ?? item?.detail ?? 'Actualización de límites',
+    changes: Array.isArray(item?.changes)
+      ? item.changes
+      : item?.oldValue !== undefined || item?.newValue !== undefined
+      ? [
+          {
+            field: item?.field ?? item?.campo ?? 'limit',
+            oldValue: item?.oldValue ?? '-',
+            newValue: item?.newValue ?? '-',
+          },
+        ]
+      : undefined,
+    timestamp: item?.timestamp ?? item?.createdAt ?? new Date().toISOString(),
+    ipAddress: item?.ipAddress ?? item?.ip,
+  };
+}
+
+// Obtener historial de auditoría (no se encontró endpoint documentado en json para límites; se intenta backend actual)
 export async function getAuditLog(params?: {
   search?: string;
   page?: number;
@@ -437,11 +474,16 @@ export async function getAuditLog(params?: {
     if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
     if (params?.module) queryParams.set('module', params.module);
 
-    const response = await customAuthFetch<{ data: { data: AuditLog[]; total: number } }>(
+    const response = await customAuthFetch<any>(
       buildUrl('/parameters/audit', queryParams),
       { method: "GET", headers },
     );
-    return response.data;
+
+    const rows = response?.data?.data ?? response?.data ?? [];
+    const normalized = (Array.isArray(rows) ? rows : []).map((item, index) => normalizeAuditLog(item, index));
+    const total = Number(response?.data?.total ?? response?.total ?? response?.metadata?.totalCount ?? normalized.length);
+
+    return { data: normalized, total };
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }
@@ -451,13 +493,21 @@ export async function getAuditLog(params?: {
 export async function getRecentAudit(limit: number = 5): Promise<AuditLog[]> {
   try {
     const headers = getAuthHeaders();
-    const response = await customAuthFetch<{ data: AuditLog[] }>(
+    const response = await customAuthFetch<any>(
       `${API_URL}/parameters/audit/recent?limit=${limit}`,
       { method: "GET", headers },
     );
-    return response.data;
-  } catch (error) {
-    throw new Error(getErrorMessage(error));
+
+    const rows = response?.data ?? [];
+    if (Array.isArray(rows) && rows.length > 0) {
+      return rows.map((item, index) => normalizeAuditLog(item, index)).slice(0, limit);
+    }
+
+    const fallback = await getAuditLog({ page: 1, pageSize: limit, module: 'limits' });
+    return fallback.data.slice(0, limit);
+  } catch {
+    const fallback = await getAuditLog({ page: 1, pageSize: limit, module: 'limits' });
+    return fallback.data.slice(0, limit);
   }
 }
 
