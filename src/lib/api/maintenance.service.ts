@@ -20,17 +20,18 @@ import type {
   MaintenanceAuditLog,
 } from './types/maintenance.types';
 
-const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+const API_URL = 'https://bo-comedica-service-dev.echotechs.net/api';
 
-function getAuthHeaders(): Record<string, string> {
+function getAuthHeaders(contentType: 'json' | 'multipart' = 'json'): Record<string, string> {
   const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
   const accessToken = clientTokenJSON
     ? JSON.parse(clientTokenJSON)?.accessToken
     : null;
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers: Record<string, string> = {};
+  if (contentType === 'json') {
+    headers["Content-Type"] = "application/json";
+  }
   if (accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
   }
@@ -297,15 +298,30 @@ export async function getSecurityQuestions(params?: {
 }): Promise<{ data: SecurityQuestion[]; total: number }> {
   try {
     const headers = getAuthHeaders();
-    const response = await customAuthFetch<BackofficeEnvelope<any[]>>(
-      `${API_URL}/list-security-questions`,
-      {
-        method: "POST",
-        body: JSON.stringify(buildContext('WEB')),
-        headers,
-      },
-    );
-    const questions = assertProxySuccess(response, 'Error al obtener preguntas de seguridad').map(normalizeSecurityQuestion);
+
+    let rawQuestions: any[] = [];
+    try {
+      const getResponse = await customAuthFetch<any[]>(
+        `${API_URL}/list-security-questions`,
+        {
+          method: "GET",
+          headers,
+        },
+      );
+      rawQuestions = getResponse || [];
+    } catch {
+      const postResponse = await customAuthFetch<BackofficeEnvelope<any[]>>(
+        `${API_URL}/list-security-questions`,
+        {
+          method: "POST",
+          body: JSON.stringify(buildContext('WEB')),
+          headers,
+        },
+      );
+      rawQuestions = assertProxySuccess(postResponse, 'Error al obtener preguntas de seguridad');
+    }
+
+    const questions = rawQuestions.map(normalizeSecurityQuestion);
     const filtered = params?.search
       ? questions.filter((item) => item.question.toLowerCase().includes(params.search!.toLowerCase()))
       : questions;
@@ -397,9 +413,12 @@ export async function getSecurityImages(type?: 'mobile' | 'desktop'): Promise<Se
 export async function uploadSecurityImage(image: Partial<SecurityImage>): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = 'admin-test';
+
+    const clazz: 'P' | 'I' = image.filename ? 'I' : 'P';
     const params = new URLSearchParams({
       module: image.type === 'desktop' ? 'TC' : 'AH',
-      clazz: image.type === 'desktop' ? 'I' : 'P',
+      clazz,
       productType: image.name || '',
     });
 
@@ -415,6 +434,7 @@ export async function uploadSecurityImage(image: Partial<SecurityImage>): Promis
 export async function deleteSecurityImage(id: string): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = 'admin-test';
     const params = new URLSearchParams({
       module: 'AH',
       clazz: 'I',
