@@ -75,6 +75,21 @@ export interface ParamsProxyItem {
   status?: number | null;
 }
 
+function normalizeParamsProxyItems(payload: unknown): ParamsProxyItem[] {
+  const source = Array.isArray(payload)
+    ? payload
+    : Array.isArray((payload as any)?.data)
+      ? (payload as any).data
+      : [];
+
+  return source.map((item: any) => ({
+    name: item?.name ?? item?.paramName ?? '',
+    value: item?.value ?? item?.paramValue ?? null,
+    description: item?.description ?? item?.paramDescription ?? null,
+    status: item?.status ?? null,
+  } )).filter((item: ParamsProxyItem) => item.name);
+}
+
 function buildParamsProxyRequest<T>(request: T): ParamsProxyRequest<T> {
   return {
     uuid: crypto.randomUUID(),
@@ -92,12 +107,18 @@ function buildT365Context() {
   };
 }
 
-function assertProxySuccess<T>(response: ParamsProxyResponse<T>): T {
-  if (response?.result?.code !== 0) {
-    throw new Error(response?.result?.message || 'Error consumiendo servicio de parámetros');
+function assertProxySuccess<T>(response: ParamsProxyResponse<T> | ApiResponse<T>): T {
+  const hasResultCode = typeof (response as ParamsProxyResponse<T>)?.result?.code === 'number';
+
+  if (hasResultCode && (response as ParamsProxyResponse<T>).result.code !== 0) {
+    throw new Error((response as ParamsProxyResponse<T>)?.result?.message || 'Error consumiendo servicio de parámetros');
   }
 
-  return response.data;
+  if (typeof (response as ApiResponse<T>)?.success === 'boolean' && !(response as ApiResponse<T>).success) {
+    throw new Error((response as ApiResponse<T>).error || (response as ApiResponse<T>).message || 'Error consumiendo servicio de parámetros');
+  }
+
+  return (response as ParamsProxyResponse<T>).data ?? (response as ApiResponse<T>).data as T;
 }
 
 function assertT365Success<T>(response: T365Envelope<T>): T {
@@ -201,7 +222,8 @@ export const parametersService = {
         })
       );
 
-      return assertProxySuccess(response.data);
+      const rawData = assertProxySuccess(response.data as any);
+      return normalizeParamsProxyItems(rawData);
     } catch (error) {
       throw new Error(getErrorMessage(error));
     }
@@ -331,7 +353,8 @@ export const parametersService = {
       const response = await apiClient.get<ApiResponse<{ data: UserLimits[]; total: number }>>('/parameters/limits/users', { params });
       return response.data.data!;
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      console.warn('No se pudieron cargar límites por usuario desde servicio real:', getErrorMessage(error));
+      return { data: [], total: 0 };
     }
   },
 
@@ -364,7 +387,8 @@ export const parametersService = {
       const response = await apiClient.get<ApiResponse<{ data: AuditLog[]; total: number }>>('/parameters/audit', { params });
       return response.data.data!;
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      console.warn('No se pudo cargar auditoría desde servicio real:', getErrorMessage(error));
+      return { data: [], total: 0 };
     }
   },
 
@@ -374,7 +398,8 @@ export const parametersService = {
       const response = await apiClient.get<ApiResponse<AuditLog[]>>('/parameters/audit/recent', { params: { limit } });
       return response.data.data!;
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      console.warn('No se pudo cargar auditoría reciente desde servicio real:', getErrorMessage(error));
+      return [];
     }
   },
 
