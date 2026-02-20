@@ -123,6 +123,19 @@ function buildT365Context() {
   };
 }
 
+function getFormUrlEncodedHeaders(): Record<string, string> {
+  return {
+    ...getAuthHeaders(),
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+}
+
+function buildT365CodBody(search?: string): string {
+  const body = new URLSearchParams();
+  body.set('cod', (search || '').toUpperCase());
+  return body.toString();
+}
+
 function assertProxySuccess<T>(response: ParamsProxyResponse<T>): T {
   if (response?.result?.code !== 0) {
     throw new Error(response?.result?.message || 'Error consumiendo servicio de parámetros');
@@ -152,28 +165,37 @@ function normalizeStatus(status: string): 'Activo' | 'Inactivo' {
   return status === 'A' ? 'Activo' : 'Inactivo';
 }
 
-function mapLocalInstitution(raw: T365LocalRaw) {
+function mapLocalInstitution(raw: T365LocalRaw & Record<string, any>) {
+  const ahorro = raw.ahorro ?? raw.saving ?? '0';
+  const corriente = raw.corriente ?? raw.current ?? '0';
+  const credito = raw.credito ?? raw.credit ?? '0';
+  const tarjeta = raw.tarjeta ?? raw.card ?? '0';
+  const movil = raw.movil ?? raw.mobile ?? '0';
+
   const products: string[] = [];
-  if (raw.ahorro === '1') products.push('Ahorro');
-  if (raw.corriente === '1') products.push('Corriente');
-  if (raw.credito === '1') products.push('Crédito');
-  if (raw.tarjeta === '1') products.push('Tarjeta');
-  if (raw.movil === '1') products.push('Móvil');
+  if (ahorro === '1') products.push('Ahorro');
+  if (corriente === '1') products.push('Corriente');
+  if (credito === '1') products.push('Crédito');
+  if (tarjeta === '1') products.push('Tarjeta');
+  if (movil === '1') products.push('Móvil');
+
+  const shortName = raw.nombrecorto ?? raw.nombre_CORTO ?? raw.shortName ?? '';
+  const compensate = raw.codcompensa ?? raw.cod_COMPENSA ?? raw.compensate ?? '';
 
   return {
     id: String(raw.id),
     bic: raw.bic,
-    shortName: raw.nombrecorto,
+    shortName,
     status: normalizeStatus(raw.estado),
     fullName: raw.nombre,
     institution: raw.descripcion,
-    compensate: raw.codcompensa,
+    compensate,
     products,
-    ahorro: raw.ahorro === '1',
-    corriente: raw.corriente === '1',
-    credito: raw.credito === '1',
-    tarjeta: raw.tarjeta === '1',
-    movil: raw.movil === '1',
+    ahorro: ahorro === '1',
+    corriente: corriente === '1',
+    credito: credito === '1',
+    tarjeta: tarjeta === '1',
+    movil: movil === '1',
   };
 }
 
@@ -570,10 +592,14 @@ export async function getLocalInstitutions(params?: {
   pageSize?: number;
 }): Promise<{ data: any[]; total: number }> {
   try {
-    const headers = getAuthHeaders();
+    const headers = getFormUrlEncodedHeaders();
     const response = await customAuthFetch<T365Envelope<T365LocalRaw[]>>(
       `${API_URL}/t365/get-banks`,
-      { method: "POST", headers },
+      {
+        method: "POST",
+        body: buildT365CodBody(params?.search),
+        headers,
+      },
     );
     const mapped = assertT365Success(response).map(mapLocalInstitution);
     const filtered = filterBySearch(mapped, params?.search, ['bic', 'shortName', 'fullName', 'institution']);
@@ -605,10 +631,14 @@ export async function getCARDInstitutions(params?: {
   pageSize?: number;
 }): Promise<{ data: any[]; total: number }> {
   try {
-    const headers = getAuthHeaders();
+    const headers = getFormUrlEncodedHeaders();
     const response = await customAuthFetch<T365Envelope<T365CardRaw[]>>(
       `${API_URL}/t365/get-banks-CARD`,
-      { method: "POST", headers },
+      {
+        method: "POST",
+        body: buildT365CodBody(params?.search),
+        headers,
+      },
     );
     const mapped = assertT365Success(response).map(mapCardInstitution);
     const filtered = filterBySearch(mapped, params?.search, ['bic', 'fullName', 'country']);
