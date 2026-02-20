@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { getErrorMessage } from '@/lib/api/client';
 import apiClient from '@/lib/api/client';
 import styles from './styles/dashboardPage.module.css';
 
@@ -28,6 +29,114 @@ type TxRow = {
 type DistributionItem = { label: string; value: number; color: string };
 type VolumeItem = { label: string; value: number };
 
+type OverviewMetricsResponse = {
+  data?: {
+    fechaHoy?: string;
+    cntDia?: number;
+    volumenDia?: number;
+    pctTransaccionesTxt?: string;
+    pctMontoTxt?: string;
+    tipoPagoMasUsadoDia?: {
+      paymentType?: string;
+      cnt?: number;
+      monto?: number;
+    };
+    distributionPaymentTypeDay?: Array<{
+      paymentType?: string;
+      cnt?: number;
+      pctCnt?: number;
+      monto?: number;
+      pctMonto?: number;
+    }>;
+  };
+};
+
+type OverviewTransactionsResponse = {
+  metadata?: {
+    totalCount?: number;
+  };
+  data?: Array<Record<string, unknown>>;
+};
+
+const CHART_COLORS = ['#3E7BFA', '#6DA7FF', '#99C4FF', '#3D5CB8', '#A4B0D3', '#233269'];
+
+function buildOverviewContext() {
+  return {
+    uuid: crypto.randomUUID(),
+    pageId: 1,
+    channel: 'W',
+    requestId: crypto.randomUUID(),
+  };
+}
+
+function toCurrency(value: number): string {
+  return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function formatDate(value?: string): string {
+  if (!value) return '-';
+  const dt = new Date(value);
+  if (Number.isNaN(dt.getTime())) return value;
+  return dt.toLocaleDateString('es-SV', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function mapOverview(metrics: OverviewMetricsResponse): Overview {
+  const data = metrics.data ?? {};
+  const txCount = Number(data.cntDia ?? 0);
+  const volume = Number(data.volumenDia ?? 0);
+  const avg = txCount > 0 ? volume / txCount : 0;
+  const pctTx = data.pctTransaccionesTxt ?? '0%';
+  const pctMonto = data.pctMontoTxt ?? '0%';
+  const mostUsed = data.tipoPagoMasUsadoDia;
+
+  return {
+    lastUpdated: formatDate(data.fechaHoy),
+    cards: {
+      totalTransactions: { value: txCount, deltaText: pctTx },
+      totalAmount: { value: toCurrency(volume), deltaText: pctMonto, deltaType: pctMonto.startsWith('-') ? 'down' : 'up' },
+      avgPerTx: { value: toCurrency(avg), deltaText: pctTx, deltaType: pctTx.startsWith('-') ? 'down' : 'up' },
+      mostUsed: {
+        value: mostUsed?.paymentType ?? '-',
+        subtitle: `${mostUsed?.cnt ?? 0} transacciones · ${toCurrency(Number(mostUsed?.monto ?? 0))}`,
+      },
+    },
+  };
+}
+
+function mapDistribution(metrics: OverviewMetricsResponse): DistributionItem[] {
+  return (metrics.data?.distributionPaymentTypeDay ?? []).map((item, idx) => ({
+    label: item.paymentType ?? 'Sin tipo',
+    value: Number(item.cnt ?? 0),
+    color: CHART_COLORS[idx % CHART_COLORS.length],
+  }));
+}
+
+function mapVolume(metrics: OverviewMetricsResponse): VolumeItem[] {
+  return [{ label: formatDate(metrics.data?.fechaHoy), value: Number(metrics.data?.volumenDia ?? 0) }];
+}
+
+function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow {
+  const txId = String(item.transactionId ?? item.idTransaccion ?? item.id ?? `TX-${index + 1}`);
+  const date = String(item.transactionDate ?? item.fechaHora ?? item.fecha ?? '');
+  const associate = String(item.associatedNumber ?? item.numeroAsociado ?? item.asociado ?? '-');
+  const client = String(item.customerName ?? item.nombreCliente ?? item.nombreDestino ?? '-');
+  const category = String(item.category ?? item.categoria ?? item.productType ?? '-');
+  const type = String(item.paymentType ?? item.tipoTransferencia ?? item.tipo ?? '-');
+  const amountRaw = Number(item.amount ?? item.monto ?? item.montoEntrante ?? 0);
+  const statusRaw = String(item.status ?? item.estado ?? 'A');
+
+  return {
+    id: txId,
+    date: formatDate(date),
+    associate,
+    client,
+    category,
+    type,
+    amount: toCurrency(Number.isFinite(amountRaw) ? amountRaw : 0),
+    status: statusRaw.toUpperCase().startsWith('I') ? 'Inactivo' : 'Activo',
+  };
+}
+
 export default function DashboardPage() {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [search, setSearch] = useState('');
@@ -37,17 +146,65 @@ export default function DashboardPage() {
   const [tx, setTx] = useState<{ data: TxRow[]; total: number }>({ data: [], total: 0 });
   const [dist, setDist] = useState<DistributionItem[]>([]);
   const [vol, setVol] = useState<VolumeItem[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    apiClient.get('/dashboard/overview').then((res) => setOverview(res.data.data));
-    apiClient.get('/dashboard/distribution').then((res) => setDist(res.data.data));
-    apiClient.get('/dashboard/volume').then((res) => setVol(res.data.data));
+    const loadMetrics = async () => {
+      try {
+        const today = new Date().toISOString().slice(0, 10);
+        const response = await apiClient.post<OverviewMetricsResponse>('/overview/metrics', {
+          ...buildOverviewContext(),
+          data: { fecha: today },
+        });
+
+        setOverview(mapOverview(response.data));
+        setDist(mapDistribution(response.data));
+        setVol(mapVolume(response.data));
+      } catch (error) {
+        setOverview(null);
+        setDist([]);
+        setVol([]);
+        setLoadError(getErrorMessage(error));
+      }
+    };
+
+    void loadMetrics();
   }, []);
 
   useEffect(() => {
-    apiClient
-      .get('/dashboard/transactions', { params: { search, page, pageSize } })
-      .then((res) => setTx(res.data.data));
+    const loadTransactions = async () => {
+      try {
+        const today = new Date();
+        const from = new Date(today);
+        from.setDate(today.getDate() - 30);
+
+        const response = await apiClient.post<OverviewTransactionsResponse>('/overview/transactions', {
+          ...buildOverviewContext(),
+          data: {
+            filters: {
+              fechaInicio: from.toISOString().slice(0, 10),
+              fechaFin: today.toISOString().slice(0, 10),
+              paymentType: null,
+              productType: null,
+              textoBusqueda: search,
+            },
+            pagination: {
+              page: page - 1,
+              size: pageSize,
+              sortBy: 'transactionDate',
+              sortDirection: 'DESC',
+            },
+          },
+        });
+
+        const rows = (response.data.data ?? []).map((item, idx) => mapTransactionRow(item, idx));
+        setTx({ data: rows, total: Number(response.data.metadata?.totalCount ?? rows.length) });
+      } catch {
+        setTx({ data: [], total: 0 });
+      }
+    };
+
+    void loadTransactions();
   }, [search, page]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(tx.total / pageSize)), [tx.total]);
@@ -60,6 +217,8 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.wrap}>
+      {loadError && <p className={styles.cardSub}>No se pudo cargar dashboard: {loadError}</p>}
+
       {/* Top cards */}
       <div className={styles.cardsRow}>
         <div className={styles.cardGradient}>
@@ -238,33 +397,32 @@ function PieChart({ data }: { data: DistributionItem[] }) {
 /** Barras simples con SVG (sin librerías) */
 function BarChart({ data }: { data: VolumeItem[] }) {
   const max = Math.max(...data.map((d) => d.value), 1);
-  const w = 980;
-  const h = 260;
-  const padL = 60;
-  const padB = 50;
-  const barW = 44;
-  const gap = 130;
 
   return (
     <div className={styles.barWrap}>
-      <svg viewBox={`0 0 ${w} ${h}`} className={styles.barSvg}>
-        {/* grid */}
-        {[0.25, 0.5, 0.75, 1].map((k) => {
-          const y = (h - padB) - (h - padB - 20) * k;
-          return <line key={k} x1={padL} x2={w - 20} y1={y} y2={y} stroke="#e8edf6" />;
-        })}
+      <svg width="100%" height="260" viewBox="0 0 900 260" preserveAspectRatio="none">
+        {/* líneas guía */}
+        {[0, 1, 2, 3].map((i) => (
+          <line
+            key={i}
+            x1={60}
+            x2={880}
+            y1={30 + i * 55}
+            y2={30 + i * 55}
+            stroke="#EEF1F6"
+          />
+        ))}
 
         {data.map((d, i) => {
-          const x = padL + i * gap + 40;
-          const barH = ((h - padB - 20) * d.value) / max;
-          const y = (h - padB) - barH;
+          const width = 70;
+          const gap = 35;
+          const x = 80 + i * (width + gap);
+          const h = (d.value / max) * 180;
+          const y = 210 - h;
           return (
             <g key={d.label}>
-              <rect x={x} y={y} width={barW} height={barH} rx={6} fill="#233269" />
-              <text x={x + barW / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#233269" fontWeight="700">
-                {d.value.toLocaleString()}
-              </text>
-              <text x={x + barW / 2} y={h - 18} textAnchor="middle" fontSize="11" fill="#6b7280">
+              <rect x={x} y={y} width={width} height={h} rx={10} fill="#3E7BFA" />
+              <text x={x + width / 2} y={240} textAnchor="middle" fontSize="12" fill="#5B667A">
                 {d.label}
               </text>
             </g>
