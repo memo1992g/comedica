@@ -20,21 +20,32 @@ import type {
   MaintenanceAuditLog,
 } from './types/maintenance.types';
 
-const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+const API_URL = 'https://bo-comedica-service-dev.echotechs.net/api';
 
-function getAuthHeaders(): Record<string, string> {
+function getAuthHeaders(contentType: 'json' | 'multipart' = 'json'): Record<string, string> {
   const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
-  const accessToken = clientTokenJSON
-    ? JSON.parse(clientTokenJSON)?.accessToken
-    : null;
+  let accessToken: string | null = null;
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  if (clientTokenJSON) {
+    try {
+      accessToken = JSON.parse(clientTokenJSON)?.accessToken ?? null;
+    } catch {
+      accessToken = clientTokenJSON;
+    }
+  }
+
+  const headers: Record<string, string> = {};
+  if (contentType === 'json') {
+    headers["Content-Type"] = "application/json";
+  }
   if (accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
   }
   return headers;
+}
+
+function getRequestUser(): string {
+  return cookies().get(APP_COOKIES.AUTH.LOGIN_USERNAME)?.value || 'admin';
 }
 
 function getErrorMessage(error: unknown): string {
@@ -297,15 +308,30 @@ export async function getSecurityQuestions(params?: {
 }): Promise<{ data: SecurityQuestion[]; total: number }> {
   try {
     const headers = getAuthHeaders();
-    const response = await customAuthFetch<BackofficeEnvelope<any[]>>(
-      `${API_URL}/list-security-questions`,
-      {
-        method: "POST",
-        body: JSON.stringify(buildContext('WEB')),
-        headers,
-      },
-    );
-    const questions = assertProxySuccess(response, 'Error al obtener preguntas de seguridad').map(normalizeSecurityQuestion);
+
+    let rawQuestions: any[] = [];
+    try {
+      const getResponse = await customAuthFetch<any[]>(
+        `${API_URL}/list-security-questions`,
+        {
+          method: "GET",
+          headers,
+        },
+      );
+      rawQuestions = getResponse || [];
+    } catch {
+      const postResponse = await customAuthFetch<BackofficeEnvelope<any[]>>(
+        `${API_URL}/list-security-questions`,
+        {
+          method: "POST",
+          body: JSON.stringify(buildContext('WEB')),
+          headers,
+        },
+      );
+      rawQuestions = assertProxySuccess(postResponse, 'Error al obtener preguntas de seguridad');
+    }
+
+    const questions = rawQuestions.map(normalizeSecurityQuestion);
     const filtered = params?.search
       ? questions.filter((item) => item.question.toLowerCase().includes(params.search!.toLowerCase()))
       : questions;
@@ -319,6 +345,7 @@ export async function getSecurityQuestions(params?: {
 export async function createSecurityQuestion(question: Partial<SecurityQuestion>): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = getRequestUser();
     await customAuthFetch(`${API_URL}/create-security-question`, {
       method: "POST",
       body: JSON.stringify({
@@ -340,6 +367,7 @@ export async function createSecurityQuestion(question: Partial<SecurityQuestion>
 export async function updateSecurityQuestion(id: string, question: Partial<SecurityQuestion>): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = getRequestUser();
     await customAuthFetch(`${API_URL}/update-security-question/${id}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -361,6 +389,7 @@ export async function updateSecurityQuestion(id: string, question: Partial<Secur
 export async function deleteSecurityQuestion(id: string): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = getRequestUser();
     await customAuthFetch(`${API_URL}/delete-security-question/${id}`, {
       method: "DELETE",
       body: JSON.stringify(buildContext('WEB')),
@@ -397,9 +426,12 @@ export async function getSecurityImages(type?: 'mobile' | 'desktop'): Promise<Se
 export async function uploadSecurityImage(image: Partial<SecurityImage>): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = 'admin-test';
+
+    const clazz: 'P' | 'I' = image.filename ? 'I' : 'P';
     const params = new URLSearchParams({
       module: image.type === 'desktop' ? 'TC' : 'AH',
-      clazz: image.type === 'desktop' ? 'I' : 'P',
+      clazz,
       productType: image.name || '',
     });
 
@@ -415,6 +447,7 @@ export async function uploadSecurityImage(image: Partial<SecurityImage>): Promis
 export async function deleteSecurityImage(id: string): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = 'admin-test';
     const params = new URLSearchParams({
       module: 'AH',
       clazz: 'I',
