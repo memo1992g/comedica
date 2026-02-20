@@ -24,9 +24,15 @@ const API_URL = 'https://bo-comedica-service-dev.echotechs.net/api';
 
 function getAuthHeaders(contentType: 'json' | 'multipart' = 'json'): Record<string, string> {
   const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
-  const accessToken = clientTokenJSON
-    ? JSON.parse(clientTokenJSON)?.accessToken
-    : null;
+  let accessToken: string | null = null;
+
+  if (clientTokenJSON) {
+    try {
+      accessToken = JSON.parse(clientTokenJSON)?.accessToken ?? null;
+    } catch {
+      accessToken = clientTokenJSON;
+    }
+  }
 
   const headers: Record<string, string> = {};
   if (contentType === 'json') {
@@ -36,6 +42,10 @@ function getAuthHeaders(contentType: 'json' | 'multipart' = 'json'): Record<stri
     headers.Authorization = `Bearer ${accessToken}`;
   }
   return headers;
+}
+
+function getRequestUser(): string {
+  return cookies().get(APP_COOKIES.AUTH.LOGIN_USERNAME)?.value || 'admin';
 }
 
 function getErrorMessage(error: unknown): string {
@@ -335,6 +345,7 @@ export async function getSecurityQuestions(params?: {
 export async function createSecurityQuestion(question: Partial<SecurityQuestion>): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = getRequestUser();
     await customAuthFetch(`${API_URL}/create-security-question`, {
       method: "POST",
       body: JSON.stringify({
@@ -356,6 +367,7 @@ export async function createSecurityQuestion(question: Partial<SecurityQuestion>
 export async function updateSecurityQuestion(id: string, question: Partial<SecurityQuestion>): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = getRequestUser();
     await customAuthFetch(`${API_URL}/update-security-question/${id}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -377,6 +389,7 @@ export async function updateSecurityQuestion(id: string, question: Partial<Secur
 export async function deleteSecurityQuestion(id: string): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    headers['X-User'] = getRequestUser();
     await customAuthFetch(`${API_URL}/delete-security-question/${id}`, {
       method: "DELETE",
       body: JSON.stringify(buildContext('WEB')),
