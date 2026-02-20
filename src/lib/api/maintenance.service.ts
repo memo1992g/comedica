@@ -22,17 +22,27 @@ import type {
 
 const API_URL = 'https://bo-comedica-service-dev.echotechs.net/api';
 
-function getAuthHeaders(contentType: 'json' | 'multipart' = 'json'): Record<string, string> {
-  const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
-  let accessToken: string | null = null;
+function resolveAccessToken(): string | null {
+  const cookieStore = cookies();
+  const clientTokenRaw = cookieStore.get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
 
-  if (clientTokenJSON) {
+  if (clientTokenRaw) {
     try {
-      accessToken = JSON.parse(clientTokenJSON)?.accessToken ?? null;
+      const parsed = JSON.parse(clientTokenRaw);
+      const tokenFromJson = parsed?.accessToken ?? parsed?.token ?? null;
+      if (tokenFromJson && typeof tokenFromJson === 'string') {
+        return tokenFromJson;
+      }
     } catch {
-      accessToken = clientTokenJSON;
+      return clientTokenRaw;
     }
   }
+
+  return cookieStore.get(APP_COOKIES.AUTH.ACCESS_TOKEN)?.value || null;
+}
+
+function getAuthHeaders(contentType: 'json' | 'multipart' = 'json'): Record<string, string> {
+  const accessToken = resolveAccessToken();
 
   const headers: Record<string, string> = {};
   if (contentType === 'json') {
@@ -351,6 +361,7 @@ export async function createSecurityQuestion(question: Partial<SecurityQuestion>
       body: JSON.stringify({
         ...buildContext('WEB'),
         data: {
+          code: question.code,
           questionText: question.question,
           sqlText: null,
           fields: question.fields || 'texto',
@@ -373,6 +384,7 @@ export async function updateSecurityQuestion(id: string, question: Partial<Secur
       body: JSON.stringify({
         ...buildContext('WEB'),
         data: {
+          code: question.code,
           questionText: question.question,
           sqlText: null,
           fields: question.fields || 'texto',
