@@ -34,6 +34,45 @@ function getErrorMessage(error: unknown): string {
   return 'Error desconocido';
 }
 
+
+function resolveAuditClassificationCode(module?: string): string {
+  const value = (module || '').toUpperCase();
+
+  if (value.includes('USER') || value.includes('USUARIO')) return 'USER_MANAGEMENT';
+  if (value.includes('LIMITE') || value.includes('LIMIT')) return 'LIMITS';
+  if (value.includes('PARAM')) return 'PARAMS';
+  if (value.includes('NOTIFIC')) return 'NOTIFICATIONS';
+  if (value.includes('LOGIN')) return 'LOGIN_HISTORY';
+  if (value.includes('REPORT')) return 'REPORTS';
+  if (value.includes('TRANS')) return 'TRANSACTIONS';
+  if (value.includes('SOFT')) return 'SOFTTOKEN';
+
+  return 'PARAMS';
+}
+
+function buildAuditChangesRequest(params?: {
+  page?: number;
+  pageSize?: number;
+  module?: string;
+}) {
+  return {
+    uuid: crypto.randomUUID(),
+    channel: 'W',
+    pageId: 1,
+    request: {
+      classificationCode: resolveAuditClassificationCode(params?.module),
+      createdAtFrom: '2026-01-01T00:00:00',
+      createdAtTo: new Date().toISOString(),
+    },
+    pagination: {
+      page: params?.page && params.page > 0 ? params.page : 1,
+      size: params?.pageSize && params.pageSize > 0 ? params.pageSize : 20,
+      sortBy: 'createdAt',
+      sortDirection: 'DESC',
+    },
+  };
+}
+
 function buildUrl(path: string, queryParams?: URLSearchParams): string {
   const qs = queryParams?.toString();
   const base = `${API_URL}${path}`;
@@ -575,46 +614,66 @@ export async function getAuditLog(params?: {
 }): Promise<{ data: AuditLog[]; total: number }> {
   try {
     const headers = getAuthHeaders();
-    const queryParams = new URLSearchParams();
-    if (params?.search) queryParams.set('search', params.search);
-    if (params?.page) queryParams.set('page', String(params.page));
-    if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
-    if (params?.module) queryParams.set('module', params.module);
-
     const response = await customAuthFetch<any>(
-      buildUrl('/parameters/audit', queryParams),
-      { method: "GET", headers },
+      `${API_URL}/audit/changes`,
+      {
+        method: "POST",
+        body: JSON.stringify(buildAuditChangesRequest(params)),
+        headers,
+      },
     );
 
-    const rows = response?.data?.data ?? response?.data ?? [];
+    const rows = response?.data ?? [];
     const normalized = (Array.isArray(rows) ? rows : []).map((item, index) => normalizeAuditLog(item, index));
-    const total = Number(response?.data?.total ?? response?.total ?? response?.metadata?.totalCount ?? normalized.length);
+    const total = Number(response?.pagination?.totalElements ?? response?.metadata?.totalCount ?? normalized.length);
 
     return { data: normalized, total };
-  } catch (error) {
-    throw new Error(getErrorMessage(error));
+  } catch (primaryError) {
+    try {
+      const headers = getAuthHeaders();
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.set('search', params.search);
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
+      if (params?.module) queryParams.set('module', params.module);
+
+      const response = await customAuthFetch<any>(
+        buildUrl('/parameters/audit', queryParams),
+        { method: "GET", headers },
+      );
+
+      const rows = response?.data?.data ?? response?.data ?? [];
+      const normalized = (Array.isArray(rows) ? rows : []).map((item, index) => normalizeAuditLog(item, index));
+      const total = Number(response?.data?.total ?? response?.total ?? response?.metadata?.totalCount ?? normalized.length);
+
+      return { data: normalized, total };
+    } catch (error) {
+      throw new Error(getErrorMessage(primaryError || error));
+    }
   }
 }
 
 // Obtener resumen reciente de auditoría
-export async function getRecentAudit(limit: number = 5): Promise<AuditLog[]> {
+export async function getRecentAudit(limit: number = 5, module?: string): Promise<AuditLog[]> {
   try {
-    const headers = getAuthHeaders();
-    const response = await customAuthFetch<any>(
-      `${API_URL}/parameters/audit/recent?limit=${limit}`,
-      { method: "GET", headers },
-    );
-
-    const rows = response?.data ?? [];
-    if (Array.isArray(rows) && rows.length > 0) {
-      return rows.map((item, index) => normalizeAuditLog(item, index)).slice(0, limit);
-    }
-
-    const fallback = await getAuditLog({ page: 1, pageSize: limit, module: 'limits' });
-    return fallback.data.slice(0, limit);
+    const response = await getAuditLog({ page: 1, pageSize: limit, module });
+    return response.data.slice(0, limit);
   } catch {
-    const fallback = await getAuditLog({ page: 1, pageSize: limit, module: 'limits' });
-    return fallback.data.slice(0, limit);
+    try {
+      const headers = getAuthHeaders();
+      const response = await customAuthFetch<any>(
+        `${API_URL}/parameters/audit/recent?limit=${limit}`,
+        { method: "GET", headers },
+      );
+
+      const rows = response?.data ?? [];
+      if (Array.isArray(rows) && rows.length > 0) {
+        return rows.map((item, index) => normalizeAuditLog(item, index)).slice(0, limit);
+      }
+      return [];
+    } catch {
+      return [];
+    }
   }
 }
 

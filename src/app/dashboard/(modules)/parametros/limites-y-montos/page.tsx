@@ -82,7 +82,7 @@ export default function LimitesYMontosPage() {
 
   const loadRecentAudit = async () => {
     try {
-      const data = await getRecentAudit(5);
+      const data = await getRecentAudit(5, activeTab === 'users' ? 'LIMITS' : 'PARAMS');
       setRecentAudit(data);
     } catch (error) {
       console.error('Error al cargar auditoría:', error);
