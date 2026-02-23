@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSecurityConfig, getRecentAudit, updateSecurityConfig } from '@/lib/api/parameters.service';
 import { AuditLog } from '@/types';
@@ -21,17 +21,34 @@ interface SecurityConfig {
   updatedBy: string;
 }
 
+type SecurityEditableField =
+  | 'passwordExpiration'
+  | 'sessionTimeout'
+  | 'minUsernameLength'
+  | 'maxUsernameLength'
+  | 'minPasswordLength'
+  | 'maxPasswordLength'
+  | 'codeExpiration'
+  | 'softTokenExpiration';
+
+const editableFields: SecurityEditableField[] = [
+  'passwordExpiration',
+  'sessionTimeout',
+  'minUsernameLength',
+  'maxUsernameLength',
+  'minPasswordLength',
+  'maxPasswordLength',
+  'codeExpiration',
+  'softTokenExpiration',
+];
+
 export default function ConfiguracionesSeguridadPage() {
   const router = useRouter();
-  
-  // Estado para configuración
+
   const [config, setConfig] = useState<SecurityConfig | null>(null);
   const [editedConfig, setEditedConfig] = useState<SecurityConfig | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [pendingChanges, setPendingChanges] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Estado para auditoría
   const [recentAudit, setRecentAudit] = useState<AuditLog[]>([]);
 
   useEffect(() => {
@@ -51,69 +68,54 @@ export default function ConfiguracionesSeguridadPage() {
 
   const loadRecentAudit = async () => {
     try {
-      const data = await getRecentAudit(5);
+      const data = await getRecentAudit(5, 'PARAMS');
       setRecentAudit(data);
     } catch (error) {
       console.error('Error al cargar auditoría:', error);
     }
   };
 
-  const handleChange = (field: keyof SecurityConfig, value: number) => {
+  const handleChange = (field: SecurityEditableField, value: string) => {
     if (!editedConfig) return;
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) return;
+
     setEditedConfig({
       ...editedConfig,
-      [field]: value,
+      [field]: parsed,
     });
   };
 
-  const getChanges = () => {
-    if (!config || !editedConfig) return {};
-    
-    const changes: any = {};
-    const fields = [
-      'passwordExpiration',
-      'sessionTimeout',
-      'minUsernameLength',
-      'maxUsernameLength',
-      'minPasswordLength',
-      'maxPasswordLength',
-      'codeExpiration',
-      'softTokenExpiration',
-    ];
+  const pendingChanges = useMemo(() => {
+    if (!config || !editedConfig) return {} as Record<SecurityEditableField, { old: number; new: number }>;
 
-    fields.forEach((field) => {
-      const key = field as keyof SecurityConfig;
-      if (config[key] !== editedConfig[key]) {
-        changes[field] = {
-          old: config[key],
-          new: editedConfig[key],
+    return editableFields.reduce((acc, field) => {
+      if (config[field] !== editedConfig[field]) {
+        acc[field] = {
+          old: config[field],
+          new: editedConfig[field],
         };
       }
-    });
+      return acc;
+    }, {} as Record<SecurityEditableField, { old: number; new: number }>);
+  }, [config, editedConfig]);
 
-    return changes;
-  };
-
-  const hasChanges = () => {
-    return Object.keys(getChanges()).length > 0;
-  };
+  const hasChanges = Object.keys(pendingChanges).length > 0;
 
   const handleSave = () => {
-    const changes = getChanges();
-    setPendingChanges(changes);
+    if (!hasChanges) return;
     setShowConfirmation(true);
   };
 
   const handleConfirm = async () => {
     if (!editedConfig) return;
-    
+
     setIsLoading(true);
     try {
       await updateSecurityConfig(editedConfig);
       await loadConfig();
       await loadRecentAudit();
       setShowConfirmation(false);
-      setPendingChanges({});
     } catch (error) {
       console.error('Error al guardar configuración:', error);
     } finally {
@@ -127,23 +129,16 @@ export default function ConfiguracionesSeguridadPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+    return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   };
 
-  const getFieldLabel = (field: string): string => {
-    const labels: any = {
+  const getFieldLabel = (field: SecurityEditableField): string => {
+    const labels: Record<SecurityEditableField, string> = {
       passwordExpiration: 'Vigencia de Contraseña (días)',
       sessionTimeout: 'Tiempo de sesión (segundos)',
       minUsernameLength: 'Longitud mínima de usuario',
@@ -153,229 +148,203 @@ export default function ConfiguracionesSeguridadPage() {
       codeExpiration: 'Vigencia de códigos (segundos)',
       softTokenExpiration: 'Vigencia Soft-Token (segundos)',
     };
-    return labels[field] || field;
+    return labels[field];
   };
+
+  const firstPendingChange = useMemo(() => {
+    const [field] = Object.keys(pendingChanges) as SecurityEditableField[];
+    if (!field) return null;
+
+    return {
+      label: getFieldLabel(field),
+      oldValue: pendingChanges[field].old,
+      newValue: pendingChanges[field].new,
+    };
+  }, [pendingChanges]);
 
   if (!config || !editedConfig) {
     return (
       <div className={styles.container}>
-        <div>Cargando...</div>
+        <div className={styles.mainCard}>Cargando...</div>
       </div>
     );
   }
 
   return (
     <div className={styles.container}>
-      {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1>Configuraciones de Seguridad</h1>
-          <p>En esta pantalla se llevará a cabo la configuración de parámetros de usuarios de BEL</p>
-        </div>
-        <div className={styles.headerActions}>
-          <button 
-            className={`${styles.btn} ${styles.btnSecondary}`}
-            onClick={() => router.push('/parametros/seguridad/historial')}
-          >
-            Historial
-          </button>
-          <button 
-            className={`${styles.btn} ${styles.btnPrimary}`}
-            onClick={handleSave}
-            disabled={!hasChanges()}
-          >
-            Guardar Cambios
-          </button>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className={styles.content}>
-        <div className={styles.mainContent}>
-          {/* Parámetros Generales */}
-          <div className={styles.panel}>
-            <h2 className={styles.sectionTitle}>Parámetros Generales</h2>
-            <div className={styles.limitFields}>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Vigencia de Contraseñas (Días)</label>
-                <input
-                  type="number"
-                  className={styles.fieldValue}
-                  value={editedConfig.passwordExpiration}
-                  onChange={(e) => handleChange('passwordExpiration', Number(e.target.value))}
-                  style={{ 
-                    background: '#fff',
-                    border: '1px solid #e5e7eb',
-                    cursor: 'text',
-                  }}
-                />
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Tiempo de Sesión (Segundos)</label>
-                <input
-                  type="number"
-                  className={styles.fieldValue}
-                  value={editedConfig.sessionTimeout}
-                  onChange={(e) => handleChange('sessionTimeout', Number(e.target.value))}
-                  style={{ 
-                    background: '#fff',
-                    border: '1px solid #e5e7eb',
-                    cursor: 'text',
-                  }}
-                />
+      <div className={styles.mainCard}>
+        <div className={styles.content}>
+          <div className={styles.mainContent}>
+            <div className={styles.header}>
+              <div className={styles.headerLeft}>
+                <h1>Configuraciones de Seguridad</h1>
+                <p>En esta pantalla se llevará a cabo la configuración de parámetros de usuarios de BEL</p>
               </div>
             </div>
-          </div>
 
-          {/* Longitud de Usuarios */}
-          <div className={styles.panel}>
-            <h2 className={styles.sectionTitle}>Longitud de Usuarios</h2>
-            <div className={styles.limitFields}>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Valor mínimo (caracteres)</label>
-                <input
-                  type="number"
-                  className={styles.fieldValue}
-                  value={editedConfig.minUsernameLength}
-                  onChange={(e) => handleChange('minUsernameLength', Number(e.target.value))}
-                  style={{ 
-                    background: '#fff',
-                    border: '1px solid #e5e7eb',
-                    cursor: 'text',
-                  }}
-                />
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Valor máximo (caracteres)</label>
-                <input
-                  type="number"
-                  className={styles.fieldValue}
-                  value={editedConfig.maxUsernameLength}
-                  onChange={(e) => handleChange('maxUsernameLength', Number(e.target.value))}
-                  style={{ 
-                    background: '#fff',
-                    border: '1px solid #e5e7eb',
-                    cursor: 'text',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Longitud de Contraseña */}
-          <div className={styles.panel}>
-            <h2 className={styles.sectionTitle}>Longitud de Contraseña</h2>
-            <div className={styles.limitFields}>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Valor mínimo (caracteres)</label>
-                <input
-                  type="number"
-                  className={styles.fieldValue}
-                  value={editedConfig.minPasswordLength}
-                  onChange={(e) => handleChange('minPasswordLength', Number(e.target.value))}
-                  style={{ 
-                    background: '#fff',
-                    border: '1px solid #e5e7eb',
-                    cursor: 'text',
-                  }}
-                />
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Valor máximo (caracteres)</label>
-                <input
-                  type="number"
-                  className={styles.fieldValue}
-                  value={editedConfig.maxPasswordLength}
-                  onChange={(e) => handleChange('maxPasswordLength', Number(e.target.value))}
-                  style={{ 
-                    background: '#fff',
-                    border: '1px solid #e5e7eb',
-                    cursor: 'text',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Vigencia de Códigos */}
-          <div className={styles.panel}>
-            <h2 className={styles.sectionTitle}>Vigencia de Códigos</h2>
-            <div className={styles.limitFields}>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Vigencia de códigos (Segundos)</label>
-                <input
-                  type="number"
-                  className={styles.fieldValue}
-                  value={editedConfig.codeExpiration}
-                  onChange={(e) => handleChange('codeExpiration', Number(e.target.value))}
-                  style={{ 
-                    background: '#fff',
-                    border: '1px solid #e5e7eb',
-                    cursor: 'text',
-                  }}
-                />
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Vigencia Soft-Token (Segundos)</label>
-                <input
-                  type="number"
-                  className={styles.fieldValue}
-                  value={editedConfig.softTokenExpiration}
-                  onChange={(e) => handleChange('softTokenExpiration', Number(e.target.value))}
-                  style={{ 
-                    background: '#fff',
-                    border: '1px solid #e5e7eb',
-                    cursor: 'text',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Sidebar - Historial de Auditoría */}
-        <div className={styles.sidebar}>
-          <div className={styles.historialPanel}>
-            <div className={styles.historialHeader}>
-              <h3 className={styles.historialTitle}>Historial de Auditoría</h3>
-              <button 
-                className={styles.viewAllBtn}
-                onClick={() => router.push('/parametros/seguridad/historial')}
-              >
-                Ver todo
-              </button>
-            </div>
-
-            {recentAudit.map((log) => (
-              <div key={log.id} className={styles.auditItem}>
-                <div className={styles.auditUser}>{log.userName}</div>
-                <div className={styles.auditTime}>
-                  {formatDate(log.timestamp)} - {formatTime(log.timestamp)}
+            <div className={styles.panel}>
+              <h2 className={styles.sectionTitle}>Parámetros Generales</h2>
+              <div className={styles.limitFields}>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel}>Vigencia de Contraseñas (Días)</label>
+                  <input
+                    type="number"
+                    className={styles.fieldValue}
+                    value={String(editedConfig.passwordExpiration)}
+                    onChange={(e) => handleChange('passwordExpiration', e.target.value)}
+                  />
                 </div>
-                <div className={styles.auditDetails}>{log.details}</div>
-                {log.changes && log.changes.length > 0 && (
-                  <div className={styles.auditChange}>
-                    <span className={styles.oldValue}>{log.changes[0].oldValue}</span>
-                    <span>→</span>
-                    <span className={styles.newValue}>{log.changes[0].newValue}</span>
-                  </div>
-                )}
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel}>Tiempo de Sesión (Segundos)</label>
+                  <input
+                    type="number"
+                    className={styles.fieldValue}
+                    value={String(editedConfig.sessionTimeout)}
+                    onChange={(e) => handleChange('sessionTimeout', e.target.value)}
+                  />
+                </div>
               </div>
-            ))}
+            </div>
+
+            <div className={styles.panel}>
+              <h2 className={styles.sectionTitle}>Longitud de Usuarios</h2>
+              <div className={styles.limitFields}>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel}>Valor mínimo (caracteres)</label>
+                  <input
+                    type="number"
+                    className={styles.fieldValue}
+                    value={String(editedConfig.minUsernameLength)}
+                    onChange={(e) => handleChange('minUsernameLength', e.target.value)}
+                  />
+                </div>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel}>Valor máximo (caracteres)</label>
+                  <input
+                    type="number"
+                    className={styles.fieldValue}
+                    value={String(editedConfig.maxUsernameLength)}
+                    onChange={(e) => handleChange('maxUsernameLength', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.panel}>
+              <h2 className={styles.sectionTitle}>Longitud de Contraseña</h2>
+              <div className={styles.limitFields}>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel}>Valor mínimo (caracteres)</label>
+                  <input
+                    type="number"
+                    className={styles.fieldValue}
+                    value={String(editedConfig.minPasswordLength)}
+                    onChange={(e) => handleChange('minPasswordLength', e.target.value)}
+                  />
+                </div>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel}>Valor máximo (caracteres)</label>
+                  <input
+                    type="number"
+                    className={styles.fieldValue}
+                    value={String(editedConfig.maxPasswordLength)}
+                    onChange={(e) => handleChange('maxPasswordLength', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.panel}>
+              <h2 className={styles.sectionTitle}>Vigencia de Códigos</h2>
+              <div className={styles.limitFields}>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel}>Vigencia de códigos (Segundos)</label>
+                  <input
+                    type="number"
+                    className={styles.fieldValue}
+                    value={String(editedConfig.codeExpiration)}
+                    onChange={(e) => handleChange('codeExpiration', e.target.value)}
+                  />
+                </div>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel}>Vigencia Soft-Token (Segundos)</label>
+                  <input
+                    type="number"
+                    className={styles.fieldValue}
+                    value={String(editedConfig.softTokenExpiration)}
+                    onChange={(e) => handleChange('softTokenExpiration', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.sidebar}>
+            <div className={styles.historialPanel}>
+              <div className={styles.sidebarActions}>
+                <button className={`${styles.btn} ${styles.btnPrimary} ${styles.sidebarActionBtn}`} onClick={handleSave} disabled={!hasChanges}>
+                  Guardar Cambios
+                </button>
+                <button
+                  className={`${styles.btn} ${styles.btnSecondary} ${styles.sidebarActionBtn}`}
+                  onClick={() => {
+                    if (hasChanges) {
+                      handleDiscard();
+                      return;
+                    }
+                    router.push('/dashboard/parametros/seguridad/historial');
+                  }}
+                >
+                  {hasChanges ? 'Deshacer cambios' : 'Historial'}
+                </button>
+              </div>
+
+              {firstPendingChange ? (
+                <>
+                  <h3 className={styles.historialTitle}>Confirme sus cambios</h3>
+                  <div className={styles.auditDetails}>{firstPendingChange.label}</div>
+                  <div className={styles.auditChangeBox}>
+                    <span style={{ color: '#9ca3af' }}>Valor:</span>
+                    <span className={styles.oldValue}>{firstPendingChange.oldValue}</span>
+                    <span>→</span>
+                    <span className={styles.newValue}>{firstPendingChange.newValue}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3 className={styles.historialTitle}>Historial de Auditoría</h3>
+                  {recentAudit.length === 0 && <div className={styles.emptyAudit}>No hay registros de auditoría disponibles.</div>}
+
+                  {recentAudit.map((log) => (
+                    <div key={log.id} className={styles.auditItem}>
+                      <div className={styles.auditUser}>{log.userName}</div>
+                      <div className={styles.auditTime}>{formatDate(log.timestamp)} - {formatTime(log.timestamp)}</div>
+                      <div className={styles.auditDetails}>{log.details}</div>
+                      {log.changes && log.changes.length > 0 && (
+                        <div className={styles.auditChangeBox}>
+                          <span className={styles.oldValue}>{log.changes[0].oldValue}</span>
+                          <span>→</span>
+                          <span className={styles.newValue}>{log.changes[0].newValue}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Modal de Confirmación */}
       <ConfirmationModal
         isOpen={showConfirmation}
         onClose={() => setShowConfirmation(false)}
         onConfirm={handleConfirm}
-        title="Confirmación"
+        title="Confirmar actualización"
         message="¿Está seguro de guardar los cambios realizados en los parámetros de seguridad del sistema?"
-        type="info"
-        confirmText="Sí, guardar"
-        cancelText="No, cancelar"
+        type="warning"
+        confirmText="Confirmar"
+        cancelText="Cancelar"
         isLoading={isLoading}
       />
     </div>
