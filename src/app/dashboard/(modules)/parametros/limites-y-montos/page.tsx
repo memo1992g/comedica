@@ -82,7 +82,7 @@ export default function LimitesYMontosPage() {
 
   const loadRecentAudit = async () => {
     try {
-      const data = await getRecentAudit(5);
+      const data = await getRecentAudit(5, activeTab === 'users' ? 'LIMITS' : 'PARAMS');
       setRecentAudit(data);
     } catch (error) {
       console.error('Error al cargar auditoría:', error);
@@ -170,20 +170,6 @@ export default function LimitesYMontosPage() {
         <div className={styles.headerLeft}>
           <h1>Límites y Montos</h1>
           <p>Administre los límites transaccionales generales y por usuario.</p>
-        </div>
-        <div className={styles.headerActions}>
-          <button 
-            className={`${styles.btn} ${styles.btnSecondary}`}
-            onClick={() => router.push('/parametros/limites-y-montos/historial')}
-          >
-            Historial
-          </button>
-          <button 
-            className={`${styles.btn} ${styles.btnPrimary}`}
-            onClick={() => setIsEditingGeneral(true)}
-          >
-            Guardar Cambios
-          </button>
         </div>
       </div>
 
@@ -406,15 +392,26 @@ export default function LimitesYMontosPage() {
         {/* Sidebar - Historial de Auditoría */}
         <div className={styles.sidebar}>
           <div className={styles.historialPanel}>
-            <div className={styles.historialHeader}>
-              <h3 className={styles.historialTitle}>Historial de Auditoría</h3>
-              <button 
-                className={styles.viewAllBtn}
-                onClick={() => router.push('/parametros/limites-y-montos/historial')}
+            <div className={styles.sidebarActions}>
+              <button
+                className={`${styles.btn} ${styles.btnPrimary} ${styles.sidebarActionBtn}`}
+                onClick={() => setIsEditingGeneral(true)}
               >
-                Ver todo
+                Guardar Cambios
+              </button>
+              <button
+                className={`${styles.btn} ${styles.btnSecondary} ${styles.sidebarActionBtn}`}
+                onClick={() => router.push('/dashboard/parametros/limites-y-montos/historial')}
+              >
+                Historial
               </button>
             </div>
+
+            <h3 className={styles.historialTitle}>Historial de Auditoría</h3>
+
+            {recentAudit.length === 0 && (
+              <div className={styles.emptyAudit}>No hay registros de auditoría disponibles.</div>
+            )}
 
             {recentAudit.map((log) => (
               <div key={log.id} className={styles.auditItem}>
@@ -424,7 +421,7 @@ export default function LimitesYMontosPage() {
                 </div>
                 <div className={styles.auditDetails}>{log.details}</div>
                 {log.changes && log.changes.length > 0 && (
-                  <div className={styles.auditChange}>
+                  <div className={styles.auditChangeBox}>
                     <span className={styles.oldValue}>
                       {typeof log.changes[0].oldValue === 'number'
                         ? formatCurrency(log.changes[0].oldValue)
