@@ -26,6 +26,7 @@ export default function HistorialTransfer365Page() {
         page: currentPage,
         pageSize,
         module: 'Red Transfer365',
+        classificationCode: 'PARAMS',
       });
       setAuditLogs(response.data);
       setTotalLogs(response.total);
@@ -61,13 +62,13 @@ export default function HistorialTransfer365Page() {
       <div className={styles.header}>
         <button 
           className={styles.backBtn}
-          onClick={() => router.push('/parametros/transfer365')}
+          onClick={() => router.push('/dashboard/parametros/transfer365')}
           aria-label="Volver"
         >
           <ArrowLeft size={20} />
         </button>
         <div className={styles.headerContent}>
-          <h1>Historial completo de auditoría</h1>
+          <h1>Historial de Auditoría</h1>
           <p>{totalLogs} resultados</p>
         </div>
       </div>
