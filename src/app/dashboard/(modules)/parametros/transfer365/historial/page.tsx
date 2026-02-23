@@ -26,6 +26,7 @@ export default function HistorialTransfer365Page() {
         page: currentPage,
         pageSize,
         module: 'Red Transfer365',
+        classificationCode: 'PARAMS',
       });
       setAuditLogs(response.data);
       setTotalLogs(response.total);
@@ -67,7 +68,7 @@ export default function HistorialTransfer365Page() {
           <ArrowLeft size={20} />
         </button>
         <div className={styles.headerContent}>
-          <h1>Historial completo de auditoría</h1>
+          <h1>Historial de Auditoría</h1>
           <p>{totalLogs} resultados</p>
         </div>
       </div>

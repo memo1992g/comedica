@@ -44,6 +44,7 @@ function resolveAuditClassificationCode(module?: string): string {
   if (value.includes('NOTIFIC')) return 'NOTIFICATIONS';
   if (value.includes('LOGIN')) return 'LOGIN_HISTORY';
   if (value.includes('REPORT')) return 'REPORTS';
+  if (value.includes('TRANSFER365') || value.includes('T365')) return 'PARAMS';
   if (value.includes('TRANS')) return 'TRANSACTIONS';
   if (value.includes('SOFT')) return 'SOFTTOKEN';
 
@@ -54,13 +55,14 @@ function buildAuditChangesRequest(params?: {
   page?: number;
   pageSize?: number;
   module?: string;
+  classificationCode?: string;
 }) {
   return {
     uuid: crypto.randomUUID(),
     channel: 'W',
     pageId: 1,
     request: {
-      classificationCode: resolveAuditClassificationCode(params?.module),
+      classificationCode: params?.classificationCode || resolveAuditClassificationCode(params?.module),
       createdAtFrom: '2026-01-01T00:00:00',
       createdAtTo: new Date().toISOString(),
     },
@@ -611,6 +613,7 @@ export async function getAuditLog(params?: {
   page?: number;
   pageSize?: number;
   module?: string;
+  classificationCode?: string;
 }): Promise<{ data: AuditLog[]; total: number }> {
   try {
     const headers = getAuthHeaders();
