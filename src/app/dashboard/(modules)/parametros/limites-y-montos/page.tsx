@@ -116,7 +116,11 @@ export default function LimitesYMontosPage() {
         const original = originalGeneralLimits.find((item) => item.id === current.id);
         if (!original) return null;
 
-        const diff: Partial<TransactionLimits> = { id: current.id };
+        const diff: Partial<TransactionLimits> = {
+          id: current.id,
+          category: current.category,
+          subcategory: current.subcategory,
+        };
         let changed = false;
 
         if (current.maxPerTransaction !== original.maxPerTransaction) {
@@ -288,7 +292,7 @@ export default function LimitesYMontosPage() {
                         <span className={styles.fieldLabel}>Máximo por transacción</span>
                         <input
                           className={styles.fieldValue}
-                          value={formatCurrency(canalesElectronicos.maxPerTransaction)}
+                          value={String(canalesElectronicos.maxPerTransaction)}
                           onChange={(e) => updateGeneralField(canalesElectronicos.id, 'maxPerTransaction', e.target.value.replace(/[^0-9.]/g, ''))}
                         />
                       </div>
@@ -296,7 +300,7 @@ export default function LimitesYMontosPage() {
                         <span className={styles.fieldLabel}>Máximo diario</span>
                         <input
                           className={styles.fieldValue}
-                          value={formatCurrency(canalesElectronicos.maxDaily)}
+                          value={String(canalesElectronicos.maxDaily)}
                           onChange={(e) => updateGeneralField(canalesElectronicos.id, 'maxDaily', e.target.value.replace(/[^0-9.]/g, ''))}
                         />
                       </div>
@@ -304,7 +308,7 @@ export default function LimitesYMontosPage() {
                         <span className={styles.fieldLabel}>Máximo mensual</span>
                         <input
                           className={styles.fieldValue}
-                          value={formatCurrency(canalesElectronicos.maxMonthly)}
+                          value={String(canalesElectronicos.maxMonthly)}
                           onChange={(e) => updateGeneralField(canalesElectronicos.id, 'maxMonthly', e.target.value.replace(/[^0-9.]/g, ''))}
                         />
                       </div>
@@ -321,7 +325,7 @@ export default function LimitesYMontosPage() {
                         <span className={styles.fieldLabel}>Máximo por transacción</span>
                         <input
                           className={styles.fieldValue}
-                          value={formatCurrency(puntoXpressAhorro.maxPerTransaction)}
+                          value={String(puntoXpressAhorro.maxPerTransaction)}
                           onChange={(e) => updateGeneralField(puntoXpressAhorro.id, 'maxPerTransaction', e.target.value.replace(/[^0-9.]/g, ''))}
                         />
                       </div>
@@ -343,7 +347,7 @@ export default function LimitesYMontosPage() {
                             <span className={styles.fieldLabel}>Máximo por transacción</span>
                             <input
                               className={styles.fieldValue}
-                              value={formatCurrency(puntoXpressCorriente.maxPerTransaction)}
+                              value={String(puntoXpressCorriente.maxPerTransaction)}
                               onChange={(e) => updateGeneralField(puntoXpressCorriente.id, 'maxPerTransaction', e.target.value.replace(/[^0-9.]/g, ''))}
                             />
                           </div>
