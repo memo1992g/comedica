@@ -67,7 +67,7 @@ export default function HistorialAuditoriaPage() {
       <div className={styles.header}>
         <button 
           className={styles.backBtn}
-          onClick={() => router.push('/parametros/limites-y-montos')}
+          onClick={() => router.push('/dashboard/parametros/limites-y-montos')}
           aria-label="Volver"
         >
           <ArrowLeft size={20} />

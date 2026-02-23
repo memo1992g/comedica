@@ -61,7 +61,7 @@ export default function HistorialSeguridadPage() {
       <div className={styles.header}>
         <button 
           className={styles.backBtn}
-          onClick={() => router.push('/parametros/seguridad')}
+          onClick={() => router.push('/dashboard/parametros/seguridad')}
           aria-label="Volver"
         >
           <ArrowLeft size={20} />

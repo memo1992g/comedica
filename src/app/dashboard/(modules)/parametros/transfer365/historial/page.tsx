@@ -61,7 +61,7 @@ export default function HistorialTransfer365Page() {
       <div className={styles.header}>
         <button 
           className={styles.backBtn}
-          onClick={() => router.push('/parametros/transfer365')}
+          onClick={() => router.push('/dashboard/parametros/transfer365')}
           aria-label="Volver"
         >
           <ArrowLeft size={20} />

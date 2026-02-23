@@ -135,7 +135,7 @@ export default function RedTransfer365Page() {
         <div className={styles.headerActions}>
           <button 
             className={`${styles.btn} ${styles.btnSecondary}`}
-            onClick={() => router.push('/parametros/transfer365/historial')}
+            onClick={() => router.push('/dashboard/parametros/transfer365/historial')}
           >
             Historial
           </button>
