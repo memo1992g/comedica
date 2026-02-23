@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Settings,
@@ -22,7 +22,10 @@ export default function LimitesYMontosPage() {
   const [activeTab, setActiveTab] = useState<TabType>('general');
 
   const [generalLimits, setGeneralLimits] = useState<TransactionLimits[]>([]);
+  const [originalGeneralLimits, setOriginalGeneralLimits] = useState<TransactionLimits[] | null>(null);
+  const [pendingGeneralLimits, setPendingGeneralLimits] = useState<Partial<TransactionLimits>[] | null>(null);
   const [isEditingGeneral, setIsEditingGeneral] = useState(false);
+  const [showGeneralConfirmation, setShowGeneralConfirmation] = useState(false);
 
   const [userLimits, setUserLimits] = useState<UserLimits[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserLimits | null>(null);
@@ -55,6 +58,9 @@ export default function LimitesYMontosPage() {
     try {
       const data = await getGeneralLimits();
       setGeneralLimits(data);
+      if (!pendingGeneralLimits) {
+        setOriginalGeneralLimits(data);
+      }
     } catch (error) {
       console.error('Error al cargar límites generales:', error);
     }
@@ -84,15 +90,39 @@ export default function LimitesYMontosPage() {
   };
 
   const handleSaveGeneralLimits = async (limits: Partial<TransactionLimits>[]) => {
+    const snapshot = originalGeneralLimits ?? generalLimits;
+
+    const preview = snapshot.map((item) => {
+      const edited = limits.find((l) => l.id === item.id);
+      return edited ? { ...item, ...edited } : item;
+    });
+
+    setGeneralLimits(preview);
+    setPendingGeneralLimits(limits);
+    setIsEditingGeneral(false);
+  };
+
+  const handleConfirmGeneralLimits = async () => {
+    if (!pendingGeneralLimits) return;
+
     try {
-      await updateGeneralLimits(limits);
+      await updateGeneralLimits(pendingGeneralLimits);
       await loadGeneralLimits();
       await loadRecentAudit();
-      setIsEditingGeneral(false);
+      setPendingGeneralLimits(null);
+      setOriginalGeneralLimits(null);
+      setShowGeneralConfirmation(false);
     } catch (error) {
       console.error('Error al guardar límites generales:', error);
       throw error;
     }
+  };
+
+  const handleUndoGeneralChanges = () => {
+    if (originalGeneralLimits) {
+      setGeneralLimits(originalGeneralLimits);
+    }
+    setPendingGeneralLimits(null);
   };
 
   const handleSaveUserLimits = async (limits: UserLimits['limits']) => {
@@ -144,6 +174,52 @@ export default function LimitesYMontosPage() {
       minute: '2-digit',
     });
   };
+
+  const pendingSummary = useMemo(() => {
+    if (!pendingGeneralLimits || !originalGeneralLimits) return null;
+
+    const edited = pendingGeneralLimits[0];
+    if (!edited?.id) return null;
+
+    const original = originalGeneralLimits.find((l) => l.id === edited.id);
+    if (!original) return null;
+
+    if (edited.maxMonthly !== undefined) {
+      return {
+        label: 'Canales Electrónicos - Máximo mensual',
+        oldValue: original.maxMonthly,
+        newValue: edited.maxMonthly,
+      };
+    }
+
+    if (edited.maxDaily !== undefined) {
+      return {
+        label: 'Canales Electrónicos - Máximo diario',
+        oldValue: original.maxDaily,
+        newValue: edited.maxDaily,
+      };
+    }
+
+    if (edited.maxPerTransaction !== undefined) {
+      const section = original.category === 'punto_xpress' ? 'Punto Xpress' : 'Canales Electrónicos';
+      return {
+        label: `${section} - Máximo por transacción`,
+        oldValue: original.maxPerTransaction,
+        newValue: edited.maxPerTransaction,
+      };
+    }
+
+    if (edited.maxMonthlyTransactions !== undefined) {
+      const section = original.subcategory === 'cuentas_corriente' ? 'Punto Xpress - Cuentas Corriente' : 'Punto Xpress - Cuentas Ahorro';
+      return {
+        label: `${section} - Cantidad de transacciones mensuales`,
+        oldValue: original.maxMonthlyTransactions ?? 0,
+        newValue: edited.maxMonthlyTransactions,
+      };
+    }
+
+    return null;
+  }, [pendingGeneralLimits, originalGeneralLimits]);
 
   const canalesElectronicos = generalLimits.find((l) => l.category === 'canales_electronicos');
   const puntoXpressAhorro = generalLimits.find((l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_ahorro');
@@ -297,31 +373,65 @@ export default function LimitesYMontosPage() {
           <div className={styles.sidebar}>
             <div className={styles.historialPanel}>
               <div className={styles.sidebarActions}>
-                <button className={`${styles.btn} ${styles.btnPrimary} ${styles.sidebarActionBtn}`} onClick={() => setIsEditingGeneral(true)}>
+                <button
+                  className={`${styles.btn} ${styles.btnPrimary} ${styles.sidebarActionBtn}`}
+                  onClick={() => {
+                    if (pendingGeneralLimits) {
+                      setShowGeneralConfirmation(true);
+                      return;
+                    }
+                    setOriginalGeneralLimits(generalLimits);
+                    setIsEditingGeneral(true);
+                  }}
+                >
                   Guardar Cambios
                 </button>
-                <button className={`${styles.btn} ${styles.btnSecondary} ${styles.sidebarActionBtn}`} onClick={() => router.push('/dashboard/parametros/limites-y-montos/historial')}>
-                  Historial
+                <button
+                  className={`${styles.btn} ${styles.btnSecondary} ${styles.sidebarActionBtn}`}
+                  onClick={() => {
+                    if (pendingGeneralLimits) {
+                      handleUndoGeneralChanges();
+                      return;
+                    }
+                    router.push('/dashboard/parametros/limites-y-montos/historial');
+                  }}
+                >
+                  {pendingGeneralLimits ? 'Deshacer cambios' : 'Historial'}
                 </button>
               </div>
 
-              <h3 className={styles.historialTitle}>Historial de Auditoría</h3>
-              {recentAudit.length === 0 && <div className={styles.emptyAudit}>No hay registros de auditoría disponibles.</div>}
+              {pendingSummary ? (
+                <>
+                  <h3 className={styles.historialTitle}>Confirme sus cambios</h3>
+                  <div className={styles.auditDetails}>{pendingSummary.label}</div>
+                  <div className={styles.auditChangeBox}>
+                    <span style={{ color: '#9ca3af' }}>Valor:</span>
+                    <span className={styles.oldValue}>{formatCurrency(pendingSummary.oldValue)}</span>
+                    <span>→</span>
+                    <span className={styles.newValue}>{formatCurrency(pendingSummary.newValue)}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3 className={styles.historialTitle}>Historial de Auditoría</h3>
+                  {recentAudit.length === 0 && <div className={styles.emptyAudit}>No hay registros de auditoría disponibles.</div>}
 
-              {recentAudit.map((log) => (
-                <div key={log.id} className={styles.auditItem}>
-                  <div className={styles.auditUser}>{log.userName}</div>
-                  <div className={styles.auditTime}>{formatDate(log.timestamp)} - {formatTime(log.timestamp)}</div>
-                  <div className={styles.auditDetails}>{log.details}</div>
-                  {log.changes && log.changes.length > 0 && (
-                    <div className={styles.auditChangeBox}>
-                      <span className={styles.oldValue}>{typeof log.changes[0].oldValue === 'number' ? formatCurrency(log.changes[0].oldValue) : log.changes[0].oldValue}</span>
-                      <span>→</span>
-                      <span className={styles.newValue}>{typeof log.changes[0].newValue === 'number' ? formatCurrency(log.changes[0].newValue) : log.changes[0].newValue}</span>
+                  {recentAudit.map((log) => (
+                    <div key={log.id} className={styles.auditItem}>
+                      <div className={styles.auditUser}>{log.userName}</div>
+                      <div className={styles.auditTime}>{formatDate(log.timestamp)} - {formatTime(log.timestamp)}</div>
+                      <div className={styles.auditDetails}>{log.details}</div>
+                      {log.changes && log.changes.length > 0 && (
+                        <div className={styles.auditChangeBox}>
+                          <span className={styles.oldValue}>{typeof log.changes[0].oldValue === 'number' ? formatCurrency(log.changes[0].oldValue) : log.changes[0].oldValue}</span>
+                          <span>→</span>
+                          <span className={styles.newValue}>{typeof log.changes[0].newValue === 'number' ? formatCurrency(log.changes[0].newValue) : log.changes[0].newValue}</span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              ))}
+                  ))}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -342,6 +452,18 @@ export default function LimitesYMontosPage() {
         }}
         onSave={handleSaveUserLimits}
         user={selectedUser}
+      />
+
+      <ConfirmationModal
+        isOpen={showGeneralConfirmation}
+        onClose={() => setShowGeneralConfirmation(false)}
+        onConfirm={handleConfirmGeneralLimits}
+        title="Confirmar actualización"
+        message="¿Está seguro que desea actualizar los límites generales? Esta acción afectará a todos los usuarios que no tengan límites personalizados."
+        type="warning"
+        confirmText="Confirmar"
+        cancelText="Cancelar"
+        isLoading={isLoading}
       />
 
       <ConfirmationModal
