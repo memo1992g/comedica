@@ -93,7 +93,7 @@ export default function AtencionSoportePage() {
           <p>Administración de catálogo de motivos de atención y soporte</p>
         </div>
         <div className={styles.headerActions}>
-          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/mantenimiento/atencion-soporte/historial')}>Historial</button>
+          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/dashboard/mantenimiento/atencion-soporte/historial')}>Historial</button>
           <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleAdd}><Plus size={18} />Agregar Motivo</button>
         </div>
       </div>

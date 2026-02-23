@@ -93,7 +93,7 @@ export default function CatalogoProductosPage() {
           <p>Gestión del catálogo de productos y servicios financieros</p>
         </div>
         <div className={styles.headerActions}>
-          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/mantenimiento/catalogo-productos/historial')}>Historial</button>
+          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/dashboard/mantenimiento/catalogo-productos/historial')}>Historial</button>
           <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleAdd}><Plus size={18} />Agregar Producto</button>
         </div>
       </div>

@@ -104,7 +104,7 @@ export default function CuestionarioSeguridadPage() {
           <p>Gestión de preguntas de seguridad para atención telefónica</p>
         </div>
         <div className={styles.headerActions}>
-          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/mantenimiento/cuestionario-seguridad/historial')}>Historial</button>
+          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/dashboard/mantenimiento/cuestionario-seguridad/historial')}>Historial</button>
           <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleAdd}><Plus size={18} />Agregar Pregunta</button>
         </div>
       </div>
