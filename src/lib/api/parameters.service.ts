@@ -414,18 +414,50 @@ export async function getUserLimits(params?: {
 }): Promise<{ data: UserLimits[]; total: number }> {
   try {
     const headers = getAuthHeaders();
-    const queryParams = new URLSearchParams();
-    if (params?.search) queryParams.set('search', params.search);
-    if (params?.page) queryParams.set('page', String(params.page));
-    if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
+    const cliId = Number(params?.search);
 
-    const response = await customAuthFetch<{ data: { data: UserLimits[]; total: number } }>(
-      buildUrl('/parameters/limits/users', queryParams),
-      { method: "GET", headers },
+    const response = await customAuthFetch<ParamsProxyResponse<any[]>>(
+      `${API_URL}/limits/limit-serviceOpt`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          uuid: crypto.randomUUID(),
+          channel: 'W',
+          pageId: 1,
+          request: {
+            cliId: Number.isFinite(cliId) ? cliId : 0,
+          },
+        }),
+        headers,
+      },
     );
-    return response.data;
-  } catch (error) {
-    throw new Error(getErrorMessage(error));
+
+    const rows = assertProxySuccess(response);
+    const mapped = mapLimitServiceOptRows(Array.isArray(rows) ? rows : []);
+    const page = params?.page && params.page > 0 ? params.page : 1;
+    const pageSize = params?.pageSize && params.pageSize > 0 ? params.pageSize : 20;
+    const start = (page - 1) * pageSize;
+
+    return {
+      data: mapped.slice(start, start + pageSize),
+      total: mapped.length,
+    };
+  } catch (primaryError) {
+    try {
+      const headers = getAuthHeaders();
+      const queryParams = new URLSearchParams();
+      if (params?.search) queryParams.set('search', params.search);
+      if (params?.page) queryParams.set('page', String(params.page));
+      if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
+
+      const response = await customAuthFetch<{ data: { data: UserLimits[]; total: number } }>(
+        buildUrl('/parameters/limits/users', queryParams),
+        { method: "GET", headers },
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(getErrorMessage(primaryError || error));
+    }
   }
 }
 
@@ -456,6 +488,57 @@ export async function deleteUserLimits(userId: string): Promise<void> {
   }
 }
 
+
+
+function mapLimitServiceOptRows(rows: any[]): UserLimits[] {
+  const grouped = new Map<string, UserLimits>();
+
+  rows.forEach((item, index) => {
+    const cliId = String(item?.cliId ?? item?.clientId ?? item?.associatedNumber ?? `cli-${index}`);
+    const current = grouped.get(cliId) ?? {
+      id: cliId,
+      userId: cliId,
+      userName: `Cliente ${cliId}`,
+      userCode: cliId,
+      limitType: 'general' as const,
+      limits: {},
+      lastUpdate: new Date().toISOString(),
+    };
+
+    const maxAmount = Number(item?.maxAmount ?? 0);
+    const typeLimit = Number(item?.typeLimit ?? 0);
+
+    if (item?.accountClass === 'CE') {
+      current.limits.canalesElectronicos = current.limits.canalesElectronicos ?? {
+        maxPerTransaction: 0,
+        maxDaily: 0,
+        maxMonthly: 0,
+      };
+
+      if (typeLimit === 1) {
+        current.limits.canalesElectronicos.maxPerTransaction = maxAmount;
+      } else if (typeLimit === 2) {
+        current.limits.canalesElectronicos.maxMonthly = maxAmount;
+      } else {
+        current.limits.canalesElectronicos.maxDaily = maxAmount;
+      }
+    }
+
+    if (item?.productType === 'T365' || item?.transactionType === 'TRANSFER365') {
+      current.limits.transfer365 = { maxAmount };
+    }
+
+    grouped.set(cliId, current);
+  });
+
+  return Array.from(grouped.values()).map((item) => ({
+    ...item,
+    limitType:
+      item.limits.canalesElectronicos || item.limits.puntoXpress || item.limits.transfer365
+        ? 'personalizado'
+        : 'general',
+  }));
+}
 
 function normalizeAuditLog(item: any, index: number): AuditLog {
   return {
