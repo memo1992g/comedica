@@ -85,6 +85,7 @@ interface ParamsProxyRequest<T> {
   uuid: string;
   channel: string;
   pageId: number;
+  requestId: string;
   request: T;
 }
 
@@ -150,6 +151,7 @@ function buildParamsProxyRequest<T>(request: T): ParamsProxyRequest<T> {
     uuid: crypto.randomUUID(),
     channel: 'W',
     pageId: 1,
+    requestId: crypto.randomUUID(),
     request,
   };
 }
