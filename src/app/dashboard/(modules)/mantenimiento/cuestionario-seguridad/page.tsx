@@ -23,6 +23,7 @@ export default function CuestionarioSeguridadPage() {
   
   const [formData, setFormData] = useState({ code: '', question: '', status: 'Activo' as 'Activo' | 'Inactivo' });
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const pageSize = 20;
 
   useEffect(() => {
@@ -34,8 +35,10 @@ export default function CuestionarioSeguridadPage() {
       const response = await getSecurityQuestions({ search: searchQuery, page: currentPage, pageSize });
       setQuestions(response.data);
       setTotal(response.total);
+      setErrorMessage(null);
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible cargar las preguntas de seguridad.');
     }
   };
 
@@ -62,8 +65,10 @@ export default function CuestionarioSeguridadPage() {
       setShowAddModal(false);
       setShowEditModal(false);
       setSelectedQuestion(null);
+      setErrorMessage(null);
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible guardar la pregunta de seguridad.');
     } finally {
       setIsLoading(false);
     }
@@ -76,8 +81,10 @@ export default function CuestionarioSeguridadPage() {
       await deleteSecurityQuestion(questionToDelete.id);
       await loadQuestions();
       setQuestionToDelete(null);
+      setErrorMessage(null);
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible eliminar la pregunta de seguridad.');
     } finally {
       setIsLoading(false);
     }
@@ -105,6 +112,20 @@ export default function CuestionarioSeguridadPage() {
       <div className={styles.searchBar}>
         <input type="text" className={styles.searchInput} placeholder="Buscar pregunta..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} />
       </div>
+
+      {errorMessage && (
+        <div style={{
+          marginBottom: '16px',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          border: '1px solid #fecaca',
+          background: '#fef2f2',
+          color: '#b91c1c',
+          fontSize: '14px',
+        }}>
+          {errorMessage}
+        </div>
+      )}
 
       <div className={styles.panel}>
         {questions.length > 0 ? (
