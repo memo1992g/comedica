@@ -51,7 +51,7 @@ export default function ConfiguracionesSeguridadPage() {
 
   const loadRecentAudit = async () => {
     try {
-      const data = await getRecentAudit(5);
+      const data = await getRecentAudit(5, 'PARAMS');
       setRecentAudit(data);
     } catch (error) {
       console.error('Error al cargar auditoría:', error);
