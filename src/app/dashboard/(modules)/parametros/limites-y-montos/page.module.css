@@ -53,6 +53,11 @@
   border: 0.8px solid #23366a;
 }
 
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .tabs {
   display: flex;
   gap: 20px;
@@ -145,6 +150,11 @@
   color: #233269;
   font-size: 15px;
   font-weight: 500;
+}
+
+.fieldValue:disabled {
+  cursor: default;
+  opacity: 1;
 }
 
 .historialPanel {

@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { Settings, Users, Pencil, Trash2 } from 'lucide-react';
 import {
-  Settings,
-  Users,
-  Pencil,
-  Trash2,
-} from 'lucide-react';
-import { getGeneralLimits, getUserLimits, getRecentAudit, updateGeneralLimits, updateUserLimits, deleteUserLimits } from '@/lib/api/parameters.service';
+  getGeneralLimits,
+  getUserLimits,
+  getRecentAudit,
+  updateGeneralLimits,
+  updateUserLimits,
+  deleteUserLimits,
+} from '@/lib/api/parameters.service';
 import { TransactionLimits, UserLimits, AuditLog } from '@/types';
-import { EditGeneralLimitsModal } from '@/components/parametros/EditGeneralLimitsModal';
 import { EditUserLimitsModal } from '@/components/parametros/EditUserLimitsModal';
 import { ConfirmationModal } from '@/components/parametros/ConfirmationModal';
 import styles from './page.module.css';
@@ -23,8 +24,6 @@ export default function LimitesYMontosPage() {
 
   const [generalLimits, setGeneralLimits] = useState<TransactionLimits[]>([]);
   const [originalGeneralLimits, setOriginalGeneralLimits] = useState<TransactionLimits[] | null>(null);
-  const [pendingGeneralLimits, setPendingGeneralLimits] = useState<Partial<TransactionLimits>[] | null>(null);
-  const [isEditingGeneral, setIsEditingGeneral] = useState(false);
   const [showGeneralConfirmation, setShowGeneralConfirmation] = useState(false);
 
   const [userLimits, setUserLimits] = useState<UserLimits[]>([]);
@@ -38,6 +37,11 @@ export default function LimitesYMontosPage() {
 
   const [recentAudit, setRecentAudit] = useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const hasPendingGeneralChanges = useMemo(() => {
+    if (!originalGeneralLimits) return false;
+    return JSON.stringify(originalGeneralLimits) !== JSON.stringify(generalLimits);
+  }, [generalLimits, originalGeneralLimits]);
 
   useEffect(() => {
     loadGeneralLimits();
@@ -58,9 +62,7 @@ export default function LimitesYMontosPage() {
     try {
       const data = await getGeneralLimits();
       setGeneralLimits(data);
-      if (!pendingGeneralLimits) {
-        setOriginalGeneralLimits(data);
-      }
+      setOriginalGeneralLimits(data);
     } catch (error) {
       console.error('Error al cargar límites generales:', error);
     }
@@ -68,11 +70,7 @@ export default function LimitesYMontosPage() {
 
   const loadUserLimits = async () => {
     try {
-      const response = await getUserLimits({
-        search: searchQuery,
-        page: currentPage,
-        pageSize,
-      });
+      const response = await getUserLimits({ search: searchQuery, page: currentPage, pageSize });
       setUserLimits(response.data);
       setTotalUsers(response.total);
     } catch (error) {
@@ -89,28 +87,68 @@ export default function LimitesYMontosPage() {
     }
   };
 
-  const handleSaveGeneralLimits = async (limits: Partial<TransactionLimits>[]) => {
-    const snapshot = originalGeneralLimits ?? generalLimits;
+  const updateGeneralField = (
+    id: string,
+    field: keyof TransactionLimits,
+    value: string,
+  ) => {
+    const numValue = Number(value);
+    if (Number.isNaN(numValue)) return;
 
-    const preview = snapshot.map((item) => {
-      const edited = limits.find((l) => l.id === item.id);
-      return edited ? { ...item, ...edited } : item;
-    });
+    setGeneralLimits((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: numValue } : item)),
+    );
+  };
 
-    setGeneralLimits(preview);
-    setPendingGeneralLimits(limits);
-    setIsEditingGeneral(false);
+  const handlePrimaryGeneralAction = () => {
+    if (!hasPendingGeneralChanges) {
+      return;
+    }
+
+    setShowGeneralConfirmation(true);
   };
 
   const handleConfirmGeneralLimits = async () => {
-    if (!pendingGeneralLimits) return;
+    if (!originalGeneralLimits) return;
+
+    const changes: Partial<TransactionLimits>[] = generalLimits
+      .map((current) => {
+        const original = originalGeneralLimits.find((item) => item.id === current.id);
+        if (!original) return null;
+
+        const diff: Partial<TransactionLimits> = { id: current.id };
+        let changed = false;
+
+        if (current.maxPerTransaction !== original.maxPerTransaction) {
+          diff.maxPerTransaction = current.maxPerTransaction;
+          changed = true;
+        }
+        if (current.maxDaily !== original.maxDaily) {
+          diff.maxDaily = current.maxDaily;
+          changed = true;
+        }
+        if (current.maxMonthly !== original.maxMonthly) {
+          diff.maxMonthly = current.maxMonthly;
+          changed = true;
+        }
+        if ((current.maxMonthlyTransactions ?? 0) !== (original.maxMonthlyTransactions ?? 0)) {
+          diff.maxMonthlyTransactions = current.maxMonthlyTransactions;
+          changed = true;
+        }
+
+        return changed ? diff : null;
+      })
+      .filter(Boolean) as Partial<TransactionLimits>[];
+
+    if (changes.length === 0) {
+      setShowGeneralConfirmation(false);
+      return;
+    }
 
     try {
-      await updateGeneralLimits(pendingGeneralLimits);
+      await updateGeneralLimits(changes);
       await loadGeneralLimits();
       await loadRecentAudit();
-      setPendingGeneralLimits(null);
-      setOriginalGeneralLimits(null);
       setShowGeneralConfirmation(false);
     } catch (error) {
       console.error('Error al guardar límites generales:', error);
@@ -122,12 +160,10 @@ export default function LimitesYMontosPage() {
     if (originalGeneralLimits) {
       setGeneralLimits(originalGeneralLimits);
     }
-    setPendingGeneralLimits(null);
   };
 
   const handleSaveUserLimits = async (limits: UserLimits['limits']) => {
     if (!selectedUser) return;
-
     try {
       await updateUserLimits(selectedUser.userId, limits);
       await loadUserLimits();
@@ -142,7 +178,6 @@ export default function LimitesYMontosPage() {
 
   const handleDeleteUserLimits = async () => {
     if (!userToDelete) return;
-
     setIsLoading(true);
     try {
       await deleteUserLimits(userToDelete.userId);
@@ -156,74 +191,67 @@ export default function LimitesYMontosPage() {
     }
   };
 
-  const formatCurrency = (value: number) => `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatCurrency = (value: number) =>
+    `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+    return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   };
 
   const pendingSummary = useMemo(() => {
-    if (!pendingGeneralLimits || !originalGeneralLimits) return null;
+    if (!hasPendingGeneralChanges || !originalGeneralLimits) return null;
 
-    const edited = pendingGeneralLimits[0];
-    if (!edited?.id) return null;
+    for (const current of generalLimits) {
+      const original = originalGeneralLimits.find((item) => item.id === current.id);
+      if (!original) continue;
 
-    const original = originalGeneralLimits.find((l) => l.id === edited.id);
-    if (!original) return null;
-
-    if (edited.maxMonthly !== undefined) {
-      return {
-        label: 'Canales Electrónicos - Máximo mensual',
-        oldValue: original.maxMonthly,
-        newValue: edited.maxMonthly,
-      };
-    }
-
-    if (edited.maxDaily !== undefined) {
-      return {
-        label: 'Canales Electrónicos - Máximo diario',
-        oldValue: original.maxDaily,
-        newValue: edited.maxDaily,
-      };
-    }
-
-    if (edited.maxPerTransaction !== undefined) {
-      const section = original.category === 'punto_xpress' ? 'Punto Xpress' : 'Canales Electrónicos';
-      return {
-        label: `${section} - Máximo por transacción`,
-        oldValue: original.maxPerTransaction,
-        newValue: edited.maxPerTransaction,
-      };
-    }
-
-    if (edited.maxMonthlyTransactions !== undefined) {
-      const section = original.subcategory === 'cuentas_corriente' ? 'Punto Xpress - Cuentas Corriente' : 'Punto Xpress - Cuentas Ahorro';
-      return {
-        label: `${section} - Cantidad de transacciones mensuales`,
-        oldValue: original.maxMonthlyTransactions ?? 0,
-        newValue: edited.maxMonthlyTransactions,
-      };
+      if (current.maxMonthly !== original.maxMonthly) {
+        return {
+          label: 'Canales Electrónicos - Máximo mensual',
+          oldValue: original.maxMonthly,
+          newValue: current.maxMonthly,
+        };
+      }
+      if (current.maxDaily !== original.maxDaily) {
+        return {
+          label: 'Canales Electrónicos - Máximo diario',
+          oldValue: original.maxDaily,
+          newValue: current.maxDaily,
+        };
+      }
+      if (current.maxPerTransaction !== original.maxPerTransaction) {
+        const section = original.category === 'punto_xpress' ? 'Punto Xpress' : 'Canales Electrónicos';
+        return {
+          label: `${section} - Máximo por transacción`,
+          oldValue: original.maxPerTransaction,
+          newValue: current.maxPerTransaction,
+        };
+      }
+      if ((current.maxMonthlyTransactions ?? 0) !== (original.maxMonthlyTransactions ?? 0)) {
+        return {
+          label: 'Punto Xpress - Cantidad de transacciones mensuales',
+          oldValue: original.maxMonthlyTransactions ?? 0,
+          newValue: current.maxMonthlyTransactions ?? 0,
+        };
+      }
     }
 
     return null;
-  }, [pendingGeneralLimits, originalGeneralLimits]);
+  }, [generalLimits, originalGeneralLimits, hasPendingGeneralChanges]);
 
   const canalesElectronicos = generalLimits.find((l) => l.category === 'canales_electronicos');
-  const puntoXpressAhorro = generalLimits.find((l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_ahorro');
-  const puntoXpressCorriente = generalLimits.find((l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_corriente');
+  const puntoXpressAhorro = generalLimits.find(
+    (l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_ahorro',
+  );
+  const puntoXpressCorriente = generalLimits.find(
+    (l) => l.category === 'punto_xpress' && l.subcategory === 'cuentas_corriente',
+  );
 
   const totalPages = Math.max(1, Math.ceil(totalUsers / pageSize));
 
@@ -258,15 +286,27 @@ export default function LimitesYMontosPage() {
                     <div className={styles.limitFields}>
                       <div className={styles.fieldGroup}>
                         <span className={styles.fieldLabel}>Máximo por transacción</span>
-                        <div className={styles.fieldValue}>{formatCurrency(canalesElectronicos.maxPerTransaction)}</div>
+                        <input
+                          className={styles.fieldValue}
+                          value={formatCurrency(canalesElectronicos.maxPerTransaction)}
+                          onChange={(e) => updateGeneralField(canalesElectronicos.id, 'maxPerTransaction', e.target.value.replace(/[^0-9.]/g, ''))}
+                        />
                       </div>
                       <div className={styles.fieldGroup}>
                         <span className={styles.fieldLabel}>Máximo diario</span>
-                        <div className={styles.fieldValue}>{formatCurrency(canalesElectronicos.maxDaily)}</div>
+                        <input
+                          className={styles.fieldValue}
+                          value={formatCurrency(canalesElectronicos.maxDaily)}
+                          onChange={(e) => updateGeneralField(canalesElectronicos.id, 'maxDaily', e.target.value.replace(/[^0-9.]/g, ''))}
+                        />
                       </div>
                       <div className={styles.fieldGroup}>
                         <span className={styles.fieldLabel}>Máximo mensual</span>
-                        <div className={styles.fieldValue}>{formatCurrency(canalesElectronicos.maxMonthly)}</div>
+                        <input
+                          className={styles.fieldValue}
+                          value={formatCurrency(canalesElectronicos.maxMonthly)}
+                          onChange={(e) => updateGeneralField(canalesElectronicos.id, 'maxMonthly', e.target.value.replace(/[^0-9.]/g, ''))}
+                        />
                       </div>
                     </div>
                   </div>
@@ -279,11 +319,19 @@ export default function LimitesYMontosPage() {
                     <div className={styles.limitFields}>
                       <div className={styles.fieldGroup}>
                         <span className={styles.fieldLabel}>Máximo por transacción</span>
-                        <div className={styles.fieldValue}>{formatCurrency(puntoXpressAhorro.maxPerTransaction)}</div>
+                        <input
+                          className={styles.fieldValue}
+                          value={formatCurrency(puntoXpressAhorro.maxPerTransaction)}
+                          onChange={(e) => updateGeneralField(puntoXpressAhorro.id, 'maxPerTransaction', e.target.value.replace(/[^0-9.]/g, ''))}
+                        />
                       </div>
                       <div className={styles.fieldGroup}>
                         <span className={styles.fieldLabel}>Cantidad de transacciones mensuales</span>
-                        <div className={styles.fieldValue}>{puntoXpressAhorro.maxMonthlyTransactions}</div>
+                        <input
+                          className={styles.fieldValue}
+                          value={String(puntoXpressAhorro.maxMonthlyTransactions ?? 0)}
+                          onChange={(e) => updateGeneralField(puntoXpressAhorro.id, 'maxMonthlyTransactions', e.target.value.replace(/[^0-9.]/g, ''))}
+                        />
                       </div>
                     </div>
 
@@ -293,11 +341,19 @@ export default function LimitesYMontosPage() {
                         <div className={styles.limitFields}>
                           <div className={styles.fieldGroup}>
                             <span className={styles.fieldLabel}>Máximo por transacción</span>
-                            <div className={styles.fieldValue}>{formatCurrency(puntoXpressCorriente.maxPerTransaction)}</div>
+                            <input
+                              className={styles.fieldValue}
+                              value={formatCurrency(puntoXpressCorriente.maxPerTransaction)}
+                              onChange={(e) => updateGeneralField(puntoXpressCorriente.id, 'maxPerTransaction', e.target.value.replace(/[^0-9.]/g, ''))}
+                            />
                           </div>
                           <div className={styles.fieldGroup}>
                             <span className={styles.fieldLabel}>Cantidad de transacciones mensuales</span>
-                            <div className={styles.fieldValue}>{puntoXpressCorriente.maxMonthlyTransactions}</div>
+                            <input
+                              className={styles.fieldValue}
+                              value={String(puntoXpressCorriente.maxMonthlyTransactions ?? 0)}
+                              onChange={(e) => updateGeneralField(puntoXpressCorriente.id, 'maxMonthlyTransactions', e.target.value.replace(/[^0-9.]/g, ''))}
+                            />
                           </div>
                         </div>
                       </>
@@ -375,28 +431,22 @@ export default function LimitesYMontosPage() {
               <div className={styles.sidebarActions}>
                 <button
                   className={`${styles.btn} ${styles.btnPrimary} ${styles.sidebarActionBtn}`}
-                  onClick={() => {
-                    if (pendingGeneralLimits) {
-                      setShowGeneralConfirmation(true);
-                      return;
-                    }
-                    setOriginalGeneralLimits(generalLimits);
-                    setIsEditingGeneral(true);
-                  }}
+                  onClick={handlePrimaryGeneralAction}
+                  disabled={!hasPendingGeneralChanges}
                 >
                   Guardar Cambios
                 </button>
                 <button
                   className={`${styles.btn} ${styles.btnSecondary} ${styles.sidebarActionBtn}`}
                   onClick={() => {
-                    if (pendingGeneralLimits) {
+                    if (hasPendingGeneralChanges) {
                       handleUndoGeneralChanges();
                       return;
                     }
                     router.push('/dashboard/parametros/limites-y-montos/historial');
                   }}
                 >
-                  {pendingGeneralLimits ? 'Deshacer cambios' : 'Historial'}
+                  {hasPendingGeneralChanges ? 'Deshacer cambios' : 'Historial'}
                 </button>
               </div>
 
@@ -436,13 +486,6 @@ export default function LimitesYMontosPage() {
           </div>
         </div>
       </div>
-
-      <EditGeneralLimitsModal
-        isOpen={isEditingGeneral}
-        onClose={() => setIsEditingGeneral(false)}
-        onSave={handleSaveGeneralLimits}
-        limits={generalLimits}
-      />
 
       <EditUserLimitsModal
         isOpen={isEditingUser}
