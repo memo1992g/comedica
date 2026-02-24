@@ -74,6 +74,8 @@
 .btnExcel { border: 1px solid #233269; color: #233269; }
 .btnPdf { border: 1px solid #ef4444; color: #ef4444; }
 
+.btnExcel:disabled, .btnPdf:disabled { opacity: 0.6; cursor: not-allowed; }
+
 .searchRow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 
 .search {
@@ -161,3 +163,62 @@
 
 .barWrap { padding: 8px 6px 6px 6px; }
 .barSvg { width: 100%; height: auto; }
+
+
+.filterBtnActive {
+  border-color: #233269;
+  color: #233269;
+  background: #eef2ff;
+}
+
+.filtersPanel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 12px;
+  border: 1px solid #e6eaf3;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #fbfcff;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filterField label {
+  font-size: 11px;
+  color: #334155;
+  font-weight: 700;
+}
+
+.filterField input,
+.filterField select {
+  height: 32px;
+  border: 1px solid #dbe3f1;
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 12px;
+  color: #1f2937;
+  background: #fff;
+}
+
+.filterActions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.clearBtn {
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #233269;
+  background: #fff;
+  color: #233269;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 12px;
+  cursor: pointer;
+}
