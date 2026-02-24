@@ -25,6 +25,7 @@ type TxRow = {
   type: string;
   amount: string;
   amountValue: number;
+  dateMs: number | null;
   status: 'Activo' | 'Inactivo';
 };
 
@@ -120,6 +121,8 @@ function mapVolume(metrics: OverviewMetricsResponse): VolumeItem[] {
 function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow {
   const txId = String(item.transactionId ?? item.idTransaccion ?? item.id ?? `TX-${index + 1}`);
   const date = String(item.transactionDate ?? item.fechaHora ?? item.fecha ?? '');
+  const parsedDate = new Date(date);
+  const dateMs = Number.isNaN(parsedDate.getTime()) ? null : parsedDate.getTime();
   const associate = String(item.associatedNumber ?? item.numeroAsociado ?? item.asociado ?? '-');
   const client = String(item.customerName ?? item.nombreCliente ?? item.nombreDestino ?? '-');
   const category = String(item.category ?? item.categoria ?? item.productType ?? '-');
@@ -136,6 +139,7 @@ function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow 
     type,
     amountValue: Number.isFinite(amountRaw) ? amountRaw : 0,
     amount: toCurrency(Number.isFinite(amountRaw) ? amountRaw : 0),
+    dateMs,
     status: statusRaw.toUpperCase().startsWith('I') ? 'Inactivo' : 'Activo',
   };
 }
@@ -228,9 +232,15 @@ export default function DashboardPage() {
         const hasMin = Number.isFinite(min) && filters.montoMinimo !== '';
         const max = Number(filters.montoMaximo);
         const hasMax = Number.isFinite(max) && filters.montoMaximo !== '';
+        const fromDate = filters.fechaDesde ? new Date(`${filters.fechaDesde}T00:00:00`) : null;
+        const toDate = filters.fechaHasta ? new Date(`${filters.fechaHasta}T23:59:59`) : null;
+        const fromMs = fromDate && !Number.isNaN(fromDate.getTime()) ? fromDate.getTime() : null;
+        const toMs = toDate && !Number.isNaN(toDate.getTime()) ? toDate.getTime() : null;
 
         const filteredRows = rows.filter((item) => {
           if (filters.estado !== 'Todos' && item.status !== filters.estado) return false;
+          if (fromMs !== null && (item.dateMs === null || item.dateMs < fromMs)) return false;
+          if (toMs !== null && (item.dateMs === null || item.dateMs > toMs)) return false;
           if (hasMin && item.amountValue < min) return false;
           if (hasMax && item.amountValue > max) return false;
           if (filters.tipoTransaccion && !item.type.toLowerCase().includes(filters.tipoTransaccion.toLowerCase())) return false;
