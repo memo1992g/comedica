@@ -74,6 +74,8 @@
 .btnExcel { border: 1px solid #233269; color: #233269; }
 .btnPdf { border: 1px solid #ef4444; color: #ef4444; }
 
+.btnExcel:disabled, .btnPdf:disabled { opacity: 0.6; cursor: not-allowed; }
+
 .searchRow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 
 .search {

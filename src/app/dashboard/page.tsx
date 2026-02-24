@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Filter } from 'lucide-react';
 import { getErrorMessage } from '@/lib/api/client';
 import apiClient from '@/lib/api/client';
@@ -181,6 +181,7 @@ export default function DashboardPage() {
   const [dist, setDist] = useState<DistributionItem[]>([]);
   const [vol, setVol] = useState<VolumeItem[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState<'excel' | 'pdf' | null>(null);
 
   useEffect(() => {
     const loadMetrics = async () => {
@@ -267,6 +268,44 @@ export default function DashboardPage() {
     return `${start}-${end} de ${tx.total}`;
   }, [tx.total, page]);
 
+  const downloadOverviewReport = useCallback(async (format: 'excel' | 'pdf') => {
+    const fecha = filters.fechaHasta || toInputDate(new Date());
+    setIsExporting(format);
+
+    try {
+      const response = await apiClient.get<Blob>(`/overview/export/${format}`, {
+        params: { fecha },
+        responseType: 'blob',
+      });
+
+      const contentDisposition = response.headers['content-disposition'];
+      const matchedFilename = typeof contentDisposition === 'string'
+        ? contentDisposition.match(/filename\*?=(?:UTF-8''|"|)?([^";]+)/i)?.[1]?.replace(/"/g, '').trim()
+        : null;
+      const defaultName = `overview-${fecha}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+      const filename = matchedFilename || defaultName;
+
+      const blob = new Blob([response.data], {
+        type: format === 'excel'
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'application/pdf',
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setLoadError(`No se pudo exportar ${format.toUpperCase()}: ${getErrorMessage(error)}`);
+    } finally {
+      setIsExporting(null);
+    }
+  }, [filters.fechaHasta]);
+
   const clearFilters = () => {
     const now = new Date();
     const from = new Date(now);
@@ -322,8 +361,20 @@ export default function DashboardPage() {
           <div className={styles.panelHead}>
             <div className={styles.panelTitle}>Resumen de Transacciones</div>
             <div className={styles.panelActions}>
-              <button className={styles.btnExcel}>Excel</button>
-              <button className={styles.btnPdf}>PDF</button>
+              <button
+                className={styles.btnExcel}
+                onClick={() => { void downloadOverviewReport('excel'); }}
+                disabled={isExporting !== null}
+              >
+                {isExporting === 'excel' ? 'Exportando...' : 'Excel'}
+              </button>
+              <button
+                className={styles.btnPdf}
+                onClick={() => { void downloadOverviewReport('pdf'); }}
+                disabled={isExporting !== null}
+              >
+                {isExporting === 'pdf' ? 'Exportando...' : 'PDF'}
+              </button>
             </div>
           </div>
 
