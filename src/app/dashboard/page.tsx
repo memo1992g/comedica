@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { Filter } from 'lucide-react';
 import { getErrorMessage } from '@/lib/api/client';
 import apiClient from '@/lib/api/client';
 import styles from './styles/dashboardPage.module.css';
@@ -23,6 +24,7 @@ type TxRow = {
   category: string;
   type: string;
   amount: string;
+  amountValue: number;
   status: 'Activo' | 'Inactivo';
 };
 
@@ -132,16 +134,44 @@ function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow 
     client,
     category,
     type,
+    amountValue: Number.isFinite(amountRaw) ? amountRaw : 0,
     amount: toCurrency(Number.isFinite(amountRaw) ? amountRaw : 0),
     status: statusRaw.toUpperCase().startsWith('I') ? 'Inactivo' : 'Activo',
   };
 }
 
+type OverviewFilters = {
+  fechaDesde: string;
+  fechaHasta: string;
+  tipoTransaccion: string;
+  montoMinimo: string;
+  montoMaximo: string;
+  estado: 'Todos' | 'Activo' | 'Inactivo';
+};
+
+function toInputDate(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
 export default function DashboardPage() {
+  const today = new Date();
+  const defaultFrom = new Date(today);
+  defaultFrom.setDate(today.getDate() - 30);
+
   const [overview, setOverview] = useState<Overview | null>(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 5;
+
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<OverviewFilters>({
+    fechaDesde: toInputDate(defaultFrom),
+    fechaHasta: toInputDate(today),
+    tipoTransaccion: '',
+    montoMinimo: '',
+    montoMaximo: '',
+    estado: 'Todos',
+  });
 
   const [tx, setTx] = useState<{ data: TxRow[]; total: number }>({ data: [], total: 0 });
   const [dist, setDist] = useState<DistributionItem[]>([]);
@@ -151,10 +181,9 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadMetrics = async () => {
       try {
-        const today = new Date().toISOString().slice(0, 10);
         const response = await apiClient.post<OverviewMetricsResponse>('/overview/metrics', {
           ...buildOverviewContext(),
-          data: { fecha: today },
+          data: { fecha: filters.fechaHasta || toInputDate(new Date()) },
         });
 
         setOverview(mapOverview(response.data));
@@ -169,28 +198,24 @@ export default function DashboardPage() {
     };
 
     void loadMetrics();
-  }, []);
+  }, [filters.fechaHasta]);
 
   useEffect(() => {
     const loadTransactions = async () => {
       try {
-        const today = new Date();
-        const from = new Date(today);
-        from.setDate(today.getDate() - 30);
-
         const response = await apiClient.post<OverviewTransactionsResponse>('/overview/transactions', {
           ...buildOverviewContext(),
           data: {
             filters: {
-              fechaInicio: from.toISOString().slice(0, 10),
-              fechaFin: today.toISOString().slice(0, 10),
-              paymentType: null,
+              fechaInicio: filters.fechaDesde,
+              fechaFin: filters.fechaHasta,
+              paymentType: filters.tipoTransaccion || null,
               productType: null,
               textoBusqueda: search,
             },
             pagination: {
-              page: page - 1,
-              size: pageSize,
+              page: 0,
+              size: 200,
               sortBy: 'transactionDate',
               sortDirection: 'DESC',
             },
@@ -198,14 +223,31 @@ export default function DashboardPage() {
         });
 
         const rows = (response.data.data ?? []).map((item, idx) => mapTransactionRow(item, idx));
-        setTx({ data: rows, total: Number(response.data.metadata?.totalCount ?? rows.length) });
+
+        const min = Number(filters.montoMinimo);
+        const hasMin = Number.isFinite(min) && filters.montoMinimo !== '';
+        const max = Number(filters.montoMaximo);
+        const hasMax = Number.isFinite(max) && filters.montoMaximo !== '';
+
+        const filteredRows = rows.filter((item) => {
+          if (filters.estado !== 'Todos' && item.status !== filters.estado) return false;
+          if (hasMin && item.amountValue < min) return false;
+          if (hasMax && item.amountValue > max) return false;
+          if (filters.tipoTransaccion && !item.type.toLowerCase().includes(filters.tipoTransaccion.toLowerCase())) return false;
+          return true;
+        });
+
+        const start = (page - 1) * pageSize;
+        const paged = filteredRows.slice(start, start + pageSize);
+
+        setTx({ data: paged, total: filteredRows.length });
       } catch {
         setTx({ data: [], total: 0 });
       }
     };
 
     void loadTransactions();
-  }, [search, page]);
+  }, [search, page, filters]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(tx.total / pageSize)), [tx.total]);
   const rangeText = useMemo(() => {
@@ -214,6 +256,23 @@ export default function DashboardPage() {
     const end = Math.min(page * pageSize, tx.total);
     return `${start}-${end} de ${tx.total}`;
   }, [tx.total, page]);
+
+  const clearFilters = () => {
+    const now = new Date();
+    const from = new Date(now);
+    from.setDate(now.getDate() - 30);
+
+    setFilters({
+      fechaDesde: toInputDate(from),
+      fechaHasta: toInputDate(now),
+      tipoTransaccion: '',
+      montoMinimo: '',
+      montoMaximo: '',
+      estado: 'Todos',
+    });
+    setSearch('');
+    setPage(1);
+  };
 
   return (
     <div className={styles.wrap}>
@@ -268,8 +327,99 @@ export default function DashboardPage() {
               }}
               placeholder="Buscar"
             />
-            <button className={styles.filterBtn} aria-label="Filtrar">⎘</button>
+            <button
+              className={`${styles.filterBtn} ${showFilters ? styles.filterBtnActive : ''}`}
+              aria-label="Filtrar"
+              onClick={() => setShowFilters((prev) => !prev)}
+              title="Mostrar/Ocultar filtros"
+            >
+              <Filter size={16} />
+            </button>
           </div>
+
+          {showFilters && (
+            <div className={styles.filtersPanel}>
+              <div className={styles.filterField}>
+                <label>Fecha Desde</label>
+                <input
+                  type="date"
+                  value={filters.fechaDesde}
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, fechaDesde: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Fecha Hasta</label>
+                <input
+                  type="date"
+                  value={filters.fechaHasta}
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, fechaHasta: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Tipo de Transacción</label>
+                <input
+                  type="text"
+                  value={filters.tipoTransaccion}
+                  placeholder="Todos los tipos"
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, tipoTransaccion: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Monto Mínimo</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={filters.montoMinimo}
+                  placeholder="0.00"
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, montoMinimo: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Monto Máximo</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={filters.montoMaximo}
+                  placeholder="0.00"
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, montoMaximo: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Estado</label>
+                <select
+                  value={filters.estado}
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, estado: e.target.value as OverviewFilters['estado'] }));
+                    setPage(1);
+                  }}
+                >
+                  <option value="Todos">Todos</option>
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              </div>
+              <div className={styles.filterActions}>
+                <button className={styles.clearBtn} onClick={clearFilters}>Limpiar Filtros</button>
+              </div>
+            </div>
+          )}
 
           <div className={styles.tableWrap}>
             <table className={styles.table}>
@@ -401,7 +551,6 @@ function BarChart({ data }: { data: VolumeItem[] }) {
   return (
     <div className={styles.barWrap}>
       <svg width="100%" height="260" viewBox="0 0 900 260" preserveAspectRatio="none">
-        {/* líneas guía */}
         {[0, 1, 2, 3].map((i) => (
           <line
             key={i}
