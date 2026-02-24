@@ -49,9 +49,11 @@ export type {
 export type {
   RecurringReportRequestI,
   RecurringReportItem,
+  RecurringReportDataI,
   RecurringReportResponseI,
   RecurringExReportRequestI,
   RecurringExReportItem,
+  RecurringExReportDataI,
   RecurringExReportResponseI,
 } from "./ReportRecurring.interface";
 
@@ -61,3 +63,8 @@ export type {
   Transfer365CardBalanceRequestI,
   Transfer365CardBalanceData,
 } from "./ReportBalance.interface";
+
+export type {
+  RecurringDetailRequestI,
+  RecurringDetailItem,
+} from "./ReportRecurringDetail.interface";

@@ -14,7 +14,11 @@ const blueCell = (value: unknown) => (
   </span>
 );
 
-const h = (label: string) => () => <span className="tableHeaderTitle">{label}</span>;
+const h = (label: string) => {
+  const Header = () => <span className="tableHeaderTitle">{label}</span>;
+  Header.displayName = `Header_${label}`;
+  return Header;
+};
 
 export const claimsColumns: ColumnDef<ComplaintI>[] = [
   {

@@ -1,1 +1,1 @@
-export { getFlowsAction, saveConfigAction } from "./soft-token.action";
+export { getFlowsAction, listConfigsAction, saveConfigAction } from "./soft-token.action";

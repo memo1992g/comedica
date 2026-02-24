@@ -11,6 +11,7 @@ export { mhReportAction } from "./mh-report.action";
 export { tcReportAction } from "./tc-report.action";
 export { recurringReportAction } from "./recurring-report.action";
 export { recurringExReportAction } from "./recurring-ex-report.action";
+export { recurringDetailAction } from "./recurring-detail.action";
 export { transfer365BalanceAction } from "./transfer365-balance.action";
 export { transfer365CardBalanceAction } from "./transfer365card-balance.action";
 export { financialCorrespondentsReportAction } from "./financial-correspondents-report.action";

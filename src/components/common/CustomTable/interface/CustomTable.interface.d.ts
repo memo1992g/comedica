@@ -25,7 +25,7 @@ export interface CustomTableI<TData> {
 // Augmentación de tipos para habilitar meta.sticky en TanStack Table
 
 declare module "@tanstack/react-table" {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line no-unused-vars
   interface ColumnMeta<TData, TValue> {
     sticky?: "left" | "right";
   }

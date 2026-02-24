@@ -5,4 +5,6 @@ export {
   listComplaintStatusesService,
   listResolutionsService,
   exportXmlReclaimService,
+  createComplaintService,
+  updateComplaintService,
 } from "./claims.service";

@@ -1,4 +1,4 @@
-import type { BackofficeApiPaginatedData } from "../ApiResponse.interface";
+
 
 /** T365 Recurrentes Report */
 export interface RecurringReportRequestI {
@@ -26,11 +26,21 @@ export interface RecurringReportItem {
   oficina: string | null;
 }
 
-export type RecurringReportResponseI =
-  BackofficeApiPaginatedData<RecurringReportItem>;
+export interface RecurringReportDataI {
+  totalTransacciones: number;
+  montoTotal: number;
+  listado: RecurringReportItem[];
+}
+
+export type RecurringReportResponseI = RecurringReportDataI;
 
 /** T365 Recurrentes Ejecutadas Report */
 export type RecurringExReportRequestI = RecurringReportRequestI;
 export type RecurringExReportItem = RecurringReportItem;
-export type RecurringExReportResponseI =
-  BackofficeApiPaginatedData<RecurringExReportItem>;
+export interface RecurringExReportDataI {
+  totalTransacciones: number;
+  montoTotal: number;
+  listado: RecurringExReportItem[];
+}
+
+export type RecurringExReportResponseI = RecurringExReportDataI;

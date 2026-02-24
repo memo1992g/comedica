@@ -1,1 +1,1 @@
-export { getFlowsService, saveConfigService } from "./soft-token.service";
+export { getFlowsService, listConfigsService, saveConfigService } from "./soft-token.service";

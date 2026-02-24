@@ -1,27 +1,27 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import MainTabs from './components/main-tabs/main-tabs';
 import SearchPanel from './components/search-panel/search-panel';
 import UserDetailInfo from './components/user-detail-info/user-detail-info';
 import UserStatePanel from './components/user-state-panel/user-state-panel';
 import SecurityModal from './components/security-modal/security-modal';
-import HistoryTable from './components/history-table/history-table';
 import {
   mockUsers,
   mockSearchHistory,
-  mockUserHistory,
 } from './data/mock-data';
 import { useUsersConsultations } from './hooks/use-users-consultations';
 import styles from './styles/users-consultations.module.css';
 
 export default function UsersConsultations() {
+  const router = useRouter();
+
   const {
     activeTab,
     activeSubTab,
     searchQuery,
     selectedUser,
     showSecurityModal,
-    currentView,
     tabRefs,
     indicatorStyle,
     isSearching,
@@ -30,7 +30,6 @@ export default function UsersConsultations() {
     setSearchQuery,
     setSelectedUser,
     setShowSecurityModal,
-    setCurrentView,
     handleHistorySelect,
     handleSaveState,
     handleVerify,
@@ -40,19 +39,6 @@ export default function UsersConsultations() {
   const usersForList = selectedUser
     ? [selectedUser, ...mockUsers.filter((user) => user.id !== selectedUser.id)]
     : mockUsers;
-
-  if (currentView === 'history-table') {
-    return (
-      <div className={styles.container}>
-        <div className={styles.content}>
-          <HistoryTable
-            data={mockUserHistory}
-            onBack={() => setCurrentView('main')}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.container}>
@@ -72,7 +58,7 @@ export default function UsersConsultations() {
           tabRefs={tabRefs}
           indicatorStyle={indicatorStyle}
           showHistoryButton={activeTab === 'estados'}
-          onHistoryClick={() => setCurrentView('history-table')}
+          onHistoryClick={() => router.push('/dashboard/usuarios/consulta-usuarios/historial')}
         />
 
         <div className={styles.mainLayout}>

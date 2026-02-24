@@ -1,9 +1,15 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { User, LoginCredentials, PasswordChangeRequest } from '@/types';
-import { authService } from '@/lib/api/auth.service';
-import { storage } from '@/lib/utils';
-import { clearAuthCookie, setAuthCookie } from '@/lib/utils/auth-cookie';
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import {
+  User,
+  LoginCredentials,
+  PasswordChangeRequest,
+  UserRole,
+  UserStatus,
+} from "@/types";
+import { authService } from "@/lib/api/auth.service";
+import { storage } from "@/lib/utils";
+import { clearAuthCookie, setAuthCookie } from "@/lib/utils/auth-cookie";
 
 interface AuthState {
   user: User | null;
@@ -11,7 +17,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
@@ -34,29 +40,43 @@ export const useAuthStore = create<AuthState>()(
         login: async (credentials: LoginCredentials) => {
           set({ isLoading: true, error: null });
           try {
-            const response = await authService.login(credentials);
-            
-            // Guardar token y usuario
-            storage.set('auth_token', response.token);
-            storage.set('user', response.user);
-            setAuthCookie(response.token);
+            const mockUser: User = {
+              id: "1",
+              username: "admin",              
+              email: "admin@comedica.com",
+              fullName: "Administrador Principal",
+              role: "admin" as UserRole,
+              associateNumber: "00001",
+              dui: "00000000-0",
+              phone: "7777-7777",
+              createdAt: "2026-01-01T00:00:00Z",
+              lastPasswordChange: "2026-01-01T00:00:00Z",
+              requiresPasswordChange: false,
+              status: "active" as UserStatus,
+            };
+            const mockToken = "token-1";
+
+            // Guardar token y usuario de ejemplo
+            storage.set("auth_token", mockToken);
+            storage.set("user", mockUser);
+            setAuthCookie(mockToken);
 
             set({
-              user: response.user,
-              token: response.token,
+              user: mockUser,
+              token: mockToken,
               isAuthenticated: true,
               isLoading: false,
             });
 
             // Si requiere cambio de contraseña, redirigir
-            if (response.requiresPasswordChange) {
-              window.location.href = '/auth/first-password-change';
+            if (mockUser.requiresPasswordChange) {
+              globalThis.location.href = "/auth/first-password-change";
             } else {
-              window.location.href = '/dashboard';
+              globalThis.location.href = "/dashboard";
             }
           } catch (error: any) {
             set({
-              error: error.message || 'Error al iniciar sesión',
+              error: error.message || "Error al iniciar sesión",
               isLoading: false,
             });
             throw error;
@@ -68,11 +88,11 @@ export const useAuthStore = create<AuthState>()(
           try {
             await authService.logout();
           } catch (error) {
-            console.error('Error al cerrar sesión:', error);
+            console.error("Error al cerrar sesión:", error);
           } finally {
             // Limpiar estado
-            storage.remove('auth_token');
-            storage.remove('user');
+            storage.remove("auth_token");
+            storage.remove("user");
             clearAuthCookie();
             set({
               user: null,
@@ -81,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
               isLoading: false,
               error: null,
             });
-            window.location.href = '/auth/login';
+            globalThis.location.href = "/auth/login";
           }
         },
 
@@ -92,7 +112,7 @@ export const useAuthStore = create<AuthState>()(
             set({ isLoading: false });
           } catch (error: any) {
             set({
-              error: error.message || 'Error al cambiar contraseña',
+              error: error.message || "Error al cambiar contraseña",
               isLoading: false,
             });
             throw error;
@@ -104,19 +124,19 @@ export const useAuthStore = create<AuthState>()(
           try {
             await authService.firstPasswordChange(request);
             set({ isLoading: false });
-            
+
             // Actualizar estado del usuario
             const user = get().user;
             if (user) {
               const updatedUser = { ...user, requiresPasswordChange: false };
               set({ user: updatedUser });
-              storage.set('user', updatedUser);
+              storage.set("user", updatedUser);
             }
-            
-            window.location.href = '/dashboard';
+
+            globalThis.location.href = "/dashboard";
           } catch (error: any) {
             set({
-              error: error.message || 'Error al cambiar contraseña',
+              error: error.message || "Error al cambiar contraseña",
               isLoading: false,
             });
             throw error;
@@ -124,11 +144,16 @@ export const useAuthStore = create<AuthState>()(
         },
 
         validateSession: async () => {
-          const token = storage.get<string>('auth_token');
-          const storedUser = storage.get<User>('user');
-          
+          const token = storage.get<string>("auth_token");
+          const storedUser = storage.get<User>("user");
+
           if (!token || !storedUser) {
-            set({ isAuthenticated: false, user: null, token: null, isLoading: false });
+            set({
+              isAuthenticated: false,
+              user: null,
+              token: null,
+              isLoading: false,
+            });
             return;
           }
 
@@ -144,13 +169,13 @@ export const useAuthStore = create<AuthState>()(
         clearError: () => set({ error: null }),
       }),
       {
-        name: 'auth-storage',
+        name: "auth-storage",
         partialize: (state) => ({
           user: state.user,
           token: state.token,
           isAuthenticated: state.isAuthenticated,
         }),
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

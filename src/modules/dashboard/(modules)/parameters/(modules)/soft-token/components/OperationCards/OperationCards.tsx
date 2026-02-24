@@ -12,11 +12,11 @@ import {
 import styles from '../../styles/SoftToken.module.css';
 
 interface OperationCardsProps {
-  label: string;
-  items: SoftTokenOperationConfig[];
-  showAmount?: boolean;
-  onChangeAmount?: (key: string, val: number) => void;
-  onChangeRequired: (key: string, val: boolean) => void;
+  readonly label: string;
+  readonly items: SoftTokenOperationConfig[];
+  readonly showAmount?: boolean;
+  readonly onChangeAmount?: (key: string, val: number) => void;
+  readonly onChangeRequired: (key: string, val: boolean) => void;
 }
 
 export default function OperationCards({
@@ -34,10 +34,11 @@ export default function OperationCards({
           <div key={item.key} className={styles.card}>
             <h3 className={styles.cardTitle}>{item.label}</h3>
             <div className={styles.cardFields}>
-              {showAmount && (
+              {showAmount && item.showAmount && (
                 <div className={styles.fieldGroup}>
-                  <label className={styles.fieldLabel}>Monto</label>
+                  <label htmlFor={`amount-${item.key}`} className={styles.fieldLabel}>Monto</label>
                   <input
+                    id={`amount-${item.key}`}
                     type="number"
                     className={styles.fieldInput}
                     value={item.amount ?? 0}
@@ -47,12 +48,12 @@ export default function OperationCards({
                 </div>
               )}
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Requiere Soft Token</label>
+                <label htmlFor={`requires-soft-token-${item.key}`} className={styles.fieldLabel}>Requiere Soft Token</label>
                 <Select
                   value={item.requiresSoftToken ? 'si' : 'no'}
                   onValueChange={(v) => onChangeRequired(item.key, v === 'si')}
                 >
-                  <SelectTrigger className={styles.selectTrigger}>
+                  <SelectTrigger id={`requires-soft-token-${item.key}`} className={styles.selectTrigger}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

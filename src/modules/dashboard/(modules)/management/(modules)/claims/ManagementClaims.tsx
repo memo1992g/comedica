@@ -20,13 +20,13 @@ export default function ManagementClaims() {
   const [isExportingPersons, setIsExportingPersons] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = async (month: number) => {
+  const handleSearch = async (month: number, year: number) => {
     setIsSearching(true);
     setError(null);
 
     const [claimsResult, personsResult] = await Promise.all([
-      listComplaintsAction(),
-      listPersonsAction(month),
+      listComplaintsAction(month, year),
+      listPersonsAction(month, year),
     ]);
 
     if (claimsResult.errors || !claimsResult.data) {
@@ -40,7 +40,7 @@ export default function ManagementClaims() {
     setIsSearching(false);
   };
 
-  const handleExportXml = async (_month: number) => {
+  const handleExportXml = async (_month: number, _year: number) => {
     setIsExporting(true);
     setError(null);
 
@@ -65,11 +65,11 @@ export default function ManagementClaims() {
     setIsExporting(false);
   };
 
-  const handleExportXmlPersons = async (month: number) => {
+  const handleExportXmlPersons = async (month: number, year: number) => {
     setIsExportingPersons(true);
     setError(null);
 
-    const result = await exportXmlPersonsAction(month);
+    const result = await exportXmlPersonsAction(month, year);
 
     if (result.errors || !result.data) {
       setError(result.errorMessage || 'Error al exportar XML personas');

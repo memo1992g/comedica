@@ -1,6 +1,5 @@
 export type MainTab = 'usuarios' | 'estados';
 export type SubTab = 'general' | 'history';
-export type View = 'main' | 'history-table';
 
 export interface TabIndicatorStyle {
   left: number;

@@ -224,9 +224,9 @@ async function fetchProductsByModule(module: 'AH' | 'TC') {
 
 async function fetchImagesByTypeAndClazz(type: 'mobile' | 'desktop', clazz: 'P' | 'I') {
   const headers = getAuthHeaders();
-  const module = type === 'desktop' ? 'TC' : 'AH';
+  const moduleCode = type === 'desktop' ? 'TC' : 'AH';
   const defaultProduct = type === 'desktop' ? 'TARJETAS' : 'AHORRO PERSONAL';
-  const params = new URLSearchParams({ module, clazz, productType: defaultProduct });
+  const params = new URLSearchParams({ module: moduleCode, clazz, productType: defaultProduct });
 
   const response = await customAuthFetch<any[]>(
     `${API_URL}/get-pimage?${params.toString()}`,

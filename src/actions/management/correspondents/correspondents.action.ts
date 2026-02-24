@@ -11,14 +11,38 @@ import {
   exportXmlCorrespondentService,
 } from "@/services/management/correspondents";
 
+function buildDateRange(month: number, year: number): {
+  from: string;
+  to: string;
+} {
+  const mm = String(month + 1).padStart(2, "0");
+  const lastDay = new Date(year, month + 1, 0).getDate();
+
+  return {
+    from: `${year}-${mm}-01`,
+    to: `${year}-${mm}-${String(lastDay).padStart(2, "0")}`,
+  };
+}
+
 /**
  * Action: List all correspondents
  */
-export const listCorrespondentsAction = async (): Promise<
-  ActionResult<CorrespondentI[]>
-> => {
+export const listCorrespondentsAction = async (
+  month: number,
+  year: number,
+): Promise<ActionResult<CorrespondentI[]>> => {
   try {
-    const res = await listCorrespondentsService();
+    const { from, to } = buildDateRange(month, year);
+    const res = await listCorrespondentsService({
+      filters: {
+        etcxCreationDateFrom: from,
+        etcxCreationDateTo: to,
+      },
+      pagination: {
+        page: 1,
+        pageSize: 10,
+      },
+    });
 
     if (res.result?.code === 0 && res.data) {
       return { data: res.data, errors: false };

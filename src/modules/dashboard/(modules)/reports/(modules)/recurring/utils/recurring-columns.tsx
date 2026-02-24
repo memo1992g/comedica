@@ -26,7 +26,7 @@ const getStatusColor = (estado: string): string => {
 };
 
 export const createRecurringColumns = (
-  onViewDetail: (id: string) => void
+  onViewDetail: (item: RecurringReport) => void
 ): ColumnDef<RecurringReport>[] => [
   {
     id: 'detalle',
@@ -34,7 +34,7 @@ export const createRecurringColumns = (
     header: 'Detalle',
     cell: ({ row }) => (
       <button
-        onClick={() => onViewDetail(row.original.id)}
+        onClick={() => onViewDetail(row.original)}
         style={{
           background: 'transparent',
           border: 'none',

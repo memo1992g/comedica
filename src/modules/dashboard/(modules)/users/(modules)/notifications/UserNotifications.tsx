@@ -1,17 +1,15 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationForm from './components/notification-form/notification-form';
 import NotificationMessage from './components/notification-message/notification-message';
 import ConfirmationModal from './components/confirmation-modal/confirmation-modal';
 import SecurityParamsPanel from './components/security-params-panel/security-params-panel';
-import NotificationHistory from './components/notification-history/notification-history';
-import { mockNotificationHistory } from './data/mock-data';
 import styles from './styles/user-notifications.module.css';
 
 type MainTab = 'masivas' | 'parametros';
-type View = 'main' | 'history';
 type RecipientType = 'segment' | 'individual';
 
 interface UploadedFile {
@@ -31,8 +29,8 @@ const mainTabs: { id: MainTab; label: string }[] = [
 ];
 
 export default function UserNotifications() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<MainTab>('masivas');
-  const [currentView, setCurrentView] = useState<View>('main');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   // Form state
@@ -45,7 +43,7 @@ export default function UserNotifications() {
   const [foundUser, setFoundUser] = useState<FoundUser | null>(null);
 
   // Params dirty state
-  const [paramsDirty, setParamsDirty] = useState(false);
+  const [, setParamsDirty] = useState(false);
 
   // Tab indicator
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -86,21 +84,7 @@ export default function UserNotifications() {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value as MainTab);
-    setCurrentView('main');
   };
-
-  if (currentView === 'history') {
-    return (
-      <div className={styles.container}>
-        <div className={styles.content}>
-          <NotificationHistory
-            data={mockNotificationHistory}
-            onBack={() => setCurrentView('main')}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.container}>
@@ -126,7 +110,7 @@ export default function UserNotifications() {
                 <button
                   type="button"
                   className={styles.historyButton}
-                  onClick={() => setCurrentView('history')}
+                  onClick={() => router.push('/dashboard/usuarios/notificaciones/historial')}
                 >
                   Historial
                 </button>

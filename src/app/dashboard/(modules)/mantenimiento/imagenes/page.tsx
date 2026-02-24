@@ -78,7 +78,7 @@ export default function ImagenesPage() {
           <p>Gestión de imágenes para aplicaciones móviles y desktop</p>
         </div>
         <div className={styles.headerActions}>
-          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/mantenimiento/imagenes/historial')}>Historial</button>
+          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/dashboard/mantenimiento/imagenes/historial')}>Historial</button>
           <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleAdd}><Plus size={18} />Cargar Imagen</button>
         </div>
       </div>

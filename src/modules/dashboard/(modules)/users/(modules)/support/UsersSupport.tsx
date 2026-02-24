@@ -1,15 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import SearchPanel from './components/search-panel/search-panel';
 import UserSupportDetail from './components/user-support-detail/user-support-detail';
 import SecurityVerificationModal from './components/security-verification-modal/security-verification-modal';
 import ConfirmationModal from './components/confirmation-modal/confirmation-modal';
-import HistoryTable from './components/history-table/history-table';
 import {
   mockSupportUsers, attentionTypes, mockPreviousManagements,
-  mockSupportHistory,
   type SupportUser, type AttentionType,
 } from './data/mock-data';
 import styles from './styles/users-support.module.css';
@@ -17,7 +16,6 @@ import { consultUser, blockUser, unblockUser, inactivateUser } from '@/lib/api/u
 import { toSupportUser } from '@/lib/api/types/user-management.types';
 
 type SubTab = 'tipos' | 'gestiones';
-type View = 'main' | 'history-table';
 
 const ATTENTION_ACTION_MAP: Record<string, 'block' | 'unblock' | 'inactivate' | null> = {
   Bloqueo: 'block',
@@ -26,7 +24,7 @@ const ATTENTION_ACTION_MAP: Record<string, 'block' | 'unblock' | 'inactivate' | 
 };
 
 export default function UsersSupport() {
-  const [view, setView] = useState<View>('main');
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('tipos');
   const [selectedUser, setSelectedUser] = useState<SupportUser | null>(null);
@@ -109,19 +107,6 @@ export default function UsersSupport() {
     }
   };
 
-  if (view === 'history-table') {
-    return (
-      <div className={styles.container}>
-        <div className={styles.content}>
-          <HistoryTable
-            data={mockSupportHistory}
-            onBack={() => setView('main')}
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -137,7 +122,7 @@ export default function UsersSupport() {
             variant="outline"
             size="sm"
             className={styles.historyButton}
-            onClick={() => setView('history-table')}
+            onClick={() => router.push('/dashboard/usuarios/soporte-usuarios/historial')}
           >
             Historial
           </Button>

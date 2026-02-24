@@ -66,7 +66,7 @@ export function useManagementTransactions() {
   const handleSave = async () => {
     setIsSaving(true);
     setError(null);
-    const result = await saveTransactionsAction([...transacciones].slice(0, 1)); //TODO Solo enviar las primeras 10 transacciones para guardar
+    const result = await saveTransactionsAction([...transacciones]);
     if (result.errors) {
       setError(result.errorMessage || 'Error al guardar las transacciones');
       setIsSaving(false);

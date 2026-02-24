@@ -23,6 +23,19 @@ export interface CorrespondentI {
   modifyDate: string | null;
 }
 
+export interface CorrespondentFilterI {
+  etcxCreationDateFrom?: string;
+  etcxCreationDateTo?: string;
+}
+
+export interface CorrespondentListRequestI {
+  filters: CorrespondentFilterI;
+  pagination: {
+    page: number;
+    pageSize: number;
+  };
+}
+
 export interface CreateCorrespondentRequestI {
   internalCode: string;
   codeSsf: string;

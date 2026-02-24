@@ -3,6 +3,8 @@ export interface ComplaintFilterI {
   estadoReclamo?: string;
   soloConsolidados?: boolean;
   textoBusqueda?: string;
+  fechaPresentaDesde?: string;
+  fechaPresentaHasta?: string;
 }
 
 export interface ComplaintListRequestI {

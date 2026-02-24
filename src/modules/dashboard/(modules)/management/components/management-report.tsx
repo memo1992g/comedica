@@ -18,14 +18,14 @@ interface ManagementReportProps<TData> {
   readonly xmlButtonLabel: string;
   readonly data: TData[];
   readonly columns: ColumnDef<TData>[];
-  readonly onSearch?: (month: number) => Promise<void>;
-  readonly onExportXml?: (month: number) => Promise<void>;
+  readonly onSearch?: (month: number, year: number) => Promise<void>;
+  readonly onExportXml?: (month: number, year: number) => Promise<void>;
   readonly isSearching?: boolean;
   readonly isExporting?: boolean;
   readonly error?: string | null;
   readonly extraXmlButtons?: {
     label: string;
-    onExport: (month: number) => Promise<void>;
+    onExport: (month: number, year: number) => Promise<void>;
     isExporting?: boolean;
     disabled?: boolean;
   }[];
@@ -41,6 +41,9 @@ export default function ManagementReport<TData>({
   onSearch, onExportXml, isSearching, isExporting, error, extraXmlButtons,
 }: ManagementReportProps<TData>) {
   const [selectedMonth, setSelectedMonth] = useState(String(new Date().getMonth()));
+  const currentYear = new Date().getFullYear();
+  const years = useMemo(() => [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4], [currentYear]);
+  const [selectedYear, setSelectedYear] = useState(String(currentYear));
   const [hasSearched, setHasSearched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -106,10 +109,20 @@ export default function ManagementReport<TData>({
               <div className={styles.searchInfo}>
                 <p className={styles.searchTitle}>Búsqueda de Reportes</p>
                 <p className={styles.searchHint}>
-                  Seleccione el mes para consultar la información existente
+                  Seleccione el mes y año para consultar la información existente
                 </p>
               </div>
               <div className={styles.searchControls}>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger className={styles.monthSelect}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                   <SelectTrigger className={styles.monthSelect}>
                     <SelectValue />
@@ -129,7 +142,7 @@ export default function ManagementReport<TData>({
                   isLoading={isSearching}
                   onClick={async () => {
                     if (onSearch) {
-                      await onSearch(Number(selectedMonth));
+                      await onSearch(Number(selectedMonth), Number(selectedYear));
                     }
                     setHasSearched(true);
                   }}
@@ -154,7 +167,7 @@ export default function ManagementReport<TData>({
                   isLoading={isExporting}
                   onClick={async () => {
                     if (onExportXml) {
-                      await onExportXml(Number(selectedMonth));
+                      await onExportXml(Number(selectedMonth), Number(selectedYear));
                     }
                   }}
                 >
@@ -170,7 +183,7 @@ export default function ManagementReport<TData>({
                   className={styles.xmlButton}
                   disabled={isExp || disabled}
                   isLoading={isExp}
-                  onClick={async () => onExport(Number(selectedMonth))}
+                  onClick={async () => onExport(Number(selectedMonth), Number(selectedYear))}
                 >
                   {label}
                 </Button>

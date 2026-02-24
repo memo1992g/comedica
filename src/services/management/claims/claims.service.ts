@@ -7,6 +7,8 @@ import type {
   ComplaintListRequestI,
   CatalogItemI,
   ReclaimXmlItemI,
+  CreateComplaintRequestI,
+  UpdateComplaintRequestI,
 } from "@/interfaces/management/claims";
 import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
 import { cookies } from "next/headers";
@@ -139,4 +141,35 @@ export const exportXmlReclaimService = async (
 
   if (!res.ok) throw new Error(`Error exportando XML reclamos: ${res.status}`);
   return res.blob();
+};
+
+/**
+ * POST /complaints — Create a new complaint
+ */
+export const createComplaintService = async (
+  request: CreateComplaintRequestI,
+): Promise<BackofficeApiResponse<ComplaintI>> => {
+  const headers = getAuthHeaders();
+
+  return customAuthFetch(`${API_URL}/complaints`, {
+    method: "POST",
+    body: JSON.stringify({ ...buildContext(), request }),
+    headers,
+  });
+};
+
+/**
+ * PUT /complaints/:id — Update complaint status/resolution
+ */
+export const updateComplaintService = async (
+  id: number,
+  request: UpdateComplaintRequestI,
+): Promise<BackofficeApiResponse<ComplaintI>> => {
+  const headers = getAuthHeaders();
+
+  return customAuthFetch(`${API_URL}/complaints/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ ...buildContext(), request }),
+    headers,
+  });
 };

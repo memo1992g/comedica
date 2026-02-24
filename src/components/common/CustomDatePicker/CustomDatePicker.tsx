@@ -22,6 +22,21 @@ import type { DateRange } from "react-day-picker";
 type ViewMode = "day" | "month" | "year";
 type SelectionMode = "single" | "range";
 
+const DEFAULT_MONTH_LABELS = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
+];
+
 export function CustomDatePicker({
   className,
   allowClear = false,
@@ -35,6 +50,7 @@ export function CustomDatePicker({
   onRangeChange,
   disableFutureDates = false,
   disablePastDates = false,
+  monthLabels = DEFAULT_MONTH_LABELS,
 }: Readonly<{
   className?: string;
   allowClear?: boolean;
@@ -48,6 +64,7 @@ export function CustomDatePicker({
   onRangeChange?: (range: DateRange | undefined) => void;
   disableFutureDates?: boolean;
   disablePastDates?: boolean;
+  monthLabels?: string[];
 }>) {
   const [isOpen, setIsOpen] = useState(false);
   const [hoverDate, setHoverDate] = useState<Date | undefined>(undefined);
@@ -101,20 +118,7 @@ export function CustomDatePicker({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rangeValue?.from?.getTime(), rangeValue?.to?.getTime()]);
 
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const months = monthLabels;
 
   const getAnchorDate = () => {
     if (selectionMode === "range") {

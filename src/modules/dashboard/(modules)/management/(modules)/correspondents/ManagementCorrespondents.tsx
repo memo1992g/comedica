@@ -16,11 +16,11 @@ export default function ManagementCorrespondents() {
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = async (_month: number) => {
+  const handleSearch = async (month: number, year: number) => {
     setIsSearching(true);
     setError(null);
 
-    const result = await listCorrespondentsAction();
+    const result = await listCorrespondentsAction(month, year);
 
     if (result.errors || !result.data) {
       setError(result.errorMessage || 'Error al obtener corresponsales');
@@ -32,7 +32,7 @@ export default function ManagementCorrespondents() {
     setIsSearching(false);
   };
 
-  const handleExportXml = async (_month: number) => {
+  const handleExportXml = async (_month: number, _year: number) => {
     setIsExporting(true);
     setError(null);
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { mockUsers } from '../data/mock-data';
 import type { UserResult } from '../data/mock-data';
-import type { MainTab, SubTab, TabIndicatorStyle, View } from '../interfaces/UsersConsultations';
+import type { MainTab, SubTab, TabIndicatorStyle } from '../interfaces/UsersConsultations';
 import { consultUser } from '@/lib/api/user-management.service';
 import { toConsultationUser } from '@/lib/api/types/user-management.types';
 
@@ -11,7 +11,6 @@ export function useUsersConsultations() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserResult | null>(null);
   const [showSecurityModal, setShowSecurityModal] = useState(false);
-  const [currentView, setCurrentView] = useState<View>('main');
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
@@ -100,7 +99,6 @@ export function useUsersConsultations() {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value as MainTab);
-    setCurrentView('main');
   };
 
   return {
@@ -109,7 +107,6 @@ export function useUsersConsultations() {
     searchQuery,
     selectedUser,
     showSecurityModal,
-    currentView,
     tabRefs,
     indicatorStyle,
     isSearching,
@@ -118,7 +115,6 @@ export function useUsersConsultations() {
     setSearchQuery,
     setSelectedUser,
     setShowSecurityModal,
-    setCurrentView,
     handleHistorySelect,
     handleSaveState,
     handleVerify,

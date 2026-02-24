@@ -4,7 +4,11 @@ import { APP_COOKIES } from "@/consts/cookies/cookies.consts";
 import type { BackofficeApiResponse } from "@/interfaces/ApiResponse.interface";
 import type {
   CorrespondentI,
+  CorrespondentListRequestI,
   CorrespondentXmlItemI,
+  CreateCorrespondentRequestI,
+  UpdateCorrespondentRequestI,
+  DeleteCorrespondentRequestI,
 } from "@/interfaces/management/correspondents";
 import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
 import { cookies } from "next/headers";
@@ -37,14 +41,25 @@ function buildRequestBody<T>(data: T) {
 }
 
 /**
- * GET /corresponsal-list — List all correspondents
+ * POST /corresponsal-list — List correspondents with filters and pagination
  */
-export const listCorrespondentsService = async (): Promise<
-  BackofficeApiResponse<CorrespondentI[]>
-> => {
+export const listCorrespondentsService = async (
+  payload: CorrespondentListRequestI,
+): Promise<BackofficeApiResponse<CorrespondentI[]>> => {
   const headers = getAuthHeaders();
+  const body = {
+    ...payload,
+    request: {
+      uuid: crypto.randomUUID(),
+      pageId: 1,
+      channel: "WEB",
+      requestId: crypto.randomUUID(),
+    },
+  };
+
   return customAuthFetch(`${API_URL}/corresponsal-list`, {
-    method: "GET",
+    method: "POST",
+    body: JSON.stringify(body),
     headers,
   });
 };
@@ -72,4 +87,46 @@ export const exportXmlCorrespondentService = async (
 
   if (!res.ok) throw new Error(`Error exportando XML corresponsal: ${res.status}`);
   return res.blob();
+};
+
+/**
+ * POST /corresponsal — Create a new correspondent
+ */
+export const createCorrespondentService = async (
+  request: CreateCorrespondentRequestI,
+): Promise<BackofficeApiResponse<CorrespondentI>> => {
+  const headers = getAuthHeaders();
+  return customAuthFetch(`${API_URL}/corresponsal`, {
+    method: "POST",
+    body: JSON.stringify(buildRequestBody(request)),
+    headers,
+  });
+};
+
+/**
+ * PUT /corresponsal — Update an existing correspondent
+ */
+export const updateCorrespondentService = async (
+  request: UpdateCorrespondentRequestI,
+): Promise<BackofficeApiResponse<CorrespondentI>> => {
+  const headers = getAuthHeaders();
+  return customAuthFetch(`${API_URL}/corresponsal`, {
+    method: "PUT",
+    body: JSON.stringify(buildRequestBody(request)),
+    headers,
+  });
+};
+
+/**
+ * DELETE /corresponsal — Delete a correspondent
+ */
+export const deleteCorrespondentService = async (
+  request: DeleteCorrespondentRequestI,
+): Promise<BackofficeApiResponse<null>> => {
+  const headers = getAuthHeaders();
+  return customAuthFetch(`${API_URL}/corresponsal`, {
+    method: "DELETE",
+    body: JSON.stringify(buildRequestBody(request)),
+    headers,
+  });
 };

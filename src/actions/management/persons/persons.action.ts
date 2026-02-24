@@ -11,8 +11,7 @@ import {
 /**
  * Builds YYYY-MM-DD date range for a given 0-based month index.
  */
-function buildDateRange(month: number): { fechaDesde: string; fechaHasta: string } {
-  const year = new Date().getFullYear();
+function buildDateRange(month: number, year: number): { fechaDesde: string; fechaHasta: string } {
   const mm = String(month + 1).padStart(2, "0");
   const lastDay = new Date(year, month + 1, 0).getDate();
   return {
@@ -26,9 +25,10 @@ function buildDateRange(month: number): { fechaDesde: string; fechaHasta: string
  */
 export const listPersonsAction = async (
   month: number,
+  year: number,
 ): Promise<ActionResult<PersonI[]>> => {
   try {
-    const { fechaDesde, fechaHasta } = buildDateRange(month);
+    const { fechaDesde, fechaHasta } = buildDateRange(month, year);
     const res = await listPersonsService(fechaDesde, fechaHasta);
 
     if (res.result?.code === 0 && res.data) {
@@ -51,9 +51,10 @@ export const listPersonsAction = async (
  */
 export const exportXmlPersonsAction = async (
   month: number,
+  year: number,
 ): Promise<ActionResult<string>> => {
   try {
-    const { fechaDesde, fechaHasta } = buildDateRange(month);
+    const { fechaDesde, fechaHasta } = buildDateRange(month, year);
 
     const res = await listPersonsService(fechaDesde, fechaHasta);
 

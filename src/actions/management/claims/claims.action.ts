@@ -17,16 +17,38 @@ import {
   exportXmlReclaimService,
 } from "@/services/management/claims";
 
+function buildDateRange(month: number, year: number): {
+  from: string;
+  to: string;
+} {
+  const mm = String(month + 1).padStart(2, "0");
+  const lastDay = new Date(year, month + 1, 0).getDate();
+
+  return {
+    from: `${year}-${mm}-01`,
+    to: `${year}-${mm}-${String(lastDay).padStart(2, "0")}`,
+  };
+}
+
 /**
  * Action: List complaints with optional filters and pagination
  */
 export const listComplaintsAction = async (
+  month: number,
+  year: number,
   filters?: ComplaintFilterI,
   pagination?: { page: number; size: number },
 ): Promise<ActionResult<ComplaintI[]>> => {
   try {
+    const { from, to } = buildDateRange(month, year);
+    const requestFilters: ComplaintFilterI = {
+      fechaPresentaDesde: from,
+      fechaPresentaHasta: to,
+      ...filters,
+    };
+
     const res = await listComplaintsService({
-      filters: filters ?? {},
+      filters: requestFilters,
       pagination: pagination ?? { page: 1, size: 10 },
     });
 

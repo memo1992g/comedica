@@ -1,11 +1,23 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { getFlowsAction, saveConfigAction } from '@/actions/parameters/soft-token';
-import type { SoftTokenFlowI } from '@/interfaces/management/soft-token';
+import {
+  getFlowsAction,
+  listConfigsAction,
+  saveConfigAction,
+} from '@/actions/parameters/soft-token';
+import type {
+  SoftTokenFlowI,
+  SoftTokenConfigI,
+} from '@/interfaces/management/soft-token';
 
 export interface SoftTokenOperationConfig {
   key: string;
+  flow: string;
   label: string;
+  product: string | null;
+  transactionType: string | null;
   amount?: number;
+  hasAmount: boolean;
+  showAmount: boolean;
   requiresSoftToken: boolean;
 }
 
@@ -14,23 +26,43 @@ export interface SoftTokenConfig {
   administrative: SoftTokenOperationConfig[];
 }
 
-function mapFlowsToConfig(flows: SoftTokenFlowI[]): SoftTokenConfig {
+function mapFlowsToConfig(
+  flows: SoftTokenFlowI[],
+  configs: SoftTokenConfigI[],
+): SoftTokenConfig {
+  const flowMap = new Map(flows.map((flow) => [flow.idFlow, flow]));
+
+  const operations = configs.map<SoftTokenOperationConfig>((config) => {
+    const flow = flowMap.get(config.flowId);
+    const hasAmount = (flow?.hasAmount ?? 0) === 1;
+    const isGenericConfig = config.productCode == null && config.typeCode == null;
+    const hasSpecificContext = config.productName || config.typeName;
+    const contextLabel = hasSpecificContext
+      ? ` · ${config.productName ?? 'General'} / ${config.typeName ?? 'General'}`
+      : '';
+
+    return {
+      key: String(config.configId),
+      flow: config.flowCode,
+      label: `${config.flowName}${contextLabel}`,
+      product: config.productCode,
+      transactionType: config.typeCode,
+      amount: hasAmount ? (config.amountLimit ?? 0) : undefined,
+      hasAmount,
+      showAmount: hasAmount && !isGenericConfig,
+      requiresSoftToken: config.tokenRequired,
+    };
+  });
+
   return {
-    transactions: flows
-      .filter((f) => f.category === 'TRANSACTIONAL')
-      .map((f) => ({
-        key: f.flowCode,
-        label: f.flowName,
-        amount: f.hasAmount === 1 ? 0 : undefined,
-        requiresSoftToken: f.status === 1,
-      })),
-    administrative: flows
-      .filter((f) => f.category === 'ADMINISTRATIVE')
-      .map((f) => ({
-        key: f.flowCode,
-        label: f.flowName,
-        requiresSoftToken: f.status === 1,
-      })),
+    transactions: operations.filter((operation) => {
+      const flow = flows.find((item) => item.flowCode === operation.flow);
+      return flow?.category === 'TRANSACTIONAL';
+    }),
+    administrative: operations.filter((operation) => {
+      const flow = flows.find((item) => item.flowCode === operation.flow);
+      return flow?.category === 'ADMINISTRATIVE';
+    }),
   };
 }
 
@@ -50,9 +82,13 @@ export function useSoftToken() {
 
   const loadConfig = useCallback(async () => {
     try {
-      const result = await getFlowsAction();
-      if (result.data) {
-        const mapped = mapFlowsToConfig(result.data);
+      const [flowsResult, configsResult] = await Promise.all([
+        getFlowsAction(),
+        listConfigsAction(),
+      ]);
+
+      if (flowsResult.data && configsResult.data) {
+        const mapped = mapFlowsToConfig(flowsResult.data, configsResult.data);
         setConfig(mapped);
         setEditedConfig(mapped);
       }
@@ -148,19 +184,44 @@ export function useSoftToken() {
   const handleSave = () => setShowConfirmation(true);
 
   const handleConfirm = async () => {
-    if (!editedConfig) return;
+    if (!config || !editedConfig) return;
     setIsLoading(true);
     try {
-      const savePromises = editedConfig.transactions
-        .filter((t) => t.amount !== undefined)
-        .map((t) =>
-          saveConfigAction({
-            flow: t.key,
-            product: 'AH',
-            transactionType: 'THIRD',
-            amount: t.amount ?? 0,
-          }),
+      const editedOperations = [
+        ...editedConfig.transactions,
+        ...editedConfig.administrative,
+      ];
+
+      const originalOperations = [
+        ...config.transactions,
+        ...config.administrative,
+      ];
+
+      const changedOperations = editedOperations.filter((editedOperation) => {
+        const originalOperation = originalOperations.find(
+          (operation) => operation.key === editedOperation.key,
         );
+
+        if (!originalOperation) return false;
+
+        return (
+          originalOperation.amount !== editedOperation.amount ||
+          originalOperation.requiresSoftToken !== editedOperation.requiresSoftToken
+        );
+      });
+
+      const savePromises = changedOperations.map((operation) => {
+        const amount = operation.hasAmount ? (operation.amount ?? 0) : 0;
+
+        return saveConfigAction({
+          flow: operation.flow,
+          product: operation.product,
+          transactionType: operation.transactionType,
+          amount,
+          tokenRequired: operation.requiresSoftToken,
+        });
+      });
+
       await Promise.all(savePromises);
       await loadConfig();
       setShowConfirmation(false);

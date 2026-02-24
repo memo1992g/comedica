@@ -17,6 +17,7 @@ import { useRecurringData } from './hooks/use-recurring-data';
 import { useExecutedData } from './hooks/use-executed-data';
 import { useRecurringActions } from './hooks/use-recurring-actions';
 import { RecurringTab } from './types';
+import type { RecurringReport } from './types';
 import styles from './styles/ReportsRecurring.module.css';
 import './styles/CustomTableOverrides.css';
 
@@ -29,7 +30,7 @@ export default function ReportsRecurring() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRecurringId, setSelectedRecurringId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<RecurringReport | null>(null);
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({ from: startOfYear, to: today });
 
   const {
@@ -62,8 +63,8 @@ export default function ReportsRecurring() {
       searchQuery: activeTab === 'ejecutadas' ? searchQuery : '',
     });
 
-  const handleViewDetail = (id: string) => {
-    setSelectedRecurringId(id);
+  const handleViewDetail = (item: RecurringReport) => {
+    setSelectedItem(item);
     setIsModalOpen(true);
   };
 
@@ -188,7 +189,7 @@ export default function ReportsRecurring() {
       <HistoricalModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        recurringId={selectedRecurringId}
+        item={selectedItem}
       />
     </>
   );

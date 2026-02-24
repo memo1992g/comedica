@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { RecurringReport, ExecutedReport, RecurringTab } from '../types';
-import type { RecurringReportItem } from '@/interfaces/reports';
+import type { RecurringReportItem, RecurringReportResponseI } from '@/interfaces/reports';
 import {
   recurringReportAction,
   recurringExReportAction,
@@ -72,9 +72,11 @@ function mapEstadoEjecucion(
   return 'Fallido';
 }
 
-function extractItems<T>(data: T[] | { data?: T[] } | null | undefined): T[] {
+function extractItems<T>(data: T[] | { data?: T[]; listado?: T[] } | null | undefined): T[] {
   if (!data) return [];
-  return Array.isArray(data) ? data : (data.data ?? []);
+  if (Array.isArray(data)) return data;
+  const obj = data as { data?: T[]; listado?: T[] };
+  return obj.listado ?? obj.data ?? [];
 }
 
 async function fetchRecurringTab(
@@ -83,7 +85,7 @@ async function fetchRecurringTab(
 ): Promise<{ items: RecurringReportItem[]; error?: string }> {
   const res = await recurringReportAction(filters, pagination);
   if (res && !res.errors && res.data) {
-    return { items: extractItems(res.data as RecurringReportItem[] | { data?: RecurringReportItem[] }) };
+    return { items: extractItems(res.data as RecurringReportResponseI | RecurringReportItem[]) };
   }
   return { items: [], error: res?.errorMessage || 'Error al obtener reporte de recurrentes' };
 }
@@ -94,7 +96,7 @@ async function fetchExecutedTab(
 ): Promise<{ items: RecurringReportItem[]; error?: string }> {
   const res = await recurringExReportAction(filters, pagination);
   if (res && !res.errors && res.data) {
-    return { items: extractItems(res.data as RecurringReportItem[] | { data?: RecurringReportItem[] }) };
+    return { items: extractItems(res.data as RecurringReportResponseI | RecurringReportItem[]) };
   }
   return { items: [], error: res?.errorMessage || 'Error al obtener reporte de ejecutadas' };
 }

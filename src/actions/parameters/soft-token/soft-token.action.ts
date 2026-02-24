@@ -3,10 +3,15 @@
 import type { ActionResult } from "@/interfaces/ApiResponse.interface";
 import type {
   SoftTokenFlowI,
+  SoftTokenConfigI,
   SaveSoftTokenConfigRequestI,
 } from "@/interfaces/management/soft-token";
 import { throwActionError } from "@/lib/error-handle";
-import { getFlowsService, saveConfigService } from "@/services/parameters/soft-token";
+import {
+  getFlowsService,
+  listConfigsService,
+  saveConfigService,
+} from "@/services/parameters/soft-token";
 
 /**
  * Action: Obtener flujos de soft token
@@ -25,6 +30,29 @@ export const getFlowsAction = async (): Promise<
       data: null,
       errors: true,
       errorMessage: res.result?.message || "Error al obtener flujos",
+    };
+  } catch (error: unknown) {
+    return throwActionError(error);
+  }
+};
+
+/**
+ * Action: Obtener configuraciones de soft token
+ */
+export const listConfigsAction = async (): Promise<
+  ActionResult<SoftTokenConfigI[]>
+> => {
+  try {
+    const res = await listConfigsService();
+
+    if (res.result?.code === 0 && res.data) {
+      return { data: res.data, errors: false };
+    }
+
+    return {
+      data: null,
+      errors: true,
+      errorMessage: res.result?.message || "Error al obtener configuraciones",
     };
   } catch (error: unknown) {
     return throwActionError(error);

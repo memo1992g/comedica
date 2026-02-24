@@ -4,6 +4,7 @@ import { APP_COOKIES } from "@/consts/cookies/cookies.consts";
 import type { BackofficeApiResponse } from "@/interfaces/ApiResponse.interface";
 import type {
   SoftTokenFlowI,
+  SoftTokenConfigI,
   SaveSoftTokenConfigRequestI,
 } from "@/interfaces/management/soft-token";
 import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
@@ -41,6 +42,23 @@ export const getFlowsService = async (): Promise<
   return customAuthFetch(`${API_URL}/sft/get-flows`, {
     method: "POST",
     body: body.toString(),
+    headers,
+  });
+};
+
+/**
+ * POST /sft/list-configs — Obtener configuraciones de soft token
+ */
+export const listConfigsService = async (): Promise<
+  BackofficeApiResponse<SoftTokenConfigI[]>
+> => {
+  const headers = {
+    ...getAuthHeaders(),
+    "Content-Type": "application/json",
+  };
+
+  return customAuthFetch(`${API_URL}/sft/list-configs`, {
+    method: "POST",
     headers,
   });
 };
