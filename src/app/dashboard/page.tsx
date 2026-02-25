@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Filter } from 'lucide-react';
 import { getErrorMessage } from '@/lib/api/client';
 import apiClient from '@/lib/api/client';
 import styles from './styles/dashboardPage.module.css';
@@ -23,6 +24,8 @@ type TxRow = {
   category: string;
   type: string;
   amount: string;
+  amountValue: number;
+  dateMs: number | null;
   status: 'Activo' | 'Inactivo';
 };
 
@@ -118,6 +121,8 @@ function mapVolume(metrics: OverviewMetricsResponse): VolumeItem[] {
 function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow {
   const txId = String(item.transactionId ?? item.idTransaccion ?? item.id ?? `TX-${index + 1}`);
   const date = String(item.transactionDate ?? item.fechaHora ?? item.fecha ?? '');
+  const parsedDate = new Date(date);
+  const dateMs = Number.isNaN(parsedDate.getTime()) ? null : parsedDate.getTime();
   const associate = String(item.associatedNumber ?? item.numeroAsociado ?? item.asociado ?? '-');
   const client = String(item.customerName ?? item.nombreCliente ?? item.nombreDestino ?? '-');
   const category = String(item.category ?? item.categoria ?? item.productType ?? '-');
@@ -132,29 +137,58 @@ function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow 
     client,
     category,
     type,
+    amountValue: Number.isFinite(amountRaw) ? amountRaw : 0,
     amount: toCurrency(Number.isFinite(amountRaw) ? amountRaw : 0),
+    dateMs,
     status: statusRaw.toUpperCase().startsWith('I') ? 'Inactivo' : 'Activo',
   };
 }
 
+type OverviewFilters = {
+  fechaDesde: string;
+  fechaHasta: string;
+  tipoTransaccion: string;
+  montoMinimo: string;
+  montoMaximo: string;
+  estado: 'Todos' | 'Activo' | 'Inactivo';
+};
+
+function toInputDate(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
 export default function DashboardPage() {
+  const today = new Date();
+  const defaultFrom = new Date(today);
+  defaultFrom.setDate(today.getDate() - 30);
+
   const [overview, setOverview] = useState<Overview | null>(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 5;
 
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<OverviewFilters>({
+    fechaDesde: toInputDate(defaultFrom),
+    fechaHasta: toInputDate(today),
+    tipoTransaccion: '',
+    montoMinimo: '',
+    montoMaximo: '',
+    estado: 'Todos',
+  });
+
   const [tx, setTx] = useState<{ data: TxRow[]; total: number }>({ data: [], total: 0 });
   const [dist, setDist] = useState<DistributionItem[]>([]);
   const [vol, setVol] = useState<VolumeItem[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState<'excel' | 'pdf' | null>(null);
 
   useEffect(() => {
     const loadMetrics = async () => {
       try {
-        const today = new Date().toISOString().slice(0, 10);
         const response = await apiClient.post<OverviewMetricsResponse>('/overview/metrics', {
           ...buildOverviewContext(),
-          data: { fecha: today },
+          data: { fecha: filters.fechaHasta || toInputDate(new Date()) },
         });
 
         setOverview(mapOverview(response.data));
@@ -169,28 +203,24 @@ export default function DashboardPage() {
     };
 
     void loadMetrics();
-  }, []);
+  }, [filters.fechaHasta]);
 
   useEffect(() => {
     const loadTransactions = async () => {
       try {
-        const today = new Date();
-        const from = new Date(today);
-        from.setDate(today.getDate() - 30);
-
         const response = await apiClient.post<OverviewTransactionsResponse>('/overview/transactions', {
           ...buildOverviewContext(),
           data: {
             filters: {
-              fechaInicio: from.toISOString().slice(0, 10),
-              fechaFin: today.toISOString().slice(0, 10),
-              paymentType: null,
+              fechaInicio: filters.fechaDesde,
+              fechaFin: filters.fechaHasta,
+              paymentType: filters.tipoTransaccion || null,
               productType: null,
               textoBusqueda: search,
             },
             pagination: {
-              page: page - 1,
-              size: pageSize,
+              page: 0,
+              size: 200,
               sortBy: 'transactionDate',
               sortDirection: 'DESC',
             },
@@ -198,14 +228,37 @@ export default function DashboardPage() {
         });
 
         const rows = (response.data.data ?? []).map((item, idx) => mapTransactionRow(item, idx));
-        setTx({ data: rows, total: Number(response.data.metadata?.totalCount ?? rows.length) });
+
+        const min = Number(filters.montoMinimo);
+        const hasMin = Number.isFinite(min) && filters.montoMinimo !== '';
+        const max = Number(filters.montoMaximo);
+        const hasMax = Number.isFinite(max) && filters.montoMaximo !== '';
+        const fromDate = filters.fechaDesde ? new Date(`${filters.fechaDesde}T00:00:00`) : null;
+        const toDate = filters.fechaHasta ? new Date(`${filters.fechaHasta}T23:59:59`) : null;
+        const fromMs = fromDate && !Number.isNaN(fromDate.getTime()) ? fromDate.getTime() : null;
+        const toMs = toDate && !Number.isNaN(toDate.getTime()) ? toDate.getTime() : null;
+
+        const filteredRows = rows.filter((item) => {
+          if (filters.estado !== 'Todos' && item.status !== filters.estado) return false;
+          if (fromMs !== null && (item.dateMs === null || item.dateMs < fromMs)) return false;
+          if (toMs !== null && (item.dateMs === null || item.dateMs > toMs)) return false;
+          if (hasMin && item.amountValue < min) return false;
+          if (hasMax && item.amountValue > max) return false;
+          if (filters.tipoTransaccion && !item.type.toLowerCase().includes(filters.tipoTransaccion.toLowerCase())) return false;
+          return true;
+        });
+
+        const start = (page - 1) * pageSize;
+        const paged = filteredRows.slice(start, start + pageSize);
+
+        setTx({ data: paged, total: filteredRows.length });
       } catch {
         setTx({ data: [], total: 0 });
       }
     };
 
     void loadTransactions();
-  }, [search, page]);
+  }, [search, page, filters]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(tx.total / pageSize)), [tx.total]);
   const rangeText = useMemo(() => {
@@ -214,6 +267,61 @@ export default function DashboardPage() {
     const end = Math.min(page * pageSize, tx.total);
     return `${start}-${end} de ${tx.total}`;
   }, [tx.total, page]);
+
+  const downloadOverviewReport = useCallback(async (format: 'excel' | 'pdf') => {
+    const fecha = filters.fechaHasta || toInputDate(new Date());
+    setIsExporting(format);
+
+    try {
+      const response = await apiClient.get<Blob>(`/overview/export/${format}`, {
+        params: { fecha },
+        responseType: 'blob',
+      });
+
+      const contentDisposition = response.headers['content-disposition'];
+      const matchedFilename = typeof contentDisposition === 'string'
+        ? contentDisposition.match(/filename\*?=(?:UTF-8''|"|)?([^";]+)/i)?.[1]?.replace(/"/g, '').trim()
+        : null;
+      const defaultName = `overview-${fecha}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+      const filename = matchedFilename || defaultName;
+
+      const blob = new Blob([response.data], {
+        type: format === 'excel'
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'application/pdf',
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setLoadError(`No se pudo exportar ${format.toUpperCase()}: ${getErrorMessage(error)}`);
+    } finally {
+      setIsExporting(null);
+    }
+  }, [filters.fechaHasta]);
+
+  const clearFilters = () => {
+    const now = new Date();
+    const from = new Date(now);
+    from.setDate(now.getDate() - 30);
+
+    setFilters({
+      fechaDesde: toInputDate(from),
+      fechaHasta: toInputDate(now),
+      tipoTransaccion: '',
+      montoMinimo: '',
+      montoMaximo: '',
+      estado: 'Todos',
+    });
+    setSearch('');
+    setPage(1);
+  };
 
   return (
     <div className={styles.wrap}>
@@ -253,8 +361,20 @@ export default function DashboardPage() {
           <div className={styles.panelHead}>
             <div className={styles.panelTitle}>Resumen de Transacciones</div>
             <div className={styles.panelActions}>
-              <button className={styles.btnExcel}>Excel</button>
-              <button className={styles.btnPdf}>PDF</button>
+              <button
+                className={styles.btnExcel}
+                onClick={() => { void downloadOverviewReport('excel'); }}
+                disabled={isExporting !== null}
+              >
+                {isExporting === 'excel' ? 'Exportando...' : 'Excel'}
+              </button>
+              <button
+                className={styles.btnPdf}
+                onClick={() => { void downloadOverviewReport('pdf'); }}
+                disabled={isExporting !== null}
+              >
+                {isExporting === 'pdf' ? 'Exportando...' : 'PDF'}
+              </button>
             </div>
           </div>
 
@@ -268,8 +388,99 @@ export default function DashboardPage() {
               }}
               placeholder="Buscar"
             />
-            <button className={styles.filterBtn} aria-label="Filtrar">⎘</button>
+            <button
+              className={`${styles.filterBtn} ${showFilters ? styles.filterBtnActive : ''}`}
+              aria-label="Filtrar"
+              onClick={() => setShowFilters((prev) => !prev)}
+              title="Mostrar/Ocultar filtros"
+            >
+              <Filter size={16} />
+            </button>
           </div>
+
+          {showFilters && (
+            <div className={styles.filtersPanel}>
+              <div className={styles.filterField}>
+                <label>Fecha Desde</label>
+                <input
+                  type="date"
+                  value={filters.fechaDesde}
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, fechaDesde: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Fecha Hasta</label>
+                <input
+                  type="date"
+                  value={filters.fechaHasta}
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, fechaHasta: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Tipo de Transacción</label>
+                <input
+                  type="text"
+                  value={filters.tipoTransaccion}
+                  placeholder="Todos los tipos"
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, tipoTransaccion: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Monto Mínimo</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={filters.montoMinimo}
+                  placeholder="0.00"
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, montoMinimo: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Monto Máximo</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={filters.montoMaximo}
+                  placeholder="0.00"
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, montoMaximo: e.target.value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+              <div className={styles.filterField}>
+                <label>Estado</label>
+                <select
+                  value={filters.estado}
+                  onChange={(e) => {
+                    setFilters((prev) => ({ ...prev, estado: e.target.value as OverviewFilters['estado'] }));
+                    setPage(1);
+                  }}
+                >
+                  <option value="Todos">Todos</option>
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              </div>
+              <div className={styles.filterActions}>
+                <button className={styles.clearBtn} onClick={clearFilters}>Limpiar Filtros</button>
+              </div>
+            </div>
+          )}
 
           <div className={styles.tableWrap}>
             <table className={styles.table}>
@@ -401,7 +612,6 @@ function BarChart({ data }: { data: VolumeItem[] }) {
   return (
     <div className={styles.barWrap}>
       <svg width="100%" height="260" viewBox="0 0 900 260" preserveAspectRatio="none">
-        {/* líneas guía */}
         {[0, 1, 2, 3].map((i) => (
           <line
             key={i}
