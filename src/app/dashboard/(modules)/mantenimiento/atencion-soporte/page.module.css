@@ -93,6 +93,16 @@
   gap: 12px;
 }
 
+.errorMessage {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
 .searchInput {
   flex: 1;
   padding: 10px 16px;
