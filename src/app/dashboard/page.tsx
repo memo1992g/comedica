@@ -142,6 +142,21 @@ function mapVolume(metrics: OverviewMetricsResponse): VolumeItem[] {
   return [{ label: formatDate(metrics.data?.fechaHoy), value: Number(metrics.data?.volumenDia ?? 0) }];
 }
 
+function mapDistributionFromRows(rows: TxRow[]): DistributionItem[] {
+  const grouped = new Map<string, number>();
+
+  rows.forEach((row) => {
+    const key = row.type || 'Sin tipo';
+    grouped.set(key, (grouped.get(key) ?? 0) + 1);
+  });
+
+  return Array.from(grouped.entries()).map(([label, value], idx) => ({
+    label,
+    value,
+    color: CHART_COLORS[idx % CHART_COLORS.length],
+  }));
+}
+
 function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow {
   const txId = String(item.transactionId ?? item.idTransaccion ?? item.id ?? `TX-${index + 1}`);
   const date = String(item.transactionDate ?? item.fechaHora ?? item.fecha ?? '');
@@ -275,9 +290,24 @@ export default function DashboardPage() {
         const start = (page - 1) * pageSize;
         const paged = filteredRows.slice(start, start + pageSize);
 
+        const hasActiveFilters =
+          search.trim() !== ''
+          || filters.tipoTransaccion.trim() !== ''
+          || filters.montoMinimo.trim() !== ''
+          || filters.montoMaximo.trim() !== ''
+          || filters.estado !== 'Todos';
+
+        // En ambiente dev el endpoint /overview/metrics puede devolver
+        // distribución vacía al aplicar filtros; usamos los datos filtrados
+        // de transacciones para mantener visible y consistente la gráfica.
+        if (hasActiveFilters) {
+          setDist(mapDistributionFromRows(filteredRows));
+        }
+
         setTx({ data: paged, total: filteredRows.length });
       } catch {
         setTx({ data: [], total: 0 });
+        setDist([]);
       }
     };
 
