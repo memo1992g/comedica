@@ -53,9 +53,16 @@ export default function LimitesYMontosPage() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (activeTab === 'users') {
-      loadUserLimits();
+    if (activeTab !== 'users') return;
+
+    if (!searchQuery.trim()) {
+      setUserLimits([]);
+      setTotalUsers(0);
+      setCurrentPage(1);
+      return;
     }
+
+    loadUserLimits();
   }, [activeTab, searchQuery, currentPage]);
 
   const loadGeneralLimits = async () => {
@@ -70,7 +77,7 @@ export default function LimitesYMontosPage() {
 
   const loadUserLimits = async () => {
     try {
-      const response = await getUserLimits({ search: searchQuery, page: currentPage, pageSize });
+      const response = await getUserLimits({ search: searchQuery.trim(), page: currentPage, pageSize });
       setUserLimits(response.data);
       setTotalUsers(response.total);
     } catch (error) {
@@ -169,7 +176,7 @@ export default function LimitesYMontosPage() {
   const handleSaveUserLimits = async (limits: UserLimits['limits']) => {
     if (!selectedUser) return;
     try {
-      await updateUserLimits(selectedUser.userId, limits);
+      await updateUserLimits(selectedUser, limits);
       await loadUserLimits();
       await loadRecentAudit();
       setIsEditingUser(false);
@@ -408,11 +415,25 @@ export default function LimitesYMontosPage() {
                   </tbody>
                 </table>
 
+                {!searchQuery.trim() && (
+                  <div className={styles.emptySearchState}>
+                    <div className={styles.emptySearchTitle}>Ingrese un criterio de búsqueda</div>
+                    <div className={styles.emptySearchText}>Busque por número de asociado para cargar la información.</div>
+                  </div>
+                )}
+
+                {searchQuery.trim() && userLimits.length === 0 && (
+                  <div className={styles.emptySearchState}>
+                    <div className={styles.emptySearchTitle}>Sin resultados</div>
+                    <div className={styles.emptySearchText}>No se encontraron límites para el asociado ingresado.</div>
+                  </div>
+                )}
+
                 <div className={styles.pagination}>
                   <input
                     type="text"
                     className={styles.searchInput}
-                    placeholder="Buscar"
+                    placeholder="Buscar por número de asociado"
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -421,15 +442,16 @@ export default function LimitesYMontosPage() {
                   />
                   <div className={styles.pageInfo}>Página {currentPage} · {Math.min(currentPage * pageSize, totalUsers)} de {totalUsers}</div>
                   <div className={styles.pageControls}>
-                    <button className={styles.pageBtn} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹</button>
+                    <button className={styles.pageBtn} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1 || totalUsers === 0}>‹</button>
                     <button className={`${styles.pageBtn} ${styles.active}`}>{currentPage}</button>
-                    <button className={styles.pageBtn} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>›</button>
+                    <button className={styles.pageBtn} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalUsers === 0}>›</button>
                   </div>
                 </div>
               </div>
             )}
           </div>
 
+          {activeTab === 'general' && (
           <div className={styles.sidebar}>
             <div className={styles.historialPanel}>
               <div className={styles.sidebarActions}>
@@ -488,6 +510,7 @@ export default function LimitesYMontosPage() {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
 

@@ -465,6 +465,9 @@ export async function getUserLimits(params?: {
     const cliIdInput = (params?.search || '').trim();
     const parsedCliId = Number(cliIdInput);
     const hasCliIdFilter = cliIdInput.length > 0 && Number.isFinite(parsedCliId) && parsedCliId > 0;
+    if (!hasCliIdFilter) {
+      return { data: [], total: 0 };
+    }
 
     const response = await customAuthFetch<ParamsProxyResponse<any[]>>(
       `${API_URL}/limits/limit-serviceOpt`,
@@ -475,7 +478,7 @@ export async function getUserLimits(params?: {
           channel: 'W',
           pageId: 1,
           request: {
-            ...(hasCliIdFilter ? { cliId: parsedCliId } : {}),
+            cliId: parsedCliId,
           },
         }),
         headers,
@@ -511,17 +514,115 @@ export async function getUserLimits(params?: {
   }
 }
 
+function buildLimitOptRequests(cliId: number, limits: UserLimits['limits']) {
+  const requests: Array<Record<string, unknown>> = [];
+
+  const ce = limits.canalesElectronicos;
+  if (ce) {
+    requests.push(
+      {
+        cliId,
+        productType: 'TC',
+        accountClass: 'CE',
+        transactionType: 'PAGO',
+        currency: 'USD',
+        maxAmount: Number(ce.maxPerTransaction ?? 0),
+        accumulate: 0,
+        typeLimit: 1,
+      },
+      {
+        cliId,
+        productType: 'TC',
+        accountClass: 'CE',
+        transactionType: 'PAGO',
+        currency: 'USD',
+        maxAmount: Number(ce.maxDaily ?? 0),
+        accumulate: 0,
+        typeLimit: 3,
+      },
+      {
+        cliId,
+        productType: 'TC',
+        accountClass: 'CE',
+        transactionType: 'PAGO',
+        currency: 'USD',
+        maxAmount: Number(ce.maxMonthly ?? 0),
+        accumulate: 0,
+        typeLimit: 2,
+      },
+    );
+  }
+
+  if (limits.transfer365) {
+    requests.push({
+      cliId,
+      productType: 'T365',
+      accountClass: 'AHORRO',
+      transactionType: 'TRANSFER365',
+      currency: 'USD',
+      maxAmount: Number(limits.transfer365.maxAmount ?? 0),
+      accumulate: 0,
+      typeLimit: 1,
+    });
+  }
+
+  return requests;
+}
+
 // Actualizar límites de un usuario específico
-export async function updateUserLimits(userId: string, limits: UserLimits['limits']): Promise<void> {
+export async function updateUserLimits(user: Pick<UserLimits, 'userId' | 'userCode'>, limits: UserLimits['limits']): Promise<void> {
   try {
     const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/parameters/limits/users/${userId}`, {
-      method: "PUT",
-      body: JSON.stringify({ limits }),
+    const cliId = Number(user.userCode || user.userId);
+
+    if (!Number.isFinite(cliId) || cliId <= 0) {
+      throw new Error('Debe ingresar un número de asociado válido para guardar límites.');
+    }
+
+    const existing = await customAuthFetch<ParamsProxyResponse<any[]>>(
+      `${API_URL}/limits/limit-serviceOpt`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          uuid: crypto.randomUUID(),
+          channel: 'W',
+          pageId: 1,
+          request: { cliId },
+        }),
+        headers,
+      },
+    );
+
+    const existingRows = assertProxySuccess(existing);
+    const hasExistingConfig = Array.isArray(existingRows) && existingRows.length > 0;
+    const endpoint = hasExistingConfig ? '/limits/updateLimitOpt' : '/limits/saveLimitOpt';
+    const requests = buildLimitOptRequests(cliId, limits);
+
+    if (requests.length === 0) {
+      return;
+    }
+
+    await Promise.all(requests.map((request) => customAuthFetch(`${API_URL}${endpoint}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        uuid: crypto.randomUUID(),
+        channel: 'W',
+        pageId: 1,
+        request,
+      }),
       headers,
-    });
-  } catch (error) {
-    throw new Error(getErrorMessage(error));
+    })));
+  } catch (primaryError) {
+    try {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/limits/users/${user.userId}`, {
+        method: "PUT",
+        body: JSON.stringify({ limits }),
+        headers,
+      });
+    } catch (error) {
+      throw new Error(getErrorMessage(primaryError || error));
+    }
   }
 }
 
