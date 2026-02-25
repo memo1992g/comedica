@@ -1,16 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { useRouter } from 'next/navigation';
-import { AuditHistoryTable } from '@/components/audit';
-
-export default function HistorialTransfer365Page() {
-  const router = useRouter();
-
-  return (
-    <AuditHistoryTable
-      classificationCode='PARAMS'
-      title='Historial de Auditoría'
-      onBack={() => router.push('/dashboard/parametros/transfer365')}
-    />
-  );
+export default function LegacyTransfer365HistoryRedirectPage() {
+  redirect('/dashboard/mantenimiento/transfer365/historial');
 }
