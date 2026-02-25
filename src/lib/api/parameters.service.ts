@@ -996,6 +996,8 @@ export async function createLocalInstitution(institution: any): Promise<void> {
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1032,6 +1034,8 @@ export async function createCARDInstitution(institution: any): Promise<void> {
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1075,6 +1079,8 @@ export async function updateLocalInstitution(id: string, institution: any): Prom
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1113,6 +1119,8 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1143,7 +1151,7 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
     }
 
     const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/t365/bank-modify`, {
+    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-modify`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1155,6 +1163,8 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1184,7 +1194,7 @@ export async function deleteCARDInstitution(id: string): Promise<void> {
     }
 
     const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
+    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-modify-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1196,6 +1206,8 @@ export async function deleteCARDInstitution(id: string): Promise<void> {
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
