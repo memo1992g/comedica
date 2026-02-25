@@ -514,56 +514,69 @@ export async function getUserLimits(params?: {
   }
 }
 
-function buildLimitOptRequests(cliId: number, limits: UserLimits['limits']) {
+function buildLimitOptRequests(cliId: number, limits: UserLimits['limits'], existingRows: any[] = []) {
   const requests: Array<Record<string, unknown>> = [];
+  const rows = Array.isArray(existingRows) ? existingRows : [];
+
+  const makeRequest = (
+    overrides: {
+      maxAmount: number;
+      typeLimit: number;
+    },
+    defaults: {
+      productType: string;
+      accountClass: string;
+      transactionType: string;
+      currency: string;
+      accumulate: number;
+    },
+    matcher: (row: any) => boolean,
+  ) => {
+    const base = rows.find(matcher);
+
+    requests.push({
+      cliId,
+      productType: String(base?.productType ?? defaults.productType),
+      accountClass: String(base?.accountClass ?? defaults.accountClass),
+      transactionType: String(base?.transactionType ?? defaults.transactionType),
+      currency: String(base?.currency ?? defaults.currency),
+      accumulate: Number(base?.accumulate ?? defaults.accumulate),
+      maxAmount: Number(overrides.maxAmount),
+      typeLimit: Number(overrides.typeLimit),
+    });
+  };
 
   const ce = limits.canalesElectronicos;
   if (ce) {
-    requests.push(
-      {
-        cliId,
-        productType: 'TC',
-        accountClass: 'CE',
-        transactionType: 'PAGO',
-        currency: 'USD',
-        maxAmount: Number(ce.maxPerTransaction ?? 0),
-        accumulate: 0,
-        typeLimit: 1,
-      },
-      {
-        cliId,
-        productType: 'TC',
-        accountClass: 'CE',
-        transactionType: 'PAGO',
-        currency: 'USD',
-        maxAmount: Number(ce.maxDaily ?? 0),
-        accumulate: 0,
-        typeLimit: 3,
-      },
-      {
-        cliId,
-        productType: 'TC',
-        accountClass: 'CE',
-        transactionType: 'PAGO',
-        currency: 'USD',
-        maxAmount: Number(ce.maxMonthly ?? 0),
-        accumulate: 0,
-        typeLimit: 2,
-      },
+    const ceMatcher = (typeLimit: number) => (row: any) => String(row?.accountClass ?? '').toUpperCase() === 'CE'
+      && Number(row?.typeLimit ?? 0) === typeLimit;
+
+    makeRequest(
+      { maxAmount: Number(ce.maxPerTransaction ?? 0), typeLimit: 1 },
+      { productType: 'SAVINGS', accountClass: 'CE', transactionType: 'TRANSFER', currency: 'USD', accumulate: 0 },
+      ceMatcher(1),
+    );
+
+    makeRequest(
+      { maxAmount: Number(ce.maxDaily ?? 0), typeLimit: 3 },
+      { productType: 'SAVINGS', accountClass: 'CE', transactionType: 'TRANSFER', currency: 'USD', accumulate: 0 },
+      ceMatcher(3),
+    );
+
+    makeRequest(
+      { maxAmount: Number(ce.maxMonthly ?? 0), typeLimit: 2 },
+      { productType: 'SAVINGS', accountClass: 'CE', transactionType: 'TRANSFER', currency: 'USD', accumulate: 0 },
+      ceMatcher(2),
     );
   }
 
   if (limits.transfer365) {
-    requests.push({
-      cliId,
-      productType: 'T365',
-      accountClass: 'AHORRO',
-      transactionType: 'TRANSFER365',
-      currency: 'USD',
-      maxAmount: Number(limits.transfer365.maxAmount ?? 0),
-      accumulate: 0,
-      typeLimit: 1,
-    });
+    makeRequest(
+      { maxAmount: Number(limits.transfer365.maxAmount ?? 0), typeLimit: 1 },
+      { productType: 'T365', accountClass: 'AHORRO', transactionType: 'TRANSFER365', currency: 'USD', accumulate: 0 },
+      (row) => String(row?.productType ?? '').toUpperCase().includes('T365')
+        || String(row?.transactionType ?? '').toUpperCase().includes('TRANSFER365'),
+    );
   }
 
   return requests;
@@ -596,7 +609,7 @@ export async function updateUserLimits(user: Pick<UserLimits, 'userId' | 'userCo
     const existingRows = assertProxySuccess(existing);
     const hasExistingConfig = Array.isArray(existingRows) && existingRows.length > 0;
     const endpoint = hasExistingConfig ? '/limits/updateLimitOpt' : '/limits/saveLimitOpt';
-    const requests = buildLimitOptRequests(cliId, limits);
+    const requests = buildLimitOptRequests(cliId, limits, Array.isArray(existingRows) ? existingRows : []);
 
     if (requests.length === 0) {
       return;
