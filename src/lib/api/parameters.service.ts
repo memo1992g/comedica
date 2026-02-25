@@ -215,50 +215,7 @@ function statusToBackendCode(status: string | number | boolean | null | undefine
   return 'I';
 }
 
-function hasProduct(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
-  const normalized = new Set((selectedProducts || []).map((item) => item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
-  return candidates.some((candidate) => normalized.has(candidate.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
-}
-
-
-
-function normalizeText(value: unknown): string {
-  return String(value ?? '').trim();
-}
-
-function resolveCountryCode(country?: string, countryCode?: string): string {
-  const normalizedCode = normalizeText(countryCode).toUpperCase();
-  if (normalizedCode.length === 2) return normalizedCode;
-
-  const normalizedCountry = normalizeText(country)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-
-  const countryMap: Record<string, string> = {
-    'el salvador': 'SV',
-    guatemala: 'GT',
-    honduras: 'HN',
-    nicaragua: 'NI',
-    'costa rica': 'CR',
-    panama: 'PA',
-    'republica dominicana': 'DO',
-  };
-
-  return countryMap[normalizedCountry] || 'SV';
-}
-
-function normalizeInstitutionNames(institution: any) {
-  const institutionName = normalizeText(institution?.institution || institution?.fullName);
-  const shortName = normalizeText(institution?.shortName || institutionName);
-
-  return {
-    institutionName,
-    shortName,
-  };
-}
-
-function hasProduct(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
+function isProductEnabled(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
   const normalized = new Set((selectedProducts || []).map((item) => item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
   return candidates.some((candidate) => normalized.has(candidate.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
 }
@@ -992,15 +949,15 @@ export async function createLocalInstitution(institution: any): Promise<void> {
       body: JSON.stringify({
         ...buildT365Context(),
         request: {
-          codeBic: normalizeText(institution.bic).toUpperCase(),
-          compensate: normalizeText(institution.compensate || institution.compensation) || '000',
-          name: institutionName,
-          shortName,
-          saving: institution.ahorro || hasProduct(institution.products, 'Ahorro') ? '1' : '0',
-          current: institution.corriente || hasProduct(institution.products, 'Corriente') ? '1' : '0',
-          credit: institution.credito || hasProduct(institution.products, 'Credito', 'Crédito') ? '1' : '0',
-          card: institution.tarjeta || hasProduct(institution.products, 'Tarjeta') ? '1' : '0',
-          mobile: institution.movil || hasProduct(institution.products, 'Movil', 'Móvil') ? '1' : '0',
+          codeBic: institution.bic,
+          compensate: institution.compensate || institution.compensation || '00',
+          name: institution.fullName,
+          shortName: institution.shortName,
+          saving: institution.ahorro || isProductEnabled(institution.products, 'Ahorro') ? '1' : '0',
+          current: institution.corriente || isProductEnabled(institution.products, 'Corriente') ? '1' : '0',
+          credit: institution.credito || isProductEnabled(institution.products, 'Credito', 'Crédito') ? '1' : '0',
+          card: institution.tarjeta || isProductEnabled(institution.products, 'Tarjeta') ? '1' : '0',
+          mobile: institution.movil || isProductEnabled(institution.products, 'Movil', 'Móvil') ? '1' : '0',
           user: 'BACKOFFICE',
           description: institution.institution || institution.fullName,
           status: backendStatus,
@@ -1075,15 +1032,15 @@ export async function updateLocalInstitution(id: string, institution: any): Prom
         ...buildT365Context(),
         request: {
           id: Number(id),
-          codeBic: normalizeText(institution.bic).toUpperCase(),
-          compensate: normalizeText(institution.compensate || institution.compensation) || '000',
-          name: institutionName,
-          shortName,
-          saving: institution.ahorro || hasProduct(institution.products, 'Ahorro') ? '1' : '0',
-          current: institution.corriente || hasProduct(institution.products, 'Corriente') ? '1' : '0',
-          credit: institution.credito || hasProduct(institution.products, 'Credito', 'Crédito') ? '1' : '0',
-          card: institution.tarjeta || hasProduct(institution.products, 'Tarjeta') ? '1' : '0',
-          mobile: institution.movil || hasProduct(institution.products, 'Movil', 'Móvil') ? '1' : '0',
+          codeBic: institution.bic,
+          compensate: institution.compensate || institution.compensation || '00',
+          name: institution.fullName,
+          shortName: institution.shortName,
+          saving: institution.ahorro || isProductEnabled(institution.products, 'Ahorro') ? '1' : '0',
+          current: institution.corriente || isProductEnabled(institution.products, 'Corriente') ? '1' : '0',
+          credit: institution.credito || isProductEnabled(institution.products, 'Credito', 'Crédito') ? '1' : '0',
+          card: institution.tarjeta || isProductEnabled(institution.products, 'Tarjeta') ? '1' : '0',
+          mobile: institution.movil || isProductEnabled(institution.products, 'Movil', 'Móvil') ? '1' : '0',
           user: 'BACKOFFICE',
           description: institution.institution || institution.fullName,
           status: backendStatus,
