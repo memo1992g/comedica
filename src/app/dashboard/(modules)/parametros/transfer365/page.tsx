@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Building2, Globe, Pencil, Trash2, Plus, Search } from 'lucide-react';
 import { getLocalInstitutions, getCARDInstitutions, createLocalInstitution, updateLocalInstitution, deleteLocalInstitution, createCARDInstitution, updateCARDInstitution, deleteCARDInstitution } from '@/lib/api/parameters.service';
@@ -41,15 +41,7 @@ export default function RedTransfer365Page() {
 
   const pageSize = 10;
 
-  useEffect(() => {
-    if (activeTab === 'local') {
-      loadLocalInstitutions();
-    } else {
-      loadCardInstitutions();
-    }
-  }, [activeTab, searchLocal, pageLocal, searchCard, pageCard]);
-
-  const loadLocalInstitutions = async () => {
+  const loadLocalInstitutions = useCallback(async () => {
     try {
       const response = await getLocalInstitutions({
         search: searchLocal,
@@ -61,9 +53,9 @@ export default function RedTransfer365Page() {
     } catch (error) {
       console.error('Error al cargar instituciones locales:', error);
     }
-  };
+  }, [searchLocal, pageLocal]);
 
-  const loadCardInstitutions = async () => {
+  const loadCardInstitutions = useCallback(async () => {
     try {
       const response = await getCARDInstitutions({
         search: searchCard,
@@ -75,7 +67,33 @@ export default function RedTransfer365Page() {
     } catch (error) {
       console.error('Error al cargar instituciones CA-RD:', error);
     }
-  };
+  }, [searchCard, pageCard]);
+
+  const refreshInstitutions = useCallback(async (type: TabType) => {
+    // doble consulta para cubrir consistencia eventual del backend
+    if (type === 'local') {
+      await loadLocalInstitutions();
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      await loadLocalInstitutions();
+      return;
+    }
+
+    await loadCardInstitutions();
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await loadCardInstitutions();
+  }, [loadLocalInstitutions, loadCardInstitutions]);
+
+  useEffect(() => {
+    if (activeTab === 'local') {
+      loadLocalInstitutions();
+    }
+  }, [activeTab, loadLocalInstitutions]);
+
+  useEffect(() => {
+    if (activeTab === 'card') {
+      loadCardInstitutions();
+    }
+  }, [activeTab, loadCardInstitutions]);
 
   const handleSaveLocal = async (institution: any) => {
     if (selectedLocal) {
@@ -83,7 +101,7 @@ export default function RedTransfer365Page() {
     } else {
       await createLocalInstitution(institution);
     }
-    await loadLocalInstitutions();
+    await refreshInstitutions('local');
     setIsAddingLocal(false);
     setIsEditingLocal(false);
     setSelectedLocal(null);
@@ -95,7 +113,7 @@ export default function RedTransfer365Page() {
     } else {
       await createCARDInstitution(institution);
     }
-    await loadCardInstitutions();
+    await refreshInstitutions('card');
     setIsAddingCard(false);
     setIsEditingCard(false);
     setSelectedCard(null);
@@ -108,10 +126,10 @@ export default function RedTransfer365Page() {
     try {
       if (institutionToDelete.type === 'local') {
         await deleteLocalInstitution(institutionToDelete.data.id);
-        await loadLocalInstitutions();
+        await refreshInstitutions('local');
       } else {
         await deleteCARDInstitution(institutionToDelete.data.id);
-        await loadCardInstitutions();
+        await refreshInstitutions('card');
       }
       setInstitutionToDelete(null);
     } catch (error) {

@@ -23,6 +23,7 @@ export default function AtencionSoportePage() {
   
   const [formData, setFormData] = useState({ code: '', description: '', status: 'Activo' as 'Activo' | 'Inactivo', hasQuestionnaire: false, questions: 0, failures: 0 });
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const pageSize = 20;
 
   useEffect(() => {
@@ -36,15 +37,18 @@ export default function AtencionSoportePage() {
       setTotal(response.total);
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible cargar los motivos.');
     }
   };
 
   const handleAdd = () => {
+    setErrorMessage('');
     setFormData({ code: '', description: '', status: 'Activo', hasQuestionnaire: false, questions: 0, failures: 0 });
     setShowAddModal(true);
   };
 
   const handleEdit = (reason: SupportReason) => {
+    setErrorMessage('');
     setSelectedReason(reason);
     setFormData({ code: reason.code, description: reason.description, status: reason.status, hasQuestionnaire: reason.hasQuestionnaire, questions: reason.questions, failures: reason.failures });
     setShowEditModal(true);
@@ -64,6 +68,7 @@ export default function AtencionSoportePage() {
       setSelectedReason(null);
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible guardar el motivo.');
     } finally {
       setIsLoading(false);
     }
@@ -76,8 +81,10 @@ export default function AtencionSoportePage() {
       await deleteSupportReason(reasonToDelete.id);
       await loadReasons();
       setReasonToDelete(null);
+      setErrorMessage('');
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible eliminar el motivo.');
     } finally {
       setIsLoading(false);
     }
@@ -101,6 +108,8 @@ export default function AtencionSoportePage() {
       <div className={styles.searchBar}>
         <input type="text" className={styles.searchInput} placeholder="Buscar por código o descripción..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} />
       </div>
+
+      {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
 
       <div className={styles.panel}>
         {reasons.length > 0 ? (
@@ -153,7 +162,7 @@ export default function AtencionSoportePage() {
         )}
       </div>
 
-      <Modal isOpen={showAddModal || showEditModal} onClose={() => { setShowAddModal(false); setShowEditModal(false); }} title={selectedReason ? 'Editar Motivo' : 'Nuevo Motivo'} subtitle="Complete la información del motivo de atención.">
+      <Modal isOpen={showAddModal || showEditModal} onClose={() => { setShowAddModal(false); setShowEditModal(false); setErrorMessage(''); }} title={selectedReason ? 'Editar Motivo' : 'Nuevo Motivo'} subtitle="Complete la información del motivo de atención.">
         <ModalBody>
           <div className={modalStyles.formSection}>
             <div className={modalStyles.formGrid}>
@@ -199,8 +208,8 @@ export default function AtencionSoportePage() {
           )}
         </ModalBody>
         <ModalFooter>
-          <button className={`${modalStyles.btn} ${modalStyles.btnSecondary}`} onClick={() => { setShowAddModal(false); setShowEditModal(false); }}>Cancelar</button>
-          <button className={`${modalStyles.btn} ${modalStyles.btnPrimary}`} onClick={handleSave} disabled={!formData.code || !formData.description || isLoading}>{isLoading ? 'Guardando...' : 'Crear Motivo'}</button>
+          <button className={`${modalStyles.btn} ${modalStyles.btnSecondary}`} onClick={() => { setShowAddModal(false); setShowEditModal(false); setErrorMessage(''); }}>Cancelar</button>
+          <button className={`${modalStyles.btn} ${modalStyles.btnPrimary}`} onClick={handleSave} disabled={!formData.code || !formData.description || isLoading}>{isLoading ? 'Guardando...' : selectedReason ? 'Guardar cambios' : 'Crear Motivo'}</button>
         </ModalFooter>
       </Modal>
 
