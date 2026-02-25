@@ -107,15 +107,54 @@ function mapOverview(metrics: OverviewMetricsResponse): Overview {
 }
 
 function mapDistribution(metrics: OverviewMetricsResponse): DistributionItem[] {
-  return (metrics.data?.distributionPaymentTypeDay ?? []).map((item, idx) => ({
-    label: item.paymentType ?? 'Sin tipo',
-    value: Number(item.cnt ?? 0),
-    color: CHART_COLORS[idx % CHART_COLORS.length],
-  }));
+  const raw = metrics.data?.distributionPaymentTypeDay ?? [];
+
+  const mapped = raw.map((item, idx) => {
+    const count = Number(item.cnt ?? 0);
+    const pctCount = Number(item.pctCnt ?? 0);
+    const amount = Number(item.monto ?? 0);
+
+    const value = count > 0
+      ? count
+      : pctCount > 0
+        ? pctCount
+        : amount > 0
+          ? amount
+          : 0;
+
+    return {
+      label: item.paymentType ?? 'Sin tipo',
+      value,
+      color: CHART_COLORS[idx % CHART_COLORS.length],
+    };
+  });
+
+  // Si el backend devuelve tipos pero sin contadores (0),
+  // repartimos 1 por tipo para que el pastel sea visible.
+  if (mapped.length > 0 && mapped.every((item) => item.value <= 0)) {
+    return mapped.map((item) => ({ ...item, value: 1 }));
+  }
+
+  return mapped;
 }
 
 function mapVolume(metrics: OverviewMetricsResponse): VolumeItem[] {
   return [{ label: formatDate(metrics.data?.fechaHoy), value: Number(metrics.data?.volumenDia ?? 0) }];
+}
+
+function mapDistributionFromRows(rows: TxRow[]): DistributionItem[] {
+  const grouped = new Map<string, number>();
+
+  rows.forEach((row) => {
+    const key = row.type || 'Sin tipo';
+    grouped.set(key, (grouped.get(key) ?? 0) + 1);
+  });
+
+  return Array.from(grouped.entries()).map(([label, value], idx) => ({
+    label,
+    value,
+    color: CHART_COLORS[idx % CHART_COLORS.length],
+  }));
 }
 
 function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow {
@@ -251,9 +290,24 @@ export default function DashboardPage() {
         const start = (page - 1) * pageSize;
         const paged = filteredRows.slice(start, start + pageSize);
 
+        const hasActiveFilters =
+          search.trim() !== ''
+          || filters.tipoTransaccion.trim() !== ''
+          || filters.montoMinimo.trim() !== ''
+          || filters.montoMaximo.trim() !== ''
+          || filters.estado !== 'Todos';
+
+        // En ambiente dev el endpoint /overview/metrics puede devolver
+        // distribución vacía al aplicar filtros; usamos los datos filtrados
+        // de transacciones para mantener visible y consistente la gráfica.
+        if (hasActiveFilters) {
+          setDist(mapDistributionFromRows(filteredRows));
+        }
+
         setTx({ data: paged, total: filteredRows.length });
       } catch {
         setTx({ data: [], total: 0 });
+        setDist([]);
       }
     };
 
@@ -569,6 +623,7 @@ export default function DashboardPage() {
 
 /** Pie simple con SVG (sin librerías) */
 function PieChart({ data }: { data: DistributionItem[] }) {
+  const hasData = data.length > 0;
   const total = data.reduce((a, b) => a + b.value, 0) || 1;
   let acc = 0;
 
@@ -597,6 +652,7 @@ function PieChart({ data }: { data: DistributionItem[] }) {
   return (
     <div className={styles.pieWrap}>
       <svg width="240" height="220">
+        {!hasData && <circle cx={cx} cy={cy} r={r} fill="#EEF1F6" />}
         {slices.map((s) => (
           <path key={s.label} d={arc(s.start, s.end)} fill={s.color} />
         ))}
