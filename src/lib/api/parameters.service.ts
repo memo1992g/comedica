@@ -911,22 +911,7 @@ export async function getLocalInstitutions(params?: {
     const filtered = filterBySearch(mapped, params?.search, ['bic', 'shortName', 'fullName', 'institution']);
     return paginate(filtered, params?.page, params?.pageSize);
   } catch (error) {
-    // fallback legacy
-    try {
-      const headers = getAuthHeaders();
-      const queryParams = new URLSearchParams();
-      if (params?.search) queryParams.set('search', params.search);
-      if (params?.page) queryParams.set('page', String(params.page));
-      if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
-
-      const response = await customAuthFetch<{ data: { data: any[]; total: number } }>(
-        buildUrl('/parameters/transfer365/local', queryParams),
-        { method: "GET", headers },
-      );
-      return response.data;
-    } catch (fallbackError) {
-      throw new Error(getErrorMessage(error || fallbackError));
-    }
+    throw new Error(getErrorMessage(error));
   }
 }
 
@@ -950,22 +935,7 @@ export async function getCARDInstitutions(params?: {
     const filtered = filterBySearch(mapped, params?.search, ['bic', 'fullName', 'country']);
     return paginate(filtered, params?.page, params?.pageSize);
   } catch (error) {
-    // fallback legacy
-    try {
-      const headers = getAuthHeaders();
-      const queryParams = new URLSearchParams();
-      if (params?.search) queryParams.set('search', params.search);
-      if (params?.page) queryParams.set('page', String(params.page));
-      if (params?.pageSize) queryParams.set('pageSize', String(params.pageSize));
-
-      const response = await customAuthFetch<{ data: { data: any[]; total: number } }>(
-        buildUrl('/parameters/transfer365/card', queryParams),
-        { method: "GET", headers },
-      );
-      return response.data;
-    } catch (fallbackError) {
-      throw new Error(getErrorMessage(error || fallbackError));
-    }
+    throw new Error(getErrorMessage(error));
   }
 }
 
@@ -999,17 +969,7 @@ export async function createLocalInstitution(institution: any): Promise<void> {
 
     assertT365Success(response);
   } catch (error) {
-    // fallback legacy
-    try {
-      const headers = getAuthHeaders();
-      await customAuthFetch(`${API_URL}/parameters/transfer365/local`, {
-        method: "POST",
-        body: JSON.stringify({ institution }),
-        headers,
-      });
-    } catch (fallbackError) {
-      throw new Error(getErrorMessage(error || fallbackError));
-    }
+    throw new Error(getErrorMessage(error));
   }
 }
 
@@ -1037,17 +997,7 @@ export async function createCARDInstitution(institution: any): Promise<void> {
 
     assertT365Success(response);
   } catch (error) {
-    // fallback legacy
-    try {
-      const headers = getAuthHeaders();
-      await customAuthFetch(`${API_URL}/parameters/transfer365/card`, {
-        method: "POST",
-        body: JSON.stringify({ institution }),
-        headers,
-      });
-    } catch (fallbackError) {
-      throw new Error(getErrorMessage(error || fallbackError));
-    }
+    throw new Error(getErrorMessage(error));
   }
 }
 
@@ -1082,17 +1032,7 @@ export async function updateLocalInstitution(id: string, institution: any): Prom
 
     assertT365Success(response);
   } catch (error) {
-    // fallback legacy
-    try {
-      const headers = getAuthHeaders();
-      await customAuthFetch(`${API_URL}/parameters/transfer365/local/${id}`, {
-        method: "PUT",
-        body: JSON.stringify({ institution }),
-        headers,
-      });
-    } catch (fallbackError) {
-      throw new Error(getErrorMessage(error || fallbackError));
-    }
+    throw new Error(getErrorMessage(error));
   }
 }
 
@@ -1122,17 +1062,7 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
 
     assertT365Success(response);
   } catch (error) {
-    // fallback legacy
-    try {
-      const headers = getAuthHeaders();
-      await customAuthFetch(`${API_URL}/parameters/transfer365/card/${id}`, {
-        method: "PUT",
-        body: JSON.stringify({ institution }),
-        headers,
-      });
-    } catch (fallbackError) {
-      throw new Error(getErrorMessage(error || fallbackError));
-    }
+    throw new Error(getErrorMessage(error));
   }
 }
 
@@ -1166,16 +1096,7 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
 
     assertT365Success(response);
   } catch (error) {
-    // fallback legacy
-    try {
-      const headers = getAuthHeaders();
-      await customAuthFetch(`${API_URL}/parameters/transfer365/local/${id}`, {
-        method: "DELETE",
-        headers,
-      });
-    } catch (fallbackError) {
-      throw new Error(getErrorMessage(error || fallbackError));
-    }
+    throw new Error(getErrorMessage(error));
   }
 }
 
@@ -1209,15 +1130,6 @@ export async function deleteCARDInstitution(id: string): Promise<void> {
 
     assertT365Success(response);
   } catch (error) {
-    // fallback legacy
-    try {
-      const headers = getAuthHeaders();
-      await customAuthFetch(`${API_URL}/parameters/transfer365/card/${id}`, {
-        method: "DELETE",
-        headers,
-      });
-    } catch (fallbackError) {
-      throw new Error(getErrorMessage(error || fallbackError));
-    }
+    throw new Error(getErrorMessage(error));
   }
 }
