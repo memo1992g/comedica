@@ -209,10 +209,10 @@ function normalizeStatus(status: string | number | null | undefined): 'Activo' |
   return value === 'A' || value === '1' || value === 'ACTIVO' ? 'Activo' : 'Inactivo';
 }
 
-function statusToBackendCode(status: string | number | boolean | null | undefined): 'A' | 'I' {
+function statusToBackendCode(status: string | number | boolean | null | undefined): 'A' | 'B' {
   const value = String(status ?? '').trim().toUpperCase();
   if (value === 'A' || value === '1' || value === 'ACTIVO' || value === 'TRUE') return 'A';
-  return 'I';
+  return 'B';
 }
 
 function normalizeText(value: unknown): string {
@@ -1066,7 +1066,7 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
   }
 }
 
-// Eliminar institución local (en API real se usa modify con estado I)
+// Eliminar institución local (en API real se usa modify con estado B)
 export async function deleteLocalInstitution(id: string): Promise<void> {
   try {
     const current = await getLocalInstitutions({ page: 1, pageSize: 2000 });
@@ -1087,7 +1087,7 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
         ...buildT365Context(),
         request: {
           id: Number(id),
-          status: 'I',
+          status: 'B',
           user: 'BACKOFFICE',
         },
       }),
@@ -1100,7 +1100,7 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
   }
 }
 
-// Eliminar institución CA-RD (en API real se usa modify con estado I)
+// Eliminar institución CA-RD (en API real se usa modify con estado B)
 export async function deleteCARDInstitution(id: string): Promise<void> {
   try {
     const current = await getCARDInstitutions({ page: 1, pageSize: 2000 });
@@ -1121,7 +1121,7 @@ export async function deleteCARDInstitution(id: string): Promise<void> {
         ...buildT365Context(),
         request: {
           id: Number(id),
-          status: 'I',
+          status: 'B',
           user: 'BACKOFFICE',
         },
       }),

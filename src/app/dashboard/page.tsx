@@ -107,11 +107,35 @@ function mapOverview(metrics: OverviewMetricsResponse): Overview {
 }
 
 function mapDistribution(metrics: OverviewMetricsResponse): DistributionItem[] {
-  return (metrics.data?.distributionPaymentTypeDay ?? []).map((item, idx) => ({
-    label: item.paymentType ?? 'Sin tipo',
-    value: Number(item.cnt ?? 0),
-    color: CHART_COLORS[idx % CHART_COLORS.length],
-  }));
+  const raw = metrics.data?.distributionPaymentTypeDay ?? [];
+
+  const mapped = raw.map((item, idx) => {
+    const count = Number(item.cnt ?? 0);
+    const pctCount = Number(item.pctCnt ?? 0);
+    const amount = Number(item.monto ?? 0);
+
+    const value = count > 0
+      ? count
+      : pctCount > 0
+        ? pctCount
+        : amount > 0
+          ? amount
+          : 0;
+
+    return {
+      label: item.paymentType ?? 'Sin tipo',
+      value,
+      color: CHART_COLORS[idx % CHART_COLORS.length],
+    };
+  });
+
+  // Si el backend devuelve tipos pero sin contadores (0),
+  // repartimos 1 por tipo para que el pastel sea visible.
+  if (mapped.length > 0 && mapped.every((item) => item.value <= 0)) {
+    return mapped.map((item) => ({ ...item, value: 1 }));
+  }
+
+  return mapped;
 }
 
 function mapVolume(metrics: OverviewMetricsResponse): VolumeItem[] {
@@ -569,6 +593,7 @@ export default function DashboardPage() {
 
 /** Pie simple con SVG (sin librerías) */
 function PieChart({ data }: { data: DistributionItem[] }) {
+  const hasData = data.length > 0;
   const total = data.reduce((a, b) => a + b.value, 0) || 1;
   let acc = 0;
 
@@ -597,6 +622,7 @@ function PieChart({ data }: { data: DistributionItem[] }) {
   return (
     <div className={styles.pieWrap}>
       <svg width="240" height="220">
+        {!hasData && <circle cx={cx} cy={cy} r={r} fill="#EEF1F6" />}
         {slices.map((s) => (
           <path key={s.label} d={arc(s.start, s.end)} fill={s.color} />
         ))}
