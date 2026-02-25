@@ -250,6 +250,12 @@ function normalizeInstitutionNames(institution: any) {
   };
 }
 
+function hasProduct(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
+  const normalized = new Set((selectedProducts || []).map((item) => item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+  return candidates.some((candidate) => normalized.has(candidate.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+}
+
+
 function mapLocalInstitution(raw: T365LocalRaw & Record<string, any>) {
   const ahorro = raw.ahorro ?? raw.saving ?? '0';
   const corriente = raw.corriente ?? raw.current ?? '0';

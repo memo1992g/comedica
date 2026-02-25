@@ -451,6 +451,7 @@ export default function LimitesYMontosPage() {
             )}
           </div>
 
+          {activeTab === 'general' && (
           <div className={styles.sidebar}>
             <div className={styles.historialPanel}>
               <div className={styles.sidebarActions}>
@@ -509,6 +510,7 @@ export default function LimitesYMontosPage() {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
 
