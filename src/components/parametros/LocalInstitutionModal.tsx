@@ -27,6 +27,22 @@ interface InstitutionModalProps {
 
 const PRODUCTS = ['Ahorro', 'Corriente', 'Credito', 'Tarjeta', 'Movil'];
 
+function normalizeInstitutionPayload(data: Institution): Institution {
+  const bic = data.bic.trim().toUpperCase();
+  const institutionName = (data.institution || data.fullName).trim();
+  const shortName = (data.shortName || institutionName).trim();
+
+  return {
+    ...data,
+    bic,
+    institution: institutionName,
+    fullName: institutionName,
+    shortName,
+    compensation: data.compensation?.trim() || '000',
+    description: (data.description || institutionName).trim(),
+  };
+}
+
 export function LocalInstitutionModal({
   isOpen,
   onClose,
@@ -47,6 +63,7 @@ export function LocalInstitutionModal({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -66,6 +83,7 @@ export function LocalInstitutionModal({
         });
       }
       setShowConfirmation(false);
+      setErrorMessage('');
     }
   }, [isOpen, mode, institution]);
 
@@ -83,16 +101,23 @@ export function LocalInstitutionModal({
   };
 
   const handleSubmit = () => {
+    setErrorMessage('');
+    if (!formData.bic.trim() || !(formData.institution || formData.fullName).trim()) {
+      setErrorMessage('Complete los campos obligatorios para continuar.');
+      return;
+    }
     setShowConfirmation(true);
   };
 
   const handleConfirm = async () => {
     setIsLoading(true);
     try {
-      await onSave(formData);
+      const payload = normalizeInstitutionPayload(formData);
+      await onSave(payload);
       onClose();
     } catch (error) {
       console.error('Error al guardar:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible guardar la institución.');
     } finally {
       setIsLoading(false);
     }
@@ -109,6 +134,9 @@ export function LocalInstitutionModal({
           <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>
             ¿Está seguro de {mode === 'create' ? 'crear' : 'actualizar'} esta nueva institución en el sistema?
           </p>
+          {errorMessage && (
+            <p style={{ margin: 0, color: '#b91c1c', fontSize: '13px' }}>{errorMessage}</p>
+          )}
         </ModalBody>
         <ModalFooter>
           <button
@@ -257,6 +285,10 @@ export function LocalInstitutionModal({
             ))}
           </div>
         </div>
+      {errorMessage && (
+        <p style={{ margin: '0 0 10px 0', color: '#b91c1c', fontSize: '13px' }}>{errorMessage}</p>
+      )}
+
       </ModalBody>
 
       <ModalFooter>
@@ -269,7 +301,7 @@ export function LocalInstitutionModal({
         <button
           className={`${styles.btn} ${styles.btnPrimary}`}
           onClick={handleSubmit}
-          disabled={!formData.bic || !formData.institution}
+          disabled={!formData.bic.trim() || !(formData.institution || formData.fullName).trim()}
         >
           Guardar
         </button>

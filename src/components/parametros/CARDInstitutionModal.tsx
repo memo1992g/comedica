@@ -10,6 +10,7 @@ interface CARDInstitution {
   fullName: string;
   status: string;
   country: string;
+  countryCode?: string;
 }
 
 interface CARDInstitutionModalProps {
@@ -21,13 +22,23 @@ interface CARDInstitutionModalProps {
 }
 
 const COUNTRIES = [
-  'Guatemala',
-  'Honduras',
-  'Nicaragua',
-  'Costa Rica',
-  'Panamá',
-  'República Dominicana',
+  { name: 'Guatemala', code: 'GT' },
+  { name: 'Honduras', code: 'HN' },
+  { name: 'Nicaragua', code: 'NI' },
+  { name: 'Costa Rica', code: 'CR' },
+  { name: 'Panamá', code: 'PA' },
+  { name: 'República Dominicana', code: 'DO' },
 ];
+
+function normalizeCardPayload(data: CARDInstitution): CARDInstitution {
+  return {
+    ...data,
+    bic: data.bic.trim().toUpperCase(),
+    fullName: data.fullName.trim(),
+    country: data.country.trim(),
+    countryCode: data.countryCode?.trim(),
+  };
+}
 
 export function CARDInstitutionModal({
   isOpen,
@@ -44,6 +55,7 @@ export function CARDInstitutionModal({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -58,6 +70,7 @@ export function CARDInstitutionModal({
         });
       }
       setShowConfirmation(false);
+      setErrorMessage('');
     }
   }, [isOpen, mode, institution]);
 
@@ -66,16 +79,23 @@ export function CARDInstitutionModal({
   };
 
   const handleSubmit = () => {
+    setErrorMessage('');
+    if (!formData.bic.trim() || !formData.fullName.trim() || !formData.country.trim()) {
+      setErrorMessage('Complete los campos obligatorios para continuar.');
+      return;
+    }
     setShowConfirmation(true);
   };
 
   const handleConfirm = async () => {
     setIsLoading(true);
     try {
-      await onSave(formData);
+      const payload = normalizeCardPayload(formData);
+      await onSave(payload);
       onClose();
     } catch (error) {
       console.error('Error al guardar:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible guardar la institución.');
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +112,9 @@ export function CARDInstitutionModal({
           <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>
             ¿Está seguro de {mode === 'create' ? 'crear' : 'actualizar'} esta nueva institución en el sistema?
           </p>
+          {errorMessage && (
+            <p style={{ margin: 0, color: '#b91c1c', fontSize: '13px' }}>{errorMessage}</p>
+          )}
         </ModalBody>
         <ModalFooter>
           <button
@@ -166,12 +189,16 @@ export function CARDInstitutionModal({
             <select
               className={styles.formInput}
               value={formData.country}
-              onChange={(e) => handleChange('country', e.target.value)}
+              onChange={(e) => {
+                const selected = COUNTRIES.find((country) => country.name === e.target.value);
+                handleChange('country', e.target.value);
+                handleChange('countryCode', selected?.code || '');
+              }}
             >
               <option value="">Seleccionar país</option>
               {COUNTRIES.map((country) => (
-                <option key={country} value={country}>
-                  {country}
+                <option key={country.code} value={country.name}>
+                  {country.name}
                 </option>
               ))}
             </select>
@@ -192,6 +219,10 @@ export function CARDInstitutionModal({
             />
           </div>
         </div>
+      {errorMessage && (
+        <p style={{ margin: '0 0 10px 0', color: '#b91c1c', fontSize: '13px' }}>{errorMessage}</p>
+      )}
+
       </ModalBody>
 
       <ModalFooter>
@@ -204,7 +235,7 @@ export function CARDInstitutionModal({
         <button
           className={`${styles.btn} ${styles.btnPrimary}`}
           onClick={handleSubmit}
-          disabled={!formData.bic || !formData.fullName || !formData.country}
+          disabled={!formData.bic.trim() || !formData.fullName.trim() || !formData.country.trim()}
         >
           Guardar
         </button>
