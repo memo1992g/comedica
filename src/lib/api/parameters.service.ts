@@ -123,6 +123,7 @@ interface T365LocalRaw {
   nombrecorto: string;
   nombre: string;
   estado: string;
+  status?: string | number;
   bic: string;
   ahorro?: string;
   corriente?: string;
@@ -138,6 +139,7 @@ interface T365CardRaw {
   nombre_BANCO?: string;
   bic_NOMBRE?: string;
   estado?: string;
+  status?: string | number;
   pais?: string;
   nombrePais?: string;
   banco?: string;
@@ -207,7 +209,43 @@ function normalizeStatus(status: string | number | null | undefined): 'Activo' |
   return value === 'A' || value === '1' || value === 'ACTIVO' ? 'Activo' : 'Inactivo';
 }
 
-function hasProduct(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
+function statusToBackendCode(status: string | number | boolean | null | undefined): 'A' | 'I' {
+  const value = String(status ?? '').trim().toUpperCase();
+  if (value === 'A' || value === '1' || value === 'ACTIVO' || value === 'TRUE') return 'A';
+  return 'I';
+}
+
+function normalizeText(value: unknown): string {
+  return String(value ?? '').trim();
+}
+
+function normalizeInstitutionName(institution: any): string {
+  return normalizeText(institution?.fullName || institution?.institution || institution?.bankName);
+}
+
+function resolveCountryCode(country?: string, countryCode?: string): string {
+  const normalizedCode = normalizeText(countryCode).toUpperCase();
+  if (normalizedCode.length === 2) return normalizedCode;
+
+  const normalizedCountry = normalizeText(country)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  const countryMap: Record<string, string> = {
+    'el salvador': 'SV',
+    guatemala: 'GT',
+    honduras: 'HN',
+    nicaragua: 'NI',
+    'costa rica': 'CR',
+    panama: 'PA',
+    'republica dominicana': 'DO',
+  };
+
+  return countryMap[normalizedCountry] || 'SV';
+}
+
+function isProductEnabled(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
   const normalized = new Set((selectedProducts || []).map((item) => item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
   return candidates.some((candidate) => normalized.has(candidate.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
 }
@@ -234,7 +272,7 @@ function mapLocalInstitution(raw: T365LocalRaw & Record<string, any>) {
     id: String(raw.id),
     bic: raw.bic,
     shortName,
-    status: normalizeStatus(raw.estado),
+    status: normalizeStatus(raw.estado ?? raw.status),
     fullName: raw.nombre,
     institution: raw.descripcion,
     compensate,
@@ -252,7 +290,7 @@ function mapCardInstitution(raw: T365CardRaw) {
     id: String(raw.id),
     bic: raw.bic ?? raw.bic_NOMBRE ?? '',
     fullName: raw.banco ?? raw.nombre_BANCO ?? '',
-    status: normalizeStatus(raw.estado ?? 'A'),
+    status: normalizeStatus(raw.estado ?? raw.status ?? 'A'),
     country: raw.nombrePais ?? raw.pais_NOMBRE ?? raw.pais ?? raw.pais_SIG ?? '',
     countryCode: raw.pais ?? raw.pais_SIG ?? '',
   };
@@ -935,6 +973,7 @@ export async function getCARDInstitutions(params?: {
 export async function createLocalInstitution(institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    const backendStatus = statusToBackendCode(institution.status);
     await customAuthFetch(`${API_URL}/t365/bank-create`, {
       method: "POST",
       body: JSON.stringify({
@@ -944,13 +983,15 @@ export async function createLocalInstitution(institution: any): Promise<void> {
           compensate: institution.compensate || institution.compensation || '00',
           name: institution.fullName,
           shortName: institution.shortName,
-          saving: institution.ahorro || hasProduct(institution.products, 'Ahorro') ? '1' : '0',
-          current: institution.corriente || hasProduct(institution.products, 'Corriente') ? '1' : '0',
-          credit: institution.credito || hasProduct(institution.products, 'Credito', 'Crédito') ? '1' : '0',
-          card: institution.tarjeta || hasProduct(institution.products, 'Tarjeta') ? '1' : '0',
-          mobile: institution.movil || hasProduct(institution.products, 'Movil', 'Móvil') ? '1' : '0',
+          saving: institution.ahorro || isProductEnabled(institution.products, 'Ahorro') ? '1' : '0',
+          current: institution.corriente || isProductEnabled(institution.products, 'Corriente') ? '1' : '0',
+          credit: institution.credito || isProductEnabled(institution.products, 'Credito', 'Crédito') ? '1' : '0',
+          card: institution.tarjeta || isProductEnabled(institution.products, 'Tarjeta') ? '1' : '0',
+          mobile: institution.movil || isProductEnabled(institution.products, 'Movil', 'Móvil') ? '1' : '0',
           user: 'BACKOFFICE',
           description: institution.institution || institution.fullName,
+          status: backendStatus,
+          estado: backendStatus,
         },
       }),
       headers,
@@ -974,16 +1015,19 @@ export async function createLocalInstitution(institution: any): Promise<void> {
 export async function createCARDInstitution(institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
-    const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
+    const backendStatus = statusToBackendCode(institution.status);
+    const countryCode = resolveCountryCode(institution.country, institution.countryCode);
     await customAuthFetch(`${API_URL}/t365/bank-create-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
         request: {
           assigCountry: countryCode,
-          bankName: institution.fullName,
+          bankName: normalizeInstitutionName(institution),
           codeBic: institution.bic,
           user: 'BACKOFFICE',
+          status: backendStatus,
+          estado: backendStatus,
         },
       }),
       headers,
@@ -1007,6 +1051,7 @@ export async function createCARDInstitution(institution: any): Promise<void> {
 export async function updateLocalInstitution(id: string, institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
+    const backendStatus = statusToBackendCode(institution.status);
     await customAuthFetch(`${API_URL}/t365/bank-modify`, {
       method: "POST",
       body: JSON.stringify({
@@ -1017,14 +1062,15 @@ export async function updateLocalInstitution(id: string, institution: any): Prom
           compensate: institution.compensate || institution.compensation || '00',
           name: institution.fullName,
           shortName: institution.shortName,
-          saving: institution.ahorro || hasProduct(institution.products, 'Ahorro') ? '1' : '0',
-          current: institution.corriente || hasProduct(institution.products, 'Corriente') ? '1' : '0',
-          credit: institution.credito || hasProduct(institution.products, 'Credito', 'Crédito') ? '1' : '0',
-          card: institution.tarjeta || hasProduct(institution.products, 'Tarjeta') ? '1' : '0',
-          mobile: institution.movil || hasProduct(institution.products, 'Movil', 'Móvil') ? '1' : '0',
+          saving: institution.ahorro || isProductEnabled(institution.products, 'Ahorro') ? '1' : '0',
+          current: institution.corriente || isProductEnabled(institution.products, 'Corriente') ? '1' : '0',
+          credit: institution.credito || isProductEnabled(institution.products, 'Credito', 'Crédito') ? '1' : '0',
+          card: institution.tarjeta || isProductEnabled(institution.products, 'Tarjeta') ? '1' : '0',
+          mobile: institution.movil || isProductEnabled(institution.products, 'Movil', 'Móvil') ? '1' : '0',
           user: 'BACKOFFICE',
           description: institution.institution || institution.fullName,
-          status: institution.status === 'Activo' ? 'A' : 'I',
+          status: backendStatus,
+          estado: backendStatus,
         },
       }),
       headers,
@@ -1048,7 +1094,8 @@ export async function updateLocalInstitution(id: string, institution: any): Prom
 export async function updateCARDInstitution(id: string, institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
-    const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
+    const backendStatus = statusToBackendCode(institution.status);
+    const countryCode = resolveCountryCode(institution.country, institution.countryCode);
     await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
       method: "POST",
       body: JSON.stringify({
@@ -1057,10 +1104,11 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
           id: Number(id),
           assigCountry: countryCode,
           countryName: institution.country,
-          bankName: institution.fullName,
+          bankName: normalizeInstitutionName(institution),
           codeBic: institution.bic,
           user: 'BACKOFFICE',
-          status: institution.status === 'Activo' ? 'A' : 'I',
+          status: backendStatus,
+          estado: backendStatus,
         },
       }),
       headers,
