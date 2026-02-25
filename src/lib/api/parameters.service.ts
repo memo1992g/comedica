@@ -215,6 +215,36 @@ function statusToBackendCode(status: string | number | boolean | null | undefine
   return 'I';
 }
 
+function normalizeText(value: unknown): string {
+  return String(value ?? '').trim();
+}
+
+function normalizeInstitutionName(institution: any): string {
+  return normalizeText(institution?.fullName || institution?.institution || institution?.bankName);
+}
+
+function resolveCountryCode(country?: string, countryCode?: string): string {
+  const normalizedCode = normalizeText(countryCode).toUpperCase();
+  if (normalizedCode.length === 2) return normalizedCode;
+
+  const normalizedCountry = normalizeText(country)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  const countryMap: Record<string, string> = {
+    'el salvador': 'SV',
+    guatemala: 'GT',
+    honduras: 'HN',
+    nicaragua: 'NI',
+    'costa rica': 'CR',
+    panama: 'PA',
+    'republica dominicana': 'DO',
+  };
+
+  return countryMap[normalizedCountry] || 'SV';
+}
+
 function isProductEnabled(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
   const normalized = new Set((selectedProducts || []).map((item) => item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
   return candidates.some((candidate) => normalized.has(candidate.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
@@ -988,15 +1018,15 @@ export async function createCARDInstitution(institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
     const backendStatus = statusToBackendCode(institution.status);
-    const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
+    const countryCode = resolveCountryCode(institution.country, institution.countryCode);
     await customAuthFetch(`${API_URL}/t365/bank-create-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
         request: {
           assigCountry: countryCode,
-          bankName: institutionName,
-          codeBic: normalizeText(institution.bic).toUpperCase(),
+          bankName: normalizeInstitutionName(institution),
+          codeBic: institution.bic,
           user: 'BACKOFFICE',
           status: backendStatus,
           estado: backendStatus,
@@ -1071,7 +1101,7 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
   try {
     const headers = getAuthHeaders();
     const backendStatus = statusToBackendCode(institution.status);
-    const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
+    const countryCode = resolveCountryCode(institution.country, institution.countryCode);
     await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
       method: "POST",
       body: JSON.stringify({
@@ -1080,8 +1110,8 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
           id: Number(id),
           assigCountry: countryCode,
           countryName: institution.country,
-          bankName: institutionName,
-          codeBic: normalizeText(institution.bic).toUpperCase(),
+          bankName: normalizeInstitutionName(institution),
+          codeBic: institution.bic,
           user: 'BACKOFFICE',
           status: backendStatus,
           estado: backendStatus,
