@@ -213,6 +213,49 @@ function hasProduct(selectedProducts: string[] | undefined, ...candidates: strin
 }
 
 
+
+function normalizeText(value: unknown): string {
+  return String(value ?? '').trim();
+}
+
+function resolveCountryCode(country?: string, countryCode?: string): string {
+  const normalizedCode = normalizeText(countryCode).toUpperCase();
+  if (normalizedCode.length === 2) return normalizedCode;
+
+  const normalizedCountry = normalizeText(country)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  const countryMap: Record<string, string> = {
+    'el salvador': 'SV',
+    guatemala: 'GT',
+    honduras: 'HN',
+    nicaragua: 'NI',
+    'costa rica': 'CR',
+    panama: 'PA',
+    'republica dominicana': 'DO',
+  };
+
+  return countryMap[normalizedCountry] || 'SV';
+}
+
+function normalizeInstitutionNames(institution: any) {
+  const institutionName = normalizeText(institution?.institution || institution?.fullName);
+  const shortName = normalizeText(institution?.shortName || institutionName);
+
+  return {
+    institutionName,
+    shortName,
+  };
+}
+
+function hasProduct(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
+  const normalized = new Set((selectedProducts || []).map((item) => item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+  return candidates.some((candidate) => normalized.has(candidate.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+}
+
+
 function mapLocalInstitution(raw: T365LocalRaw & Record<string, any>) {
   const ahorro = raw.ahorro ?? raw.saving ?? '0';
   const corriente = raw.corriente ?? raw.current ?? '0';
@@ -935,26 +978,29 @@ export async function getCARDInstitutions(params?: {
 export async function createLocalInstitution(institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/t365/bank-create`, {
+    const { institutionName, shortName } = normalizeInstitutionNames(institution);
+    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-create`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
         request: {
-          codeBic: institution.bic,
-          compensate: institution.compensate || institution.compensation || '00',
-          name: institution.fullName,
-          shortName: institution.shortName,
+          codeBic: normalizeText(institution.bic).toUpperCase(),
+          compensate: normalizeText(institution.compensate || institution.compensation) || '000',
+          name: institutionName,
+          shortName,
           saving: institution.ahorro || hasProduct(institution.products, 'Ahorro') ? '1' : '0',
           current: institution.corriente || hasProduct(institution.products, 'Corriente') ? '1' : '0',
           credit: institution.credito || hasProduct(institution.products, 'Credito', 'Crédito') ? '1' : '0',
           card: institution.tarjeta || hasProduct(institution.products, 'Tarjeta') ? '1' : '0',
           mobile: institution.movil || hasProduct(institution.products, 'Movil', 'Móvil') ? '1' : '0',
           user: 'BACKOFFICE',
-          description: institution.institution || institution.fullName,
+          description: institutionName,
         },
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -974,20 +1020,23 @@ export async function createLocalInstitution(institution: any): Promise<void> {
 export async function createCARDInstitution(institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
-    const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
-    await customAuthFetch(`${API_URL}/t365/bank-create-CARD`, {
+    const countryCode = resolveCountryCode(institution.country, institution.countryCode);
+    const institutionName = normalizeText(institution.fullName || institution.institution);
+    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-create-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
         request: {
           assigCountry: countryCode,
-          bankName: institution.fullName,
-          codeBic: institution.bic,
+          bankName: institutionName,
+          codeBic: normalizeText(institution.bic).toUpperCase(),
           user: 'BACKOFFICE',
         },
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1007,28 +1056,31 @@ export async function createCARDInstitution(institution: any): Promise<void> {
 export async function updateLocalInstitution(id: string, institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/t365/bank-modify`, {
+    const { institutionName, shortName } = normalizeInstitutionNames(institution);
+    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-modify`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
         request: {
           id: Number(id),
-          codeBic: institution.bic,
-          compensate: institution.compensate || institution.compensation || '00',
-          name: institution.fullName,
-          shortName: institution.shortName,
+          codeBic: normalizeText(institution.bic).toUpperCase(),
+          compensate: normalizeText(institution.compensate || institution.compensation) || '000',
+          name: institutionName,
+          shortName,
           saving: institution.ahorro || hasProduct(institution.products, 'Ahorro') ? '1' : '0',
           current: institution.corriente || hasProduct(institution.products, 'Corriente') ? '1' : '0',
           credit: institution.credito || hasProduct(institution.products, 'Credito', 'Crédito') ? '1' : '0',
           card: institution.tarjeta || hasProduct(institution.products, 'Tarjeta') ? '1' : '0',
           mobile: institution.movil || hasProduct(institution.products, 'Movil', 'Móvil') ? '1' : '0',
           user: 'BACKOFFICE',
-          description: institution.institution || institution.fullName,
+          description: institutionName,
           status: institution.status === 'Activo' ? 'A' : 'I',
         },
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1048,8 +1100,9 @@ export async function updateLocalInstitution(id: string, institution: any): Prom
 export async function updateCARDInstitution(id: string, institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
-    const countryCode = institution.countryCode || institution.country?.slice(0, 2)?.toUpperCase() || 'SV';
-    await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
+    const countryCode = resolveCountryCode(institution.country, institution.countryCode);
+    const institutionName = normalizeText(institution.fullName || institution.institution);
+    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-modify-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1057,14 +1110,16 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
           id: Number(id),
           assigCountry: countryCode,
           countryName: institution.country,
-          bankName: institution.fullName,
-          codeBic: institution.bic,
+          bankName: institutionName,
+          codeBic: normalizeText(institution.bic).toUpperCase(),
           user: 'BACKOFFICE',
           status: institution.status === 'Activo' ? 'A' : 'I',
         },
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1095,7 +1150,7 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
     }
 
     const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/t365/bank-modify`, {
+    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-modify`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1107,6 +1162,8 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
@@ -1136,7 +1193,7 @@ export async function deleteCARDInstitution(id: string): Promise<void> {
     }
 
     const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
+    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-modify-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1148,6 +1205,8 @@ export async function deleteCARDInstitution(id: string): Promise<void> {
       }),
       headers,
     });
+
+    assertT365Success(response);
   } catch (error) {
     // fallback legacy
     try {
