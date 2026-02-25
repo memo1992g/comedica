@@ -202,9 +202,16 @@ function assertT365Success<T>(response: T365Envelope<T>): T {
   return (response?.data ?? []) as T;
 }
 
-function normalizeStatus(status: string): 'Activo' | 'Inactivo' {
-  return status === 'A' ? 'Activo' : 'Inactivo';
+function normalizeStatus(status: string | number | null | undefined): 'Activo' | 'Inactivo' {
+  const value = String(status ?? '').trim().toUpperCase();
+  return value === 'A' || value === '1' || value === 'ACTIVO' ? 'Activo' : 'Inactivo';
 }
+
+function hasProduct(selectedProducts: string[] | undefined, ...candidates: string[]): boolean {
+  const normalized = new Set((selectedProducts || []).map((item) => item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+  return candidates.some((candidate) => normalized.has(candidate.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+}
+
 
 function mapLocalInstitution(raw: T365LocalRaw & Record<string, any>) {
   const ahorro = raw.ahorro ?? raw.saving ?? '0';
@@ -455,7 +462,12 @@ export async function getUserLimits(params?: {
 }): Promise<{ data: UserLimits[]; total: number }> {
   try {
     const headers = getAuthHeaders();
-    const cliId = Number(params?.search);
+    const cliIdInput = (params?.search || '').trim();
+    const parsedCliId = Number(cliIdInput);
+    const hasCliIdFilter = cliIdInput.length > 0 && Number.isFinite(parsedCliId) && parsedCliId > 0;
+    if (!hasCliIdFilter) {
+      return { data: [], total: 0 };
+    }
 
     const response = await customAuthFetch<ParamsProxyResponse<any[]>>(
       `${API_URL}/limits/limit-serviceOpt`,
@@ -466,7 +478,7 @@ export async function getUserLimits(params?: {
           channel: 'W',
           pageId: 1,
           request: {
-            cliId: Number.isFinite(cliId) ? cliId : 0,
+            cliId: parsedCliId,
           },
         }),
         headers,
@@ -502,17 +514,115 @@ export async function getUserLimits(params?: {
   }
 }
 
+function buildLimitOptRequests(cliId: number, limits: UserLimits['limits']) {
+  const requests: Array<Record<string, unknown>> = [];
+
+  const ce = limits.canalesElectronicos;
+  if (ce) {
+    requests.push(
+      {
+        cliId,
+        productType: 'TC',
+        accountClass: 'CE',
+        transactionType: 'PAGO',
+        currency: 'USD',
+        maxAmount: Number(ce.maxPerTransaction ?? 0),
+        accumulate: 0,
+        typeLimit: 1,
+      },
+      {
+        cliId,
+        productType: 'TC',
+        accountClass: 'CE',
+        transactionType: 'PAGO',
+        currency: 'USD',
+        maxAmount: Number(ce.maxDaily ?? 0),
+        accumulate: 0,
+        typeLimit: 3,
+      },
+      {
+        cliId,
+        productType: 'TC',
+        accountClass: 'CE',
+        transactionType: 'PAGO',
+        currency: 'USD',
+        maxAmount: Number(ce.maxMonthly ?? 0),
+        accumulate: 0,
+        typeLimit: 2,
+      },
+    );
+  }
+
+  if (limits.transfer365) {
+    requests.push({
+      cliId,
+      productType: 'T365',
+      accountClass: 'AHORRO',
+      transactionType: 'TRANSFER365',
+      currency: 'USD',
+      maxAmount: Number(limits.transfer365.maxAmount ?? 0),
+      accumulate: 0,
+      typeLimit: 1,
+    });
+  }
+
+  return requests;
+}
+
 // Actualizar límites de un usuario específico
-export async function updateUserLimits(userId: string, limits: UserLimits['limits']): Promise<void> {
+export async function updateUserLimits(user: Pick<UserLimits, 'userId' | 'userCode'>, limits: UserLimits['limits']): Promise<void> {
   try {
     const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/parameters/limits/users/${userId}`, {
-      method: "PUT",
-      body: JSON.stringify({ limits }),
+    const cliId = Number(user.userCode || user.userId);
+
+    if (!Number.isFinite(cliId) || cliId <= 0) {
+      throw new Error('Debe ingresar un número de asociado válido para guardar límites.');
+    }
+
+    const existing = await customAuthFetch<ParamsProxyResponse<any[]>>(
+      `${API_URL}/limits/limit-serviceOpt`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          uuid: crypto.randomUUID(),
+          channel: 'W',
+          pageId: 1,
+          request: { cliId },
+        }),
+        headers,
+      },
+    );
+
+    const existingRows = assertProxySuccess(existing);
+    const hasExistingConfig = Array.isArray(existingRows) && existingRows.length > 0;
+    const endpoint = hasExistingConfig ? '/limits/updateLimitOpt' : '/limits/saveLimitOpt';
+    const requests = buildLimitOptRequests(cliId, limits);
+
+    if (requests.length === 0) {
+      return;
+    }
+
+    await Promise.all(requests.map((request) => customAuthFetch(`${API_URL}${endpoint}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        uuid: crypto.randomUUID(),
+        channel: 'W',
+        pageId: 1,
+        request,
+      }),
       headers,
-    });
-  } catch (error) {
-    throw new Error(getErrorMessage(error));
+    })));
+  } catch (primaryError) {
+    try {
+      const headers = getAuthHeaders();
+      await customAuthFetch(`${API_URL}/parameters/limits/users/${user.userId}`, {
+        method: "PUT",
+        body: JSON.stringify({ limits }),
+        headers,
+      });
+    } catch (error) {
+      throw new Error(getErrorMessage(primaryError || error));
+    }
   }
 }
 
@@ -539,8 +649,8 @@ function mapLimitServiceOptRows(rows: any[]): UserLimits[] {
     const current = grouped.get(cliId) ?? {
       id: cliId,
       userId: cliId,
-      userName: `Cliente ${cliId}`,
-      userCode: cliId,
+      userName: String(item?.clientName ?? item?.name ?? item?.fullName ?? (cliId === '0' ? 'Cliente sin identificar' : `Cliente ${cliId}`)),
+      userCode: String(item?.associatedNumber ?? item?.cliId ?? item?.clientId ?? cliId),
       limitType: 'general' as const,
       limits: {},
       lastUpdate: new Date().toISOString(),
@@ -818,14 +928,14 @@ export async function createLocalInstitution(institution: any): Promise<void> {
         ...buildT365Context(),
         request: {
           codeBic: institution.bic,
-          compensate: institution.compensate || '00',
+          compensate: institution.compensate || institution.compensation || '00',
           name: institution.fullName,
           shortName: institution.shortName,
-          saving: institution.ahorro || institution.products?.includes('Ahorro') ? '1' : '0',
-          current: institution.corriente || institution.products?.includes('Corriente') ? '1' : '0',
-          credit: institution.credito || institution.products?.includes('Crédito') ? '1' : '0',
-          card: institution.tarjeta || institution.products?.includes('Tarjeta') ? '1' : '0',
-          mobile: institution.movil || institution.products?.includes('Móvil') ? '1' : '0',
+          saving: institution.ahorro || hasProduct(institution.products, 'Ahorro') ? '1' : '0',
+          current: institution.corriente || hasProduct(institution.products, 'Corriente') ? '1' : '0',
+          credit: institution.credito || hasProduct(institution.products, 'Credito', 'Crédito') ? '1' : '0',
+          card: institution.tarjeta || hasProduct(institution.products, 'Tarjeta') ? '1' : '0',
+          mobile: institution.movil || hasProduct(institution.products, 'Movil', 'Móvil') ? '1' : '0',
           user: 'BACKOFFICE',
           description: institution.institution || institution.fullName,
         },
@@ -891,14 +1001,14 @@ export async function updateLocalInstitution(id: string, institution: any): Prom
         request: {
           id: Number(id),
           codeBic: institution.bic,
-          compensate: institution.compensate || '00',
+          compensate: institution.compensate || institution.compensation || '00',
           name: institution.fullName,
           shortName: institution.shortName,
-          saving: institution.ahorro || institution.products?.includes('Ahorro') ? '1' : '0',
-          current: institution.corriente || institution.products?.includes('Corriente') ? '1' : '0',
-          credit: institution.credito || institution.products?.includes('Crédito') ? '1' : '0',
-          card: institution.tarjeta || institution.products?.includes('Tarjeta') ? '1' : '0',
-          mobile: institution.movil || institution.products?.includes('Móvil') ? '1' : '0',
+          saving: institution.ahorro || hasProduct(institution.products, 'Ahorro') ? '1' : '0',
+          current: institution.corriente || hasProduct(institution.products, 'Corriente') ? '1' : '0',
+          credit: institution.credito || hasProduct(institution.products, 'Credito', 'Crédito') ? '1' : '0',
+          card: institution.tarjeta || hasProduct(institution.products, 'Tarjeta') ? '1' : '0',
+          mobile: institution.movil || hasProduct(institution.products, 'Movil', 'Móvil') ? '1' : '0',
           user: 'BACKOFFICE',
           description: institution.institution || institution.fullName,
           status: institution.status === 'Activo' ? 'A' : 'I',
@@ -960,6 +1070,17 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
 // Eliminar institución local (en API real se usa modify con estado I)
 export async function deleteLocalInstitution(id: string): Promise<void> {
   try {
+    const current = await getLocalInstitutions({ page: 1, pageSize: 2000 });
+    const target = current.data.find((item) => String(item.id) === String(id));
+
+    if (target) {
+      await updateLocalInstitution(String(id), {
+        ...target,
+        status: 'Inactivo',
+      });
+      return;
+    }
+
     const headers = getAuthHeaders();
     await customAuthFetch(`${API_URL}/t365/bank-modify`, {
       method: "POST",
@@ -990,6 +1111,17 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
 // Eliminar institución CA-RD (en API real se usa modify con estado I)
 export async function deleteCARDInstitution(id: string): Promise<void> {
   try {
+    const current = await getCARDInstitutions({ page: 1, pageSize: 2000 });
+    const target = current.data.find((item) => String(item.id) === String(id));
+
+    if (target) {
+      await updateCARDInstitution(String(id), {
+        ...target,
+        status: 'Inactivo',
+      });
+      return;
+    }
+
     const headers = getAuthHeaders();
     await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
       method: "POST",

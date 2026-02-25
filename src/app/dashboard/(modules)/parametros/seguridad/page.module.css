@@ -16,10 +16,11 @@
 }
 
 .headerLeft h1 {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: #233269;
   margin: 0 0 4px 0;
+  line-height: 1.1;
 }
 
 .headerLeft p {
@@ -54,12 +55,13 @@
 }
 
 .sectionTitle {
-  font-size: 32px;
+  font-size: 22px;
   color: #233269;
   font-weight: 700;
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
   border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
+  line-height: 1.15;
 }
 
 .limitFields {
@@ -82,12 +84,13 @@
 
 .fieldValue {
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #f3f4f8;
-  padding: 7px 10px;
+  padding: 6px 10px;
   color: #233269;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.2;
 }
 
 .btn {
@@ -140,10 +143,10 @@
 }
 
 .historialTitle {
-  font-size: 32px;
+  font-size: 16px;
   font-weight: 700;
   color: #233269;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
 }
 
 .emptyAudit {

@@ -1,5 +1,5 @@
 .container {
-  padding: 16px 20px 24px;
+  padding: 12px 16px 20px;
   max-width: 100%;
   margin: 0 auto;
 }
@@ -7,8 +7,8 @@
 .mainCard {
   background: #f8f9fc;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 8px;
+  padding: 12px;
 }
 
 .header {
@@ -16,25 +16,26 @@
 }
 
 .headerLeft h1 {
-  font-size: 40px;
+  font-size: 24px;
   font-weight: 700;
   color: #233269;
   margin: 0 0 4px 0;
+  line-height: 1.1;
 }
 
 .headerLeft p {
-  font-size: 13px;
+  font-size: 12px;
   color: #9ca3af;
   margin: 0;
 }
 
 .btn {
-  height: 36px;
-  padding: 0 20px;
+  height: 34px;
+  padding: 0 18px;
   border: none;
   border-radius: 4px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   display: flex;
@@ -60,21 +61,21 @@
 
 .tabs {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .tab {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 0;
+  gap: 6px;
+  padding: 9px 0;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
   color: #9ca3af;
-  font-size: 15px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -90,36 +91,37 @@
 
 .mainContent {
   flex: 1;
-  padding-right: 14px;
+  padding-right: 12px;
 }
 
 .sidebar {
-  width: 300px;
+  width: 280px;
   flex-shrink: 0;
-  border-left: 1px solid #1f2937;
-  padding-left: 16px;
+  border-left: 1px solid #e5e7eb;
+  padding-left: 12px;
 }
 
 .panel {
   background: white;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid #e5e7eb;
-  padding: 14px;
-  margin-bottom: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
 }
 
 .sectionTitle {
-  font-size: 32px;
+  font-size: 22px;
   color: #233269;
   font-weight: 700;
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
   border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
+  line-height: 1.15;
 }
 
 .subSectionTitle {
   font-size: 16px;
-  margin: 8px 0 10px;
+  margin: 6px 0 8px;
   color: #111827;
   font-weight: 700;
 }
@@ -127,14 +129,14 @@
 .limitFields {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .fieldGroup {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .fieldLabel {
@@ -144,12 +146,13 @@
 
 .fieldValue {
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #f3f4f8;
-  padding: 7px 10px;
+  padding: 6px 10px;
   color: #233269;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.2;
 }
 
 .fieldValue:disabled {
@@ -164,36 +167,36 @@
 .sidebarActions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
 }
 
 .sidebarActionBtn {
   width: 100%;
-  height: 36px;
-  font-size: 14px;
+  height: 34px;
+  font-size: 13px;
 }
 
 .historialTitle {
   font-size: 16px;
   font-weight: 700;
   color: #233269;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
 }
 
 .emptyAudit {
   background: #f3f4f8;
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 6px;
+  padding: 8px 10px;
   color: #6b7280;
   font-size: 12px;
 }
 
 .auditItem {
-  padding: 0 0 10px;
-  margin-bottom: 10px;
+  padding: 0 0 8px;
+  margin-bottom: 8px;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -206,24 +209,24 @@
 .auditTime {
   font-size: 11px;
   color: #9ca3af;
-  margin: 2px 0 5px;
+  margin: 2px 0 4px;
 }
 
 .auditDetails {
   font-size: 12px;
   color: #111827;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .auditChangeBox {
   background: #f3f4f8;
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: 6px;
+  padding: 6px 8px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   color: #4b5563;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .oldValue {
@@ -242,17 +245,17 @@
 
 .userTable th {
   text-align: left;
-  padding: 12px 14px;
+  padding: 10px 12px;
   color: #233269;
-  font-size: 14px;
+  font-size: 13px;
   border-bottom: 1px solid #e5e7eb;
 }
 
 .userTable td {
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-bottom: 1px solid #e5e7eb;
   color: #374151;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .userTable tbody tr:nth-child(odd) {
@@ -270,7 +273,7 @@
 }
 
 .limitBadge {
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .general {
@@ -283,14 +286,14 @@
 
 .actionButtons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .iconBtn {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent;
   color: #233269;
   cursor: pointer;
@@ -300,41 +303,66 @@
   color: #ef4444;
 }
 
+
+.emptySearchState {
+  min-height: 180px;
+  border: 1px dashed #e5e7eb;
+  border-radius: 8px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.emptySearchTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.emptySearchText {
+  font-size: 12px;
+}
+
 .pagination {
-  margin-top: 14px;
-  padding-top: 14px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid #e5e7eb;
   display: grid;
-  grid-template-columns: 260px 1fr auto;
+  grid-template-columns: 240px 1fr auto;
   gap: 12px;
   align-items: center;
 }
 
 .searchInput {
-  padding: 8px 12px 8px 34px;
+  padding: 7px 10px 7px 32px;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #f3f4f8 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 10px center;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .pageInfo {
   text-align: center;
   color: #9ca3af;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .pageControls {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 .pageBtn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border: 1px solid #d1d5db;
   background: white;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
