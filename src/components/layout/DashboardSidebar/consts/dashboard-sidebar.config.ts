@@ -41,7 +41,6 @@ export const sidebarItems: Item[] = [
         label: "Solicitud de Soft Token",
         href: "/dashboard/parametros/solicitud-soft-token",
       },
-      { label: "Red Transfer365", href: "/dashboard/parametros/transfer365" },
     ],
   },
   {
@@ -63,6 +62,7 @@ export const sidebarItems: Item[] = [
         label: "Catálogo de productos",
         href: "/dashboard/mantenimiento/catalogo-productos",
       },
+      { label: "Red Transfer365", href: "/dashboard/mantenimiento/transfer365" },
     ],
   },
   {
