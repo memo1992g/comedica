@@ -944,7 +944,7 @@ export async function createLocalInstitution(institution: any): Promise<void> {
   try {
     const headers = getAuthHeaders();
     const backendStatus = statusToBackendCode(institution.status);
-    await customAuthFetch(`${API_URL}/t365/bank-create`, {
+    const response = await customAuthFetch<T365Envelope<Record<string, any>>>(`${API_URL}/t365/bank-create`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -979,7 +979,7 @@ export async function createCARDInstitution(institution: any): Promise<void> {
     const headers = getAuthHeaders();
     const backendStatus = statusToBackendCode(institution.status);
     const countryCode = resolveCountryCode(institution.country, institution.countryCode);
-    await customAuthFetch(`${API_URL}/t365/bank-create-CARD`, {
+    const response = await customAuthFetch<T365Envelope<Record<string, any>>>(`${API_URL}/t365/bank-create-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1006,7 +1006,7 @@ export async function updateLocalInstitution(id: string, institution: any): Prom
   try {
     const headers = getAuthHeaders();
     const backendStatus = statusToBackendCode(institution.status);
-    await customAuthFetch(`${API_URL}/t365/bank-modify`, {
+    const response = await customAuthFetch<T365Envelope<Record<string, any>>>(`${API_URL}/t365/bank-modify`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1042,7 +1042,7 @@ export async function updateCARDInstitution(id: string, institution: any): Promi
     const headers = getAuthHeaders();
     const backendStatus = statusToBackendCode(institution.status);
     const countryCode = resolveCountryCode(institution.country, institution.countryCode);
-    await customAuthFetch(`${API_URL}/t365/bank-modify-CARD`, {
+    const response = await customAuthFetch<T365Envelope<Record<string, any>>>(`${API_URL}/t365/bank-modify-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1081,7 +1081,7 @@ export async function deleteLocalInstitution(id: string): Promise<void> {
     }
 
     const headers = getAuthHeaders();
-    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-modify`, {
+    const response = await customAuthFetch<T365Envelope<Record<string, any>>>(`${API_URL}/t365/bank-modify`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
@@ -1115,7 +1115,7 @@ export async function deleteCARDInstitution(id: string): Promise<void> {
     }
 
     const headers = getAuthHeaders();
-    const response = await customAuthFetch<T365Envelope<any>>(`${API_URL}/t365/bank-modify-CARD`, {
+    const response = await customAuthFetch<T365Envelope<Record<string, any>>>(`${API_URL}/t365/bank-modify-CARD`, {
       method: "POST",
       body: JSON.stringify({
         ...buildT365Context(),
