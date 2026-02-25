@@ -41,7 +41,7 @@ function resolveAccessToken(): string | null {
   return cookieStore.get(APP_COOKIES.AUTH.ACCESS_TOKEN)?.value || null;
 }
 
-function getAuthHeaders(contentType: 'json' | 'multipart' = 'json'): Record<string, string> {
+function getAuthHeaders(contentType: 'json' | 'multipart' = 'json', includeUserHeader = false): Record<string, string> {
   const accessToken = resolveAccessToken();
 
   const headers: Record<string, string> = {};
@@ -50,6 +50,9 @@ function getAuthHeaders(contentType: 'json' | 'multipart' = 'json'): Record<stri
   }
   if (accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
+  }
+  if (includeUserHeader) {
+    headers['X-User'] = getRequestUser();
   }
   return headers;
 }
@@ -264,8 +267,8 @@ export async function getSupportReasons(params?: {
 
 export async function createSupportReason(reason: Partial<SupportReason>): Promise<void> {
   try {
-    const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/create-support-catalog`, {
+    const headers = getAuthHeaders('json', true);
+    const response = await customAuthFetch<BackofficeEnvelope<any>>(`${API_URL}/create-support-catalog`, {
       method: "POST",
       body: JSON.stringify({
         request: buildContext('WEB'),
@@ -277,6 +280,10 @@ export async function createSupportReason(reason: Partial<SupportReason>): Promi
       }),
       headers,
     });
+
+    if (response?.result && response.result.code !== 0) {
+      throw new Error(response.result.message || 'No fue posible crear el motivo de soporte');
+    }
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }
@@ -284,8 +291,8 @@ export async function createSupportReason(reason: Partial<SupportReason>): Promi
 
 export async function updateSupportReason(id: string, reason: Partial<SupportReason>): Promise<void> {
   try {
-    const headers = getAuthHeaders();
-    await customAuthFetch(`${API_URL}/update-support-catalog/${id}`, {
+    const headers = getAuthHeaders('json', true);
+    const response = await customAuthFetch<BackofficeEnvelope<any>>(`${API_URL}/update-support-catalog/${id}`, {
       method: "PUT",
       body: JSON.stringify({
         requiresQuestionnaire: reason.hasQuestionnaire ? 1 : 0,
@@ -294,6 +301,10 @@ export async function updateSupportReason(id: string, reason: Partial<SupportRea
       }),
       headers,
     });
+
+    if (response?.result && response.result.code !== 0) {
+      throw new Error(response.result.message || 'No fue posible actualizar el motivo de soporte');
+    }
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }
@@ -301,7 +312,7 @@ export async function updateSupportReason(id: string, reason: Partial<SupportRea
 
 export async function deleteSupportReason(id: string): Promise<void> {
   try {
-    const headers = getAuthHeaders();
+    const headers = getAuthHeaders('json', true);
     await customAuthFetch(`${API_URL}/delete-support-catalog/${id}`, {
       method: "DELETE",
       headers,
