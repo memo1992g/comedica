@@ -83,6 +83,30 @@ function formatDate(value?: string): string {
   return dt.toLocaleDateString('es-SV', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+function parseDateToMs(value?: string): number | null {
+  if (!value) return null;
+
+  const direct = new Date(value);
+  if (!Number.isNaN(direct.getTime())) return direct.getTime();
+
+  const ddmmyyyy = value.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+  if (ddmmyyyy) {
+    const [, dd, mm, yyyy, hh = '00', min = '00', ss = '00'] = ddmmyyyy;
+    const parsed = new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(hh), Number(min), Number(ss));
+    return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
+  }
+
+  return null;
+}
+
+function normalizeText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
 function mapOverview(metrics: OverviewMetricsResponse): Overview {
   const data = metrics.data ?? {};
   const txCount = Number(data.cntDia ?? 0);
@@ -160,8 +184,7 @@ function mapDistributionFromRows(rows: TxRow[]): DistributionItem[] {
 function mapTransactionRow(item: Record<string, unknown>, index: number): TxRow {
   const txId = String(item.transactionId ?? item.idTransaccion ?? item.id ?? `TX-${index + 1}`);
   const date = String(item.transactionDate ?? item.fechaHora ?? item.fecha ?? '');
-  const parsedDate = new Date(date);
-  const dateMs = Number.isNaN(parsedDate.getTime()) ? null : parsedDate.getTime();
+  const dateMs = parseDateToMs(date);
   const associate = String(item.associatedNumber ?? item.numeroAsociado ?? item.asociado ?? '-');
   const client = String(item.customerName ?? item.nombreCliente ?? item.nombreDestino ?? '-');
   const category = String(item.category ?? item.categoria ?? item.productType ?? '-');
@@ -277,6 +300,8 @@ export default function DashboardPage() {
         const fromMs = fromDate && !Number.isNaN(fromDate.getTime()) ? fromDate.getTime() : null;
         const toMs = toDate && !Number.isNaN(toDate.getTime()) ? toDate.getTime() : null;
 
+        const normalizedSearch = normalizeText(search);
+
         const filteredRows = rows.filter((item) => {
           if (filters.estado !== 'Todos' && item.status !== filters.estado) return false;
           if (fromMs !== null && (item.dateMs === null || item.dateMs < fromMs)) return false;
@@ -284,25 +309,29 @@ export default function DashboardPage() {
           if (hasMin && item.amountValue < min) return false;
           if (hasMax && item.amountValue > max) return false;
           if (filters.tipoTransaccion && !item.type.toLowerCase().includes(filters.tipoTransaccion.toLowerCase())) return false;
+          if (normalizedSearch) {
+            const haystack = [
+              item.id,
+              item.date,
+              item.associate,
+              item.client,
+              item.category,
+              item.type,
+              item.amount,
+              item.status,
+            ].map(normalizeText).join(' ');
+
+            if (!haystack.includes(normalizedSearch)) return false;
+          }
           return true;
         });
 
         const start = (page - 1) * pageSize;
         const paged = filteredRows.slice(start, start + pageSize);
 
-        const hasActiveFilters =
-          search.trim() !== ''
-          || filters.tipoTransaccion.trim() !== ''
-          || filters.montoMinimo.trim() !== ''
-          || filters.montoMaximo.trim() !== ''
-          || filters.estado !== 'Todos';
-
-        // En ambiente dev el endpoint /overview/metrics puede devolver
-        // distribución vacía al aplicar filtros; usamos los datos filtrados
-        // de transacciones para mantener visible y consistente la gráfica.
-        if (hasActiveFilters) {
-          setDist(mapDistributionFromRows(filteredRows));
-        }
+        // La distribución siempre se recalcula con el mismo subconjunto
+        // mostrado en la tabla para mantener consistencia con los filtros.
+        setDist(mapDistributionFromRows(filteredRows));
 
         setTx({ data: paged, total: filteredRows.length });
       } catch {
@@ -653,7 +682,8 @@ function PieChart({ data }: { data: DistributionItem[] }) {
     <div className={styles.pieWrap}>
       <svg width="240" height="220">
         {!hasData && <circle cx={cx} cy={cy} r={r} fill="#EEF1F6" />}
-        {slices.map((s) => (
+        {slices.length === 1 && <circle cx={cx} cy={cy} r={r} fill={slices[0].color} />}
+        {slices.length > 1 && slices.map((s) => (
           <path key={s.label} d={arc(s.start, s.end)} fill={s.color} />
         ))}
       </svg>
