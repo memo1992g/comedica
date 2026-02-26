@@ -3,15 +3,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import styles from './styles/DashboardSidebar.module.css';
 import { sidebarItems } from './consts/dashboard-sidebar.config';
-import type { Item } from './consts/dashboard-sidebar.config';
+import type { Item, SubItem } from './consts/dashboard-sidebar.config';
 
 export default function DashboardSidebar({
   isCollapsed,
@@ -31,10 +27,25 @@ export default function DashboardSidebar({
 
   const [expandedItem, setExpandedItem] = useState<string | null>(currentParentKey);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [expandedSubitems, setExpandedSubitems] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setExpandedItem(currentParentKey);
   }, [currentParentKey]);
+
+  useEffect(() => {
+    const nextExpanded: Record<string, boolean> = {};
+
+    sidebarItems.forEach((item) => {
+      item.children?.forEach((child) => {
+        if (child.children?.length) {
+          nextExpanded[child.href] = pathname.startsWith(child.href);
+        }
+      });
+    });
+
+    setExpandedSubitems(nextExpanded);
+  }, [pathname]);
 
   const initials = (user?.fullName || user?.username || 'AP')
     .split(' ')
@@ -50,11 +61,54 @@ export default function DashboardSidebar({
     }
   };
 
+  const handleSubitemClick = (subitem: SubItem, e: React.MouseEvent) => {
+    if (!subitem.children?.length || isCollapsed) {
+      return;
+    }
+
+    e.preventDefault();
+    setExpandedSubitems((prev) => ({
+      ...prev,
+      [subitem.href]: !prev[subitem.href],
+    }));
+  };
+
+  const renderSubmenuItems = (items: SubItem[], level = 0) => {
+    return items.map((child) => {
+      const childActive = pathname === child.href || pathname.startsWith(child.href + '/');
+      const hasChildren = Boolean(child.children?.length);
+      const isSubExpanded = Boolean(expandedSubitems[child.href]);
+
+      return (
+        <div key={child.href} className={styles.submenuItemWrapper}>
+          <Link
+            href={child.href}
+            className={`${styles.submenuItem} ${childActive ? styles.submenuActive : ''}`}
+            style={{ paddingLeft: `${8 + level * 14}px` }}
+            onClick={(e) => handleSubitemClick(child, e)}
+          >
+            <span>{child.label}</span>
+            {hasChildren && (
+              isSubExpanded
+                ? <ChevronDown className={styles.submenuChev} />
+                : <ChevronRight className={styles.submenuChev} />
+            )}
+          </Link>
+
+          {hasChildren && isSubExpanded && (
+            <div className={styles.nestedSubmenu}>
+              {renderSubmenuItems(child.children!, level + 1)}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
+
   return (
     <aside className={isCollapsed ? styles.sidebarCollapsed : styles.sidebar}>
       <div className={styles.top}>
         <div className={styles.logoRow}>
-          {/* Poné tu logo aquí: /public/images/comedica-logo-white.png */}
           <img
             className={styles.logo}
             src="/images/comedica-logo-white.png"
@@ -76,7 +130,6 @@ export default function DashboardSidebar({
           const active = pathname === it.href || pathname.startsWith(matchPath + '/');
           const isExpanded = expandedItem === itemKey;
           const hasChildren = it.children && it.children.length > 0;
-          const submenuHeight = hasChildren ? it.children!.length * 60 + 4 : 0;
           const isHovered = hoveredItem === itemKey;
 
           return (
@@ -103,28 +156,14 @@ export default function DashboardSidebar({
                 )}
               </Link>
 
-              {/* Submenú expandido (sidebar abierto) */}
               {!isCollapsed && hasChildren && (
                 <div
                   className={`${styles.submenu} ${isExpanded ? styles.submenuExpanded : styles.submenuCollapsed}`}
-                  style={{ maxHeight: isExpanded ? submenuHeight : 0 }}
                 >
-                  {it.children!.map((child) => {
-                    const childActive = pathname === child.href || pathname.startsWith(child.href + '/');
-                    return (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className={`${styles.submenuItem} ${childActive ? styles.submenuActive : ''}`}
-                      >
-                        {child.label}
-                      </Link>
-                    );
-                  })}
+                  {renderSubmenuItems(it.children!)}
                 </div>
               )}
 
-              {/* Popover submenú (sidebar colapsado) */}
               {isCollapsed && hasChildren && isHovered && (
                 <div className={styles.popover}>
                   <div className={styles.popoverTitle}>{it.label}</div>

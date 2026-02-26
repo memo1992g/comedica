@@ -15,18 +15,32 @@ export default function SoftToken() {
     groupedChanges,
     hasChanges,
     isLoading,
+    isInitialLoading,
+    loadError,
     showConfirmation,
     setShowConfirmation,
     updateTransaction,
     updateAdmin,
     handleSave,
     handleConfirm,
+    retryLoad,
   } = useSoftToken();
+
+  if (isInitialLoading && !editedConfig) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.wrapper}>Cargando...</div>
+      </div>
+    );
+  }
 
   if (!editedConfig) {
     return (
       <div className={styles.container}>
-        <div className={styles.wrapper}>Cargando...</div>
+        <div className={styles.wrapper}>
+          <p>No se pudo inicializar la vista de Soft Token.</p>
+          <button type="button" onClick={retryLoad}>Reintentar</button>
+        </div>
       </div>
     );
   }
@@ -37,6 +51,7 @@ export default function SoftToken() {
         <div className={styles.header}>
           <h1>Solicitud de Soft Token</h1>
           <p>Configuración de operaciones y gestiones que requieren verificación mediante Soft Token</p>
+          {loadError && <p>{loadError}</p>}
         </div>
 
         <div className={styles.layout}>

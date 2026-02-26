@@ -79,21 +79,48 @@ export function useSoftToken() {
   const [editedConfig, setEditedConfig] = useState<SoftTokenConfig | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadConfig = useCallback(async () => {
+    setIsInitialLoading(true);
+    setLoadError(null);
+
     try {
       const [flowsResult, configsResult] = await Promise.all([
         getFlowsAction(),
         listConfigsAction(),
       ]);
 
+      if (flowsResult.errors || configsResult.errors) {
+        setLoadError(
+          flowsResult.errorMessage
+          || configsResult.errorMessage
+          || 'No se pudo cargar la configuración de Soft Token.',
+        );
+
+        setConfig({ transactions: [], administrative: [] });
+        setEditedConfig({ transactions: [], administrative: [] });
+        return;
+      }
+
       if (flowsResult.data && configsResult.data) {
         const mapped = mapFlowsToConfig(flowsResult.data, configsResult.data);
         setConfig(mapped);
         setEditedConfig(mapped);
+        return;
       }
+
+      setLoadError('No se recibieron datos para la configuración de Soft Token.');
+      setConfig({ transactions: [], administrative: [] });
+      setEditedConfig({ transactions: [], administrative: [] });
     } catch (error) {
       console.error('Error al cargar configuración:', error);
+      setLoadError('Ocurrió un error inesperado al cargar la configuración.');
+      setConfig({ transactions: [], administrative: [] });
+      setEditedConfig({ transactions: [], administrative: [] });
+    } finally {
+      setIsInitialLoading(false);
     }
   }, []);
 
@@ -239,11 +266,14 @@ export function useSoftToken() {
     groupedChanges,
     hasChanges,
     isLoading,
+    isInitialLoading,
+    loadError,
     showConfirmation,
     setShowConfirmation,
     updateTransaction,
     updateAdmin,
     handleSave,
     handleConfirm,
+    retryLoad: loadConfig,
   };
 }

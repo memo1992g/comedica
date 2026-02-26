@@ -11,7 +11,18 @@ import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
 import { generateDynamicUUID } from "@/utilities/uuid-generator";
 import { cookies } from "next/headers";
 
-const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL
+  ?? process.env.NEXT_PUBLIC_API_URL;
+
+function buildApiUrl(path: string): string {
+  if (!API_URL) {
+    throw new Error(
+      "Missing API base URL. Define BACKOFFICE_BASE_NEW_API_URL or NEXT_PUBLIC_API_URL.",
+    );
+  }
+
+  return `${API_URL}${path}`;
+}
 
 function getAuthHeaders(): Record<string, string> {
   const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
@@ -39,7 +50,7 @@ export const getFlowsService = async (): Promise<
 
   const body = new URLSearchParams({ category: "" });
 
-  return customAuthFetch(`${API_URL}/sft/get-flows`, {
+  return customAuthFetch(buildApiUrl("/sft/get-flows"), {
     method: "POST",
     body: body.toString(),
     headers,
@@ -57,7 +68,7 @@ export const listConfigsService = async (): Promise<
     "Content-Type": "application/json",
   };
 
-  return customAuthFetch(`${API_URL}/sft/list-configs`, {
+  return customAuthFetch(buildApiUrl("/sft/list-configs"), {
     method: "POST",
     headers,
   });
@@ -74,7 +85,7 @@ export const saveConfigService = async (
     "Content-Type": "application/json",
   };
 
-  return customAuthFetch(`${API_URL}/sft/saveConfig`, {
+  return customAuthFetch(buildApiUrl("/sft/saveConfig"), {
     method: "POST",
     body: JSON.stringify({
       request,
