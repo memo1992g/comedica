@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Pencil, Search, Package } from 'lucide-react';
+import { Plus, Pencil, Search, Package, UploadCloud } from 'lucide-react';
 import {
   createProduct,
   deleteProduct,
@@ -17,14 +17,14 @@ import styles from './page.module.css';
 
 function formatDate(value: string): string {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return '-';
-  }
+  if (Number.isNaN(date.getTime())) return '-';
   return date.toLocaleDateString('es-SV');
 }
 
 export default function CatalogoProductosPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'Productos' | 'Tarjetas'>('Productos');
@@ -41,6 +41,7 @@ export default function CatalogoProductosPage() {
     status: 'Activo' as 'Activo' | 'Inactivo',
     category: '',
   });
+  const [previewImage, setPreviewImage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -56,9 +57,16 @@ export default function CatalogoProductosPage() {
     }
   };
 
+  const closeModal = () => {
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setPreviewImage('');
+  };
+
   const handleAdd = () => {
     setSelectedProduct(null);
-    setFormData({ code: '', name: '', description: '', status: 'Activo', category: '' });
+    setFormData({ code: '', name: '', description: '', status: 'Activo', category: activeTab });
+    setPreviewImage('');
     setShowAddModal(true);
   };
 
@@ -71,7 +79,15 @@ export default function CatalogoProductosPage() {
       status: product.status,
       category: product.category,
     });
+    setPreviewImage(product.publicUrl ?? '');
     setShowEditModal(true);
+  };
+
+  const handleImagePick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const localUrl = URL.createObjectURL(file);
+    setPreviewImage(localUrl);
   };
 
   const handleSave = async () => {
@@ -83,8 +99,7 @@ export default function CatalogoProductosPage() {
         await createProduct(formData);
       }
       await loadProducts();
-      setShowAddModal(false);
-      setShowEditModal(false);
+      closeModal();
       setSelectedProduct(null);
     } catch (error) {
       console.error('Error:', error);
@@ -122,6 +137,8 @@ export default function CatalogoProductosPage() {
       });
   }, [activeTab, products, searchQuery]);
 
+  const modalTitle = selectedProduct ? 'Editar Producto' : 'Nuevo Producto';
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -130,11 +147,8 @@ export default function CatalogoProductosPage() {
           <p>Mantenimiento del catálogo de productos y tarjetas para clientes</p>
         </div>
         <div className={styles.headerActions}>
-          <button
-            className={`${styles.btn} ${styles.btnPrimary}`}
-            onClick={handleAdd}
-          >
-            <Plus size={18} /> Nuevo Producto
+          <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleAdd}>
+            <Plus size={16} /> Nuevo Producto
           </button>
           <button
             className={`${styles.btn} ${styles.btnSecondary}`}
@@ -146,22 +160,16 @@ export default function CatalogoProductosPage() {
       </div>
 
       <div className={styles.tabs}>
-        <button
-          className={`${styles.tab} ${activeTab === 'Productos' ? styles.tabActive : ''}`}
-          onClick={() => setActiveTab('Productos')}
-        >
+        <button className={`${styles.tab} ${activeTab === 'Productos' ? styles.tabActive : ''}`} onClick={() => setActiveTab('Productos')}>
           Productos
         </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'Tarjetas' ? styles.tabActive : ''}`}
-          onClick={() => setActiveTab('Tarjetas')}
-        >
+        <button className={`${styles.tab} ${activeTab === 'Tarjetas' ? styles.tabActive : ''}`} onClick={() => setActiveTab('Tarjetas')}>
           Tarjetas
         </button>
       </div>
 
       <div className={styles.searchBar}>
-        <Search size={18} className={styles.searchIcon} />
+        <Search size={16} className={styles.searchIcon} />
         <input
           type="text"
           className={styles.searchInput}
@@ -177,11 +185,7 @@ export default function CatalogoProductosPage() {
             <article key={product.id} className={styles.card}>
               <div className={styles.cardImageWrap}>
                 {product.publicUrl ? (
-                  <img
-                    src={product.publicUrl}
-                    alt={product.name}
-                    className={styles.cardImage}
-                  />
+                  <img src={product.publicUrl} alt={product.name} className={styles.cardImage} />
                 ) : (
                   <div className={styles.cardImagePlaceholder}>Sin imagen</div>
                 )}
@@ -189,14 +193,12 @@ export default function CatalogoProductosPage() {
 
               <div className={styles.cardBody}>
                 <h3>{product.name}</h3>
-                <p className={product.status === 'Activo' ? styles.statusActive : styles.statusInactive}>
-                  {product.status}
-                </p>
+                <p className={product.status === 'Activo' ? styles.statusActive : styles.statusInactive}>{product.status}</p>
                 <p className={styles.description}>{product.description || 'Sin descripción'}</p>
                 <div className={styles.cardFooter}>
                   <span>Modificado: {formatDate(product.updatedAt)}</span>
                   <button className={styles.iconBtn} onClick={() => handleEdit(product)}>
-                    <Pencil size={16} />
+                    <Pencil size={15} />
                   </button>
                 </div>
               </div>
@@ -205,57 +207,102 @@ export default function CatalogoProductosPage() {
         </div>
       ) : (
         <div className={styles.emptyState}>
-          <Package size={44} style={{ opacity: 0.5 }} />
+          <Package size={40} style={{ opacity: 0.5 }} />
           <h3>No se encontraron productos</h3>
         </div>
       )}
 
       <Modal
+        size="large"
         isOpen={showAddModal || showEditModal}
-        onClose={() => {
-          setShowAddModal(false);
-          setShowEditModal(false);
-        }}
-        title={selectedProduct ? 'Editar Producto' : 'Nuevo Producto'}
+        onClose={closeModal}
+        title={modalTitle}
         subtitle="Complete los campos para crear un producto del catálogo."
       >
         <ModalBody>
-          <div className={modalStyles.formSection}>
-            <div className={modalStyles.formGrid}>
-              <div className={modalStyles.formField}>
-                <label className={modalStyles.formLabel}>Código <span style={{ color: '#dc2626' }}>*</span></label>
-                <input type="text" className={modalStyles.formInput} placeholder="AHO-001" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} disabled={!!selectedProduct} />
-              </div>
-              <div className={modalStyles.formField}>
-                <label className={modalStyles.formLabel}>Categoría <span style={{ color: '#dc2626' }}>*</span></label>
-                <select className={modalStyles.formInput} value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
-                  <option value="">Seleccionar...</option>
-                  <option value="Productos">Productos</option>
-                  <option value="Tarjetas">Tarjetas</option>
-                </select>
-              </div>
+          <div className={styles.modalGrid}>
+            <div>
+              <label className={styles.modalLabel}>Imagen del Producto <span>*</span></label>
+              <p className={styles.modalHint}>Formatos aceptados: PNG, JPG</p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg"
+                className={styles.hiddenInput}
+                onChange={handleImagePick}
+              />
+              <button className={styles.uploadBox} onClick={() => fileInputRef.current?.click()}>
+                {previewImage ? (
+                  <img src={previewImage} alt="Preview" className={styles.uploadPreview} />
+                ) : (
+                  <UploadCloud size={30} className={styles.uploadIcon} />
+                )}
+                <div className={styles.uploadTitle}>Subir imagen</div>
+                <div className={styles.uploadSub}>PNG o JPG</div>
+              </button>
             </div>
-          </div>
-          <div className={modalStyles.formSection}>
-            <div className={modalStyles.formField}>
-              <label className={modalStyles.formLabel}>Nombre <span style={{ color: '#dc2626' }}>*</span></label>
-              <input type="text" className={modalStyles.formInput} placeholder="Ej. Aportaciones" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-            </div>
-          </div>
-          <div className={modalStyles.formSection}>
-            <div className={modalStyles.formField}>
-              <label className={modalStyles.formLabel}>Descripción <span style={{ color: '#dc2626' }}>*</span></label>
-              <textarea className={modalStyles.formInput} placeholder="Describa el producto..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} style={{ resize: 'vertical' }} />
+
+            <div className={styles.modalFormCol}>
+              <div className={modalStyles.formField}>
+                <label className={styles.modalLabel}>Nombre <span>*</span></label>
+                <input
+                  type="text"
+                  className={styles.modalInput}
+                  placeholder="Ej. Aportaciones"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+
+              <div className={modalStyles.formField}>
+                <label className={styles.modalLabel}>Descripción <span>*</span></label>
+                <textarea
+                  className={`${styles.modalInput} ${styles.modalTextarea}`}
+                  placeholder="Describa el producto..."
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={4}
+                />
+              </div>
+
+              <div className={styles.statusRow}>
+                <span className={styles.modalLabel}>Estado</span>
+                <label className={styles.switch}>
+                  <input
+                    type="checkbox"
+                    checked={formData.status === 'Activo'}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.checked ? 'Activo' : 'Inactivo' })}
+                  />
+                  <span className={styles.slider} />
+                  <span className={styles.switchText}>{formData.status === 'Activo' ? 'Habilitado' : 'Deshabilitado'}</span>
+                </label>
+              </div>
             </div>
           </div>
         </ModalBody>
         <ModalFooter>
-          <button className={`${modalStyles.btn} ${modalStyles.btnSecondary}`} onClick={() => { setShowAddModal(false); setShowEditModal(false); }}>Cancelar</button>
-          <button className={`${modalStyles.btn} ${modalStyles.btnPrimary}`} onClick={handleSave} disabled={!formData.code || !formData.name || !formData.category || isLoading}>{isLoading ? 'Guardando...' : 'Guardar cambios'}</button>
+          <button className={`${modalStyles.btn} ${modalStyles.btnSecondary}`} onClick={closeModal}>Cancelar</button>
+          <button
+            className={`${modalStyles.btn} ${modalStyles.btnPrimary}`}
+            onClick={handleSave}
+            disabled={!formData.name || !formData.description || isLoading}
+          >
+            {isLoading ? 'Guardando...' : 'Guardar cambios'}
+          </button>
         </ModalFooter>
       </Modal>
 
-      <ConfirmationModal isOpen={!!productToDelete} onClose={() => setProductToDelete(null)} onConfirm={handleDelete} title="¿Eliminar producto?" message={`¿Está seguro de eliminar el producto "${productToDelete?.name}"? Esta acción no se puede deshacer.`} type="danger" confirmText="Eliminar" cancelText="Cancelar" isLoading={isLoading} />
+      <ConfirmationModal
+        isOpen={!!productToDelete}
+        onClose={() => setProductToDelete(null)}
+        onConfirm={handleDelete}
+        title="¿Eliminar producto?"
+        message={`¿Está seguro de eliminar el producto "${productToDelete?.name}"? Esta acción no se puede deshacer.`}
+        type="danger"
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        isLoading={isLoading}
+      />
     </div>
   );
 }
