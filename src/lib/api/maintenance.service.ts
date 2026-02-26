@@ -9,6 +9,7 @@ export type {
   SecurityQuestion,
   SecurityImage,
   Product,
+  FinancialCorrespondent,
   MaintenanceAuditLog,
 } from './types/maintenance.types';
 
@@ -17,6 +18,7 @@ import type {
   SecurityQuestion,
   SecurityImage,
   Product,
+  FinancialCorrespondent,
   MaintenanceAuditLog,
 } from './types/maintenance.types';
 
@@ -546,6 +548,109 @@ export async function updateProduct(_id: string, _product: Partial<Product>): Pr
 
 export async function deleteProduct(_id: string): Promise<void> {
   throw new Error('La colección actual no incluye endpoint para eliminar productos.');
+}
+
+export async function getFinancialCorrespondents(params?: {
+  fromDate?: string;
+  toDate?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ data: FinancialCorrespondent[]; total: number }> {
+  try {
+    const headers = getAuthHeaders();
+    const payload = {
+      filters: {
+        etcxCreationDateFrom: params?.fromDate || '',
+        etcxCreationDateTo: params?.toDate || '',
+      },
+      pagination: {
+        page: params?.page ?? 1,
+        pageSize: params?.pageSize ?? 10,
+      },
+      request: buildContext('WEB'),
+    };
+
+    const response = await customAuthFetch<BackofficeEnvelope<any[]>>(`${API_URL}/corresponsal-list`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers,
+    });
+
+    const rows = assertProxySuccess(response, 'Error al obtener corresponsales financieros');
+    const normalized: FinancialCorrespondent[] = (rows || []).map((item: any) => ({
+      id: Number(item?.id ?? 0),
+      internalCode: String(item?.internalCode ?? ''),
+      codeSsf: String(item?.codeSsf ?? ''),
+      type: String(item?.type ?? ''),
+      name: String(item?.name ?? ''),
+      comercialName: String(item?.comercialName ?? ''),
+      assignmentDate: toIsoDate(item?.assignmentDate),
+      status: String(item?.status ?? ''),
+      terminationDate: item?.terminationDate ?? null,
+      terminationFlow: item?.terminationFlow ?? null,
+      nit: String(item?.nit ?? ''),
+      address: String(item?.address ?? ''),
+      municipality: String(item?.municipality ?? ''),
+      department: String(item?.department ?? ''),
+      coordinates: String(item?.coordinates ?? ''),
+      schedule: String(item?.schedule ?? ''),
+      districtCodePx: Number(item?.districtCodePx ?? 0),
+      districtCodeOr: Number(item?.districtCodeOr ?? 0),
+      creationUser: String(item?.creationUser ?? '-'),
+      creationDate: toIsoDate(item?.creationDate),
+      modifyUser: item?.modifyUser ?? null,
+      modifyDate: item?.modifyDate ? toIsoDate(item?.modifyDate) : null,
+    }));
+
+    const total = Number(response?.metadata?.filteredCount ?? normalized.length);
+    return { data: normalized, total };
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function createFinancialCorrespondent(correspondent: Partial<FinancialCorrespondent>): Promise<void> {
+  try {
+    const headers = getAuthHeaders();
+    const payload = {
+      ...buildContext('WEB'),
+      data: {
+        internalCode: correspondent.internalCode || '',
+        codeSsf: correspondent.codeSsf || '',
+        type: correspondent.type || 'J',
+        name: correspondent.name || '',
+        comercialName: correspondent.comercialName || '',
+        assignmentDate: correspondent.assignmentDate || new Date().toISOString().split('T')[0],
+        status: correspondent.status || 'A',
+        terminationDate: correspondent.terminationDate || '',
+        terminationFlow: correspondent.terminationFlow || '',
+        nit: correspondent.nit || '',
+        address: correspondent.address || '',
+        municipality: correspondent.municipality || '',
+        department: correspondent.department || '',
+        coordinates: correspondent.coordinates || '',
+        schedule: correspondent.schedule || '',
+        districtCodePx: correspondent.districtCodePx ?? 0,
+        districtCodeOr: correspondent.districtCodeOr ?? 0,
+        creationUser: correspondent.creationUser || getRequestUser(),
+        creationDate: correspondent.creationDate || new Date().toISOString().split('T')[0],
+        modifyUser: correspondent.modifyUser || getRequestUser(),
+        modifyDate: correspondent.modifyDate || new Date().toISOString().split('T')[0],
+      },
+    };
+
+    const response = await customAuthFetch<BackofficeEnvelope<any>>(`${API_URL}/create`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers,
+    });
+
+    if (response?.result && response.result.code !== 0) {
+      throw new Error(response.result.message || 'No fue posible crear el corresponsal');
+    }
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 }
 
 export async function getAuditLog(): Promise<{ data: MaintenanceAuditLog[]; total: number }> {

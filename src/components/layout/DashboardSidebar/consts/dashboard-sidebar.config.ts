@@ -53,7 +53,7 @@ export const sidebarItems: Item[] = [
       { label: "Red Transfer365", href: "/dashboard/mantenimiento/transfer365" },
       {
         label: "Corresponsales Financieros",
-        href: "/dashboard/reportes/corresponsales-financieros",
+        href: "/dashboard/mantenimiento/corresponsales-financieros",
       },
       {
         label: "Token",
