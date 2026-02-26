@@ -15,13 +15,19 @@ export default function CuestionarioSeguridadPage() {
   const [total, setTotal] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<SecurityQuestion | null>(null);
   const [questionToDelete, setQuestionToDelete] = useState<SecurityQuestion | null>(null);
-  
-  const [formData, setFormData] = useState({ code: '', question: '', status: 'Activo' as 'Activo' | 'Inactivo' });
+
+  const [formData, setFormData] = useState({
+    code: '',
+    question: '',
+    fields: 'digitar',
+    sqlParametrization: '',
+    status: 'Activo' as 'Activo' | 'Inactivo',
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const pageSize = 20;
@@ -42,14 +48,26 @@ export default function CuestionarioSeguridadPage() {
     }
   };
 
+  const closeModal = () => {
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setSelectedQuestion(null);
+  };
+
   const handleAdd = () => {
-    setFormData({ code: '', question: '', status: 'Activo' });
+    setFormData({ code: '', question: '', fields: 'digitar', sqlParametrization: '', status: 'Activo' });
     setShowAddModal(true);
   };
 
   const handleEdit = (question: SecurityQuestion) => {
     setSelectedQuestion(question);
-    setFormData({ code: question.code, question: question.question, status: question.status });
+    setFormData({
+      code: question.code,
+      question: question.question,
+      fields: question.fields || 'digitar',
+      sqlParametrization: question.sqlParametrization || '',
+      status: question.status,
+    });
     setShowEditModal(true);
   };
 
@@ -62,9 +80,7 @@ export default function CuestionarioSeguridadPage() {
         await createSecurityQuestion(formData);
       }
       await loadQuestions();
-      setShowAddModal(false);
-      setShowEditModal(false);
-      setSelectedQuestion(null);
+      closeModal();
       setErrorMessage(null);
     } catch (error) {
       console.error('Error:', error);
@@ -135,6 +151,7 @@ export default function CuestionarioSeguridadPage() {
                 <tr>
                   <th>ID</th>
                   <th>Pregunta</th>
+                  <th>Campos</th>
                   <th>Estado</th>
                   <th>Creación</th>
                   <th>Modificación</th>
@@ -146,13 +163,14 @@ export default function CuestionarioSeguridadPage() {
                   <tr key={question.id}>
                     <td>{question.code}</td>
                     <td>{question.question}</td>
+                    <td>{question.fields || 'digitar'}</td>
                     <td><span className={`${styles.statusBadge} ${question.status === 'Activo' ? styles.statusActive : styles.statusInactive}`}>{question.status}</span></td>
                     <td>
                       <div style={{ fontSize: '13px' }}>{question.createdBy}</div>
                       <div style={{ fontSize: '12px', color: '#6b7280' }}>{formatDate(question.createdAt)}</div>
                     </td>
                     <td>
-                      <div style={{ fontSize: '13px' }}>{question.modifiedBy}</div>
+                      <div style={{ fontSize: '13px' }}>{question.modifiedBy || '-'}</div>
                       <div style={{ fontSize: '12px', color: '#6b7280' }}>{formatDate(question.modifiedAt)}</div>
                     </td>
                     <td>
@@ -182,13 +200,20 @@ export default function CuestionarioSeguridadPage() {
         )}
       </div>
 
-      <Modal isOpen={showAddModal || showEditModal} onClose={() => { setShowAddModal(false); setShowEditModal(false); }} title={selectedQuestion ? 'Editar Pregunta' : 'Nueva Pregunta'} subtitle="Complete la información de la pregunta de seguridad.">
+      <Modal isOpen={showAddModal || showEditModal} onClose={closeModal} title={selectedQuestion ? 'Editar Pregunta' : 'Nueva Pregunta'} subtitle="Complete la información de la pregunta de seguridad.">
         <ModalBody>
           <div className={modalStyles.formSection}>
             <div className={modalStyles.formGrid}>
               <div className={modalStyles.formField}>
                 <label className={modalStyles.formLabel}>Código <span style={{ color: '#dc2626' }}>*</span></label>
                 <input type="text" className={modalStyles.formInput} placeholder="0001" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} disabled={!!selectedQuestion} />
+              </div>
+              <div className={modalStyles.formField}>
+                <label className={modalStyles.formLabel}>Tipo de campo</label>
+                <select className={modalStyles.formInput} value={formData.fields} onChange={(e) => setFormData({ ...formData, fields: e.target.value })}>
+                  <option value="digitar">Digitar</option>
+                  <option value="seleccionar">Seleccionar</option>
+                </select>
               </div>
               <div className={modalStyles.formField}>
                 <label className={modalStyles.formLabel}>Estado</label>
@@ -199,15 +224,23 @@ export default function CuestionarioSeguridadPage() {
               </div>
             </div>
           </div>
+
           <div className={modalStyles.formSection}>
             <div className={modalStyles.formField}>
               <label className={modalStyles.formLabel}>Pregunta <span style={{ color: '#dc2626' }}>*</span></label>
-              <textarea className={modalStyles.formInput} placeholder="¿Cuál es tu pregunta de seguridad?" value={formData.question} onChange={(e) => setFormData({ ...formData, question: e.target.value })} rows={3} style={{ resize: 'vertical' }} />
+              <textarea className={modalStyles.formInput} placeholder="Escribe la pregunta de seguridad" value={formData.question} onChange={(e) => setFormData({ ...formData, question: e.target.value })} rows={3} style={{ resize: 'vertical' }} />
+            </div>
+          </div>
+
+          <div className={modalStyles.formSection}>
+            <div className={modalStyles.formField}>
+              <label className={modalStyles.formLabel}>SQL de Parametrización</label>
+              <textarea className={modalStyles.formInput} placeholder="SELECT SUBSTR(...) AS ..." value={formData.sqlParametrization} onChange={(e) => setFormData({ ...formData, sqlParametrization: e.target.value })} rows={4} style={{ resize: 'vertical' }} />
             </div>
           </div>
         </ModalBody>
         <ModalFooter>
-          <button className={`${modalStyles.btn} ${modalStyles.btnSecondary}`} onClick={() => { setShowAddModal(false); setShowEditModal(false); }}>Cancelar</button>
+          <button className={`${modalStyles.btn} ${modalStyles.btnSecondary}`} onClick={closeModal}>Cancelar</button>
           <button className={`${modalStyles.btn} ${modalStyles.btnPrimary}`} onClick={handleSave} disabled={!formData.code || !formData.question || isLoading}>{isLoading ? 'Guardando...' : selectedQuestion ? 'Actualizar' : 'Crear Pregunta'}</button>
         </ModalFooter>
       </Modal>

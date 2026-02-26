@@ -17,6 +17,7 @@ export interface SecurityQuestion {
   code: string;
   question: string;
   fields: string;
+  sqlParametrization?: string;
   status: 'Activo' | 'Inactivo';
   createdBy: string;
   createdAt: string;
