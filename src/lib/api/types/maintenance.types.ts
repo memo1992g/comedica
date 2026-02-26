@@ -28,12 +28,15 @@ export interface SecurityImage {
   id: string;
   name: string;
   type: 'mobile' | 'desktop';
+  clazz?: 'APP' | 'WEB';
   filename: string;
   uploadedAt: string;
   uploadedBy: string;
   size: string;
   dimensions: string;
   url: string;
+  status?: 'Activo' | 'Inactivo';
+  description?: string;
 }
 
 export interface Product {
