@@ -1,6 +1,7 @@
 export type SubItem = {
   label: string;
-  href: string;
+  href?: string;
+  children?: SubItem[];
 };
 
 export type Item = {
@@ -45,24 +46,46 @@ export const sidebarItems: Item[] = [
   },
   {
     label: "Mantenimiento de",
-    href: "/dashboard/mantenimiento/atencion-soporte",
+    href: "/dashboard/mantenimiento/transfer365",
     basePath: "/dashboard/mantenimiento",
     icon: iconMantenimiento,
     children: [
-      {
-        label: "Atención y Soporte",
-        href: "/dashboard/mantenimiento/atencion-soporte",
-      },
-      {
-        label: "Cuestionario de Seguridad para Soporte Telefónico",
-        href: "/dashboard/mantenimiento/cuestionario-seguridad",
-      },
-      { label: "Imágenes", href: "/dashboard/mantenimiento/imagenes" },
-      {
-        label: "Catálogo de productos",
-        href: "/dashboard/mantenimiento/catalogo-productos",
-      },
       { label: "Red Transfer365", href: "/dashboard/mantenimiento/transfer365" },
+      {
+        label: "Corresponsales Financieros",
+        href: "/dashboard/reportes/corresponsales-financieros",
+      },
+      {
+        label: "Token",
+        href: "/dashboard/parametros/solicitud-soft-token",
+      },
+      {
+        label: "Seguridad y soporte",
+        children: [
+          {
+            label: "Atención y Soporte",
+            href: "/dashboard/mantenimiento/atencion-soporte",
+          },
+          {
+            label: "Cuestionario de Seguridad para Soporte Telefónico",
+            href: "/dashboard/mantenimiento/cuestionario-seguridad",
+          },
+          {
+            label: "Quejas y Reclamos",
+            href: "/dashboard/gestiones/reclamos",
+          },
+        ],
+      },
+      {
+        label: "Multimedia",
+        children: [
+          { label: "Imágenes de seguridad", href: "/dashboard/mantenimiento/imagenes" },
+          {
+            label: "Catálogo de productos",
+            href: "/dashboard/mantenimiento/catalogo-productos",
+          },
+        ],
+      },
     ],
   },
   {
@@ -95,7 +118,7 @@ export const sidebarItems: Item[] = [
     href: "/dashboard/gestiones/punto-express",
     basePath: "/dashboard/gestiones",
     icon: iconGestiones,
-    children: [      
+    children: [
       { label: "Corresponsales", href: "/dashboard/gestiones/corresponsales" },
       { label: "Reclamos", href: "/dashboard/gestiones/reclamos" },
       { label: "Transacciones", href: "/dashboard/gestiones/transacciones" },
@@ -108,7 +131,7 @@ export const sidebarItems: Item[] = [
     children: [
       { label: "Soporte a usuarios", href: "/dashboard/usuarios/soporte-usuarios" },
       { label: "Consulta de usuarios", href: "/dashboard/usuarios/consulta-usuarios" },
-      { label: "Envío de notificaciones", href: "/dashboard/usuarios/notificaciones" },      
+      { label: "Envío de notificaciones", href: "/dashboard/usuarios/notificaciones" },
     ],
   },
 ];
