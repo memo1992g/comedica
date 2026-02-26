@@ -1,6 +1,7 @@
 export type SubItem = {
   label: string;
   href: string;
+  children?: SubItem[];
 };
 
 export type Item = {
@@ -49,20 +50,43 @@ export const sidebarItems: Item[] = [
     basePath: "/dashboard/mantenimiento",
     icon: iconMantenimiento,
     children: [
-      {
-        label: "Atención y Soporte",
-        href: "/dashboard/mantenimiento/atencion-soporte",
-      },
-      {
-        label: "Cuestionario de Seguridad para Soporte Telefónico",
-        href: "/dashboard/mantenimiento/cuestionario-seguridad",
-      },
-      { label: "Imágenes", href: "/dashboard/mantenimiento/imagenes" },
-      {
-        label: "Catálogo de productos",
-        href: "/dashboard/mantenimiento/catalogo-productos",
-      },
       { label: "Red Transfer365", href: "/dashboard/mantenimiento/transfer365" },
+      {
+        label: "Corresponsales Financieros",
+        href: "/dashboard/reportes/corresponsales-financieros",
+      },
+      {
+        label: "Token",
+        href: "/dashboard/parametros/solicitud-soft-token",
+      },
+      {
+        label: "Seguridad y soporte",
+        href: "/dashboard/mantenimiento/atencion-soporte",
+        children: [
+          {
+            label: "Atención y Soporte",
+            href: "/dashboard/mantenimiento/atencion-soporte",
+          },
+          {
+            label: "Cuestionario de Seguridad para Soporte Telefónico",
+            href: "/dashboard/mantenimiento/cuestionario-seguridad",
+          },
+        ],
+      },
+      {
+        label: "Multimedia",
+        href: "/dashboard/mantenimiento/imagenes",
+        children: [
+          {
+            label: "Imágenes de seguridad",
+            href: "/dashboard/mantenimiento/imagenes",
+          },
+          {
+            label: "Catálogo de productos",
+            href: "/dashboard/mantenimiento/catalogo-productos",
+          },
+        ],
+      },
     ],
   },
   {

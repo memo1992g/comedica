@@ -43,6 +43,7 @@ export interface Product {
   description: string;
   status: 'Activo' | 'Inactivo';
   category: string;
+  publicUrl?: string;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
