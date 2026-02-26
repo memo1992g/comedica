@@ -17,6 +17,7 @@ export interface SecurityQuestion {
   code: string;
   question: string;
   fields: string;
+  sqlParametrization?: string;
   status: 'Activo' | 'Inactivo';
   createdBy: string;
   createdAt: string;
@@ -28,12 +29,15 @@ export interface SecurityImage {
   id: string;
   name: string;
   type: 'mobile' | 'desktop';
+  clazz?: 'APP' | 'WEB';
   filename: string;
   uploadedAt: string;
   uploadedBy: string;
   size: string;
   dimensions: string;
   url: string;
+  status?: 'Activo' | 'Inactivo';
+  description?: string;
 }
 
 export interface Product {
@@ -43,6 +47,7 @@ export interface Product {
   description: string;
   status: 'Activo' | 'Inactivo';
   category: string;
+  publicUrl?: string;
   createdAt: string;
   createdBy: string;
   updatedAt: string;

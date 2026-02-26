@@ -106,7 +106,9 @@ function statusFromNumber(status?: number | null): 'Activo' | 'Inactivo' {
 }
 
 function statusFromLetter(status?: string | null): 'Activo' | 'Inactivo' {
-  return status === 'A' ? 'Activo' : 'Inactivo';
+  if (status === 'A') return 'Activo';
+  if (status === 'I') return 'Inactivo';
+  return 'Activo';
 }
 
 function statusToNumber(status?: 'Activo' | 'Inactivo'): number {
@@ -159,6 +161,7 @@ function normalizeSecurityQuestion(item: any): SecurityQuestion {
     code: item?.code ?? fallbackCode,
     question: item?.questionText ?? item?.question ?? '',
     fields: item?.fields ?? '',
+    sqlParametrization: item?.sqlText ?? item?.sqlParametrization ?? item?.sql ?? '',
     status: statusFromNumber(item?.status),
     createdBy: item?.createdBy ?? '-',
     createdAt: toIsoDate(item?.createdAt),
@@ -167,14 +170,24 @@ function normalizeSecurityQuestion(item: any): SecurityQuestion {
   };
 }
 
+
+function normalizeProductName(value?: string | null): string {
+  if (!value) return '';
+  const compact = value.replace(/_/g, ' ').trim().toLowerCase();
+  return compact.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function normalizeProduct(item: any, module: 'AH' | 'TC'): Product {
+  const normalizedName = normalizeProductName(item?.name ?? item?.productType ?? '');
+
   return {
     id: String(item?.id ?? item?.code ?? item?.productType ?? ''),
     code: item?.code ?? item?.productType ?? '',
-    name: item?.name ?? item?.productType ?? '',
-    description: item?.description ?? item?.details ?? item?.productType ?? '',
+    name: normalizedName || item?.productType || '',
+    description: item?.description ?? item?.details ?? normalizedName ?? '',
     status: item?.status !== undefined ? statusFromNumber(item?.status) : statusFromLetter(item?.estado),
     category: module === 'TC' ? 'Tarjetas' : 'Productos',
+    publicUrl: item?.publicUrl ?? item?.url ?? '',
     createdAt: toIsoDate(item?.createdAt),
     createdBy: item?.createdBy ?? '-',
     updatedAt: toIsoDate(item?.updatedAt),
@@ -182,21 +195,43 @@ function normalizeProduct(item: any, module: 'AH' | 'TC'): Product {
   };
 }
 
-function normalizeSecurityImage(item: any, typeFallback: 'mobile' | 'desktop', clazz: 'P' | 'I'): SecurityImage {
-  const inferredType: 'mobile' | 'desktop' = item?.type === 'desktop' || item?.module === 'TC' ? 'desktop' : typeFallback;
-  const kind = clazz === 'I' ? 'inicio' : 'seguridad';
+function normalizeSecurityImage(item: any, clazz: 'APP' | 'WEB'): SecurityImage {
+  const type: 'mobile' | 'desktop' = clazz === 'WEB' ? 'desktop' : 'mobile';
+  const fileUrl = item?.publicUrl ?? item?.url ?? '';
+  const filename = item?.filename ?? (typeof fileUrl === 'string' ? fileUrl.split('/').pop() : '') ?? '';
 
   return {
-    id: String(item?.id ?? `${item?.productType ?? item?.name ?? 'img'}-${kind}-${inferredType}`),
-    name: item?.name ?? item?.productType ?? (clazz === 'I' ? 'Imagen de inicio de sesión' : 'Imagen de seguridad'),
-    type: inferredType,
-    filename: item?.filename ?? `${item?.productType ?? kind}.png`,
+    id: String(item?.id ?? `${clazz}-${item?.productType ?? 'SEGURIDAD'}`),
+    name: item?.name ?? item?.productType ?? 'Seguridad',
+    type,
+    clazz,
+    filename,
     uploadedAt: toIsoDate(item?.uploadedAt ?? item?.updatedAt ?? item?.createdAt),
     uploadedBy: item?.uploadedBy ?? item?.updatedBy ?? '-',
     size: item?.size ?? '-',
-    dimensions: item?.dimensions ?? '-',
-    url: item?.url ?? '',
+    dimensions: item?.dimensions ?? (clazz === 'WEB' ? '860x120px' : '448x102px'),
+    url: fileUrl,
+    status: item?.status !== undefined ? statusFromNumber(item?.status) : statusFromLetter(item?.estado),
+    description: item?.description ?? 'Información de seguridad en Comédica en Línea y Móvil',
   };
+}
+
+async function fetchSecurityImagesByClazz(clazz: 'APP' | 'WEB'): Promise<SecurityImage[]> {
+  const headers = getAuthHeaders();
+  const params = new URLSearchParams({ module: 'SEC', clazz, productType: 'SEGURIDAD' });
+
+  const response = await customAuthFetch<BackofficeEnvelope<any> | any[]>(
+    `${API_URL}/get-image?${params.toString()}`,
+    { method: 'GET', headers },
+  );
+
+  const payload: any[] = Array.isArray(response)
+    ? response
+    : Array.isArray((response as any)?.data)
+      ? (response as any).data
+      : ((response as any)?.data ? [(response as any).data] : []);
+
+  return payload.map((item: any) => normalizeSecurityImage(item, clazz));
 }
 
 function getPagedResult<T>(items: T[], page = 1, pageSize = 20) {
@@ -223,20 +258,6 @@ async function fetchProductsByModule(module: 'AH' | 'TC') {
 
   const data = assertProxySuccess(response, `Error al obtener catálogo (${module})`);
   return data.map((item) => normalizeProduct(item, module));
-}
-
-async function fetchImagesByTypeAndClazz(type: 'mobile' | 'desktop', clazz: 'P' | 'I') {
-  const headers = getAuthHeaders();
-  const moduleCode = type === 'desktop' ? 'TC' : 'AH';
-  const defaultProduct = type === 'desktop' ? 'TARJETAS' : 'AHORRO PERSONAL';
-  const params = new URLSearchParams({ module: moduleCode, clazz, productType: defaultProduct });
-
-  const response = await customAuthFetch<any[]>(
-    `${API_URL}/get-pimage?${params.toString()}`,
-    { method: "GET", headers },
-  );
-
-  return (response || []).map((item) => normalizeSecurityImage(item, type, clazz));
 }
 
 export async function getSupportReasons(params?: {
@@ -380,8 +401,8 @@ export async function createSecurityQuestion(question: Partial<SecurityQuestion>
         data: {
           code: question.code,
           questionText: question.question,
-          sqlText: null,
-          fields: question.fields || 'texto',
+          sqlText: question.sqlParametrization || null,
+          fields: question.fields || 'digitar',
           status: statusToNumber(question.status),
         },
       }),
@@ -403,8 +424,8 @@ export async function updateSecurityQuestion(id: string, question: Partial<Secur
         data: {
           code: question.code,
           questionText: question.question,
-          sqlText: null,
-          fields: question.fields || 'texto',
+          sqlText: question.sqlParametrization || null,
+          fields: question.fields || 'digitar',
           status: statusToNumber(question.status),
         },
       }),
@@ -431,22 +452,17 @@ export async function deleteSecurityQuestion(id: string): Promise<void> {
 
 export async function getSecurityImages(type?: 'mobile' | 'desktop'): Promise<SecurityImage[]> {
   try {
-    if (type) {
-      const [security, login] = await Promise.all([
-        fetchImagesByTypeAndClazz(type, 'P'),
-        fetchImagesByTypeAndClazz(type, 'I'),
-      ]);
-      return [...security, ...login];
-    }
-
-    const [mobileSecurity, mobileLogin, desktopSecurity, desktopLogin] = await Promise.all([
-      fetchImagesByTypeAndClazz('mobile', 'P'),
-      fetchImagesByTypeAndClazz('mobile', 'I'),
-      fetchImagesByTypeAndClazz('desktop', 'P'),
-      fetchImagesByTypeAndClazz('desktop', 'I'),
+    const [appImages, webImages] = await Promise.all([
+      fetchSecurityImagesByClazz('APP'),
+      fetchSecurityImagesByClazz('WEB'),
     ]);
 
-    return [...mobileSecurity, ...mobileLogin, ...desktopSecurity, ...desktopLogin];
+    const images = [...appImages, ...webImages];
+    if (!type) {
+      return images;
+    }
+
+    return images.filter((item) => item.type === type);
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }
@@ -457,11 +473,11 @@ export async function uploadSecurityImage(image: Partial<SecurityImage>): Promis
     const headers = getAuthHeaders();
     headers['X-User'] = 'admin-test';
 
-    const clazz: 'P' | 'I' = image.filename ? 'I' : 'P';
+    const clazz: 'APP' | 'WEB' = image.type === 'desktop' ? 'WEB' : 'APP';
     const params = new URLSearchParams({
-      module: image.type === 'desktop' ? 'TC' : 'AH',
+      module: 'SEC',
       clazz,
-      productType: image.name || '',
+      productType: 'SEGURIDAD',
     });
 
     await customAuthFetch(`${API_URL}/update-pimage?${params.toString()}`, {
@@ -478,9 +494,9 @@ export async function deleteSecurityImage(id: string): Promise<void> {
     const headers = getAuthHeaders();
     headers['X-User'] = 'admin-test';
     const params = new URLSearchParams({
-      module: 'AH',
-      clazz: 'I',
-      productType: id,
+      module: 'SEC',
+      clazz: 'APP',
+      productType: id || 'SEGURIDAD',
     });
 
     await customAuthFetch(`${API_URL}/delete-pimage?${params.toString()}`, {
