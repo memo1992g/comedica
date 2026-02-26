@@ -1,21 +1,38 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Image as ImageIcon, Monitor, Smartphone } from 'lucide-react';
-import { getSecurityImages, uploadSecurityImage, deleteSecurityImage, type SecurityImage } from '@/lib/api/maintenance.service';
+import { Plus, Pencil, Search, Package, UploadCloud } from 'lucide-react';
+import { getSecurityImages, uploadSecurityImage, type SecurityImage } from '@/lib/api/maintenance.service';
 import { Modal, ModalBody, ModalFooter } from '@/components/parametros/Modal';
-import { ConfirmationModal } from '@/components/parametros/ConfirmationModal';
 import modalStyles from '@/components/parametros/Modal.module.css';
-import styles from '../atencion-soporte/page.module.css';
+import styles from './page.module.css';
+
+function formatDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '-';
+  return date.toLocaleDateString('es-SV');
+}
 
 export default function ImagenesPage() {
   const router = useRouter();
+  const desktopInputRef = useRef<HTMLInputElement | null>(null);
+  const mobileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [images, setImages] = useState<SecurityImage[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'APP' | 'WEB'>('APP');
+
   const [showAddModal, setShowAddModal] = useState(false);
-  const [imageToDelete, setImageToDelete] = useState<SecurityImage | null>(null);
-  
-  const [formData, setFormData] = useState({ name: '', type: 'mobile' as 'mobile' | 'desktop', filename: '', size: '256 KB', dimensions: '1080x1920' });
+  const [selectedImage, setSelectedImage] = useState<SecurityImage | null>(null);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    status: 'Activo' as 'Activo' | 'Inactivo',
+  });
+  const [desktopPreview, setDesktopPreview] = useState('');
+  const [mobilePreview, setMobilePreview] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -31,15 +48,49 @@ export default function ImagenesPage() {
     }
   };
 
-  const handleAdd = () => {
-    setFormData({ name: '', type: 'mobile', filename: '', size: '256 KB', dimensions: '1080x1920' });
+  const openAddModal = () => {
+    setSelectedImage(null);
+    setFormData({ name: '', description: '', status: 'Activo' });
+    setDesktopPreview('');
+    setMobilePreview('');
     setShowAddModal(true);
+  };
+
+  const openEditModal = (image: SecurityImage) => {
+    setSelectedImage(image);
+    setFormData({
+      name: image.name,
+      description: image.description || 'Información de seguridad en Comédica en Línea y Móvil',
+      status: image.status ?? 'Activo',
+    });
+    if (image.clazz === 'WEB') {
+      setDesktopPreview(image.url);
+      setMobilePreview('');
+    } else {
+      setMobilePreview(image.url);
+      setDesktopPreview('');
+    }
+    setShowAddModal(true);
+  };
+
+  const handlePickDesktop = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) setDesktopPreview(URL.createObjectURL(file));
+  };
+
+  const handlePickMobile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) setMobilePreview(URL.createObjectURL(file));
   };
 
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      await uploadSecurityImage(formData);
+      await uploadSecurityImage({
+        name: formData.name,
+        type: activeTab === 'WEB' ? 'desktop' : 'mobile',
+        filename: formData.name,
+      });
       await loadImages();
       setShowAddModal(false);
     } catch (error) {
@@ -49,138 +100,147 @@ export default function ImagenesPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!imageToDelete) return;
-    setIsLoading(true);
-    try {
-      await deleteSecurityImage(imageToDelete.id);
-      await loadImages();
-      setImageToDelete(null);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const filteredImages = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return images
+      .filter((image) => (image.clazz ?? 'APP') === activeTab)
+      .filter((image) => {
+        if (!query) return true;
+        return (
+          image.name.toLowerCase().includes(query) ||
+          (image.description ?? '').toLowerCase().includes(query)
+        );
+      });
+  }, [activeTab, images, searchQuery]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  };
-
-  const mobileImages = images.filter(img => img.type === 'mobile');
-  const desktopImages = images.filter(img => img.type === 'desktop');
+  const modalTitle = selectedImage ? 'Editar Imagen de Seguridad' : 'Nueva Imagen de Seguridad';
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1>Imágenes de Seguridad</h1>
-          <p>Gestión de imágenes para aplicaciones móviles y desktop</p>
+          <h1>Imágenes</h1>
+          <p>Administración de la galería de imágenes para validación y control</p>
         </div>
         <div className={styles.headerActions}>
-          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/dashboard/mantenimiento/imagenes/historial')}>Historial</button>
-          <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleAdd}><Plus size={18} />Cargar Imagen</button>
+          <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={openAddModal}>
+            <Plus size={16} /> Nueva Imagen
+          </button>
+          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => router.push('/dashboard/mantenimiento/imagenes/historial')}>
+            Historial
+          </button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-        {/* Mobile */}
-        <div className={styles.panel}>
-          <div style={{ padding: '16px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Smartphone size={20} style={{ color: '#233269' }} />
-            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>Versión Mobile</h3>
-          </div>
-          {mobileImages.map((img) => (
-            <div key={img.id} style={{ padding: '16px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: '4px' }}>{img.name}</div>
-                <div style={{ fontSize: '13px', color: '#6b7280' }}>
-                  {img.dimensions} • {img.size}
-                </div>
-                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
-                  {formatDate(img.uploadedAt)} por {img.uploadedBy}
-                </div>
-              </div>
-              <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => setImageToDelete(img)}>
-                <Trash2 size={16} />
-              </button>
-            </div>
-          ))}
-          {mobileImages.length === 0 && (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
-              <ImageIcon size={40} style={{ opacity: 0.5, margin: '0 auto 8px' }} />
-              <div>No hay imágenes mobile</div>
-            </div>
-          )}
-        </div>
-
-        {/* Desktop */}
-        <div className={styles.panel}>
-          <div style={{ padding: '16px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Monitor size={20} style={{ color: '#233269' }} />
-            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>Versión Desktop</h3>
-          </div>
-          {desktopImages.map((img) => (
-            <div key={img.id} style={{ padding: '16px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, marginBottom: '4px' }}>{img.name}</div>
-                <div style={{ fontSize: '13px', color: '#6b7280' }}>
-                  {img.dimensions} • {img.size}
-                </div>
-                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
-                  {formatDate(img.uploadedAt)} por {img.uploadedBy}
-                </div>
-              </div>
-              <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => setImageToDelete(img)}>
-                <Trash2 size={16} />
-              </button>
-            </div>
-          ))}
-          {desktopImages.length === 0 && (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
-              <ImageIcon size={40} style={{ opacity: 0.5, margin: '0 auto 8px' }} />
-              <div>No hay imágenes desktop</div>
-            </div>
-          )}
-        </div>
+      <div className={styles.tabs}>
+        <button className={`${styles.tab} ${activeTab === 'APP' ? styles.tabActive : ''}`} onClick={() => setActiveTab('APP')}>
+          Imágenes de Seguridad
+        </button>
+        <button className={`${styles.tab} ${activeTab === 'WEB' ? styles.tabActive : ''}`} onClick={() => setActiveTab('WEB')}>
+          Imágenes de Inicio Web
+        </button>
       </div>
 
-      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Nueva Imagen de Seguridad" subtitle="Complete los campos para crear una imagen de seguridad.">
+      <div className={styles.searchBar}>
+        <Search size={16} className={styles.searchIcon} />
+        <input
+          className={styles.searchInput}
+          placeholder="Buscar por nombre o descripción"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {filteredImages.length > 0 ? (
+        <div className={styles.grid}>
+          {filteredImages.map((image) => (
+            <article key={image.id} className={styles.card}>
+              <div className={styles.cardImageWrap}>
+                {image.url ? (
+                  <img src={image.url} alt={image.name} className={styles.cardImage} />
+                ) : (
+                  <div className={styles.cardImagePlaceholder}>Sin imagen</div>
+                )}
+              </div>
+              <div className={styles.cardBody}>
+                <h3>{image.name}</h3>
+                <p className={styles.statusActive}>{image.status ?? 'Activo'}</p>
+                <p className={styles.description}>{image.description ?? 'Información de seguridad en Comédica en Línea y Móvil'}</p>
+                <div className={styles.cardFooter}>
+                  <span>Modificado: {formatDate(image.uploadedAt)}</span>
+                  <button className={styles.iconBtn} onClick={() => openEditModal(image)}>
+                    <Pencil size={15} />
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className={styles.emptyState}>
+          <Package size={40} style={{ opacity: 0.5 }} />
+          <h3>No se encontraron imágenes</h3>
+        </div>
+      )}
+
+      <Modal
+        size="large"
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title={modalTitle}
+        subtitle="Complete los campos para crear una imagen de seguridad."
+      >
         <ModalBody>
-          <div className={modalStyles.formSection}>
-            <div className={modalStyles.formField}>
-              <label className={modalStyles.formLabel}>Tipo <span style={{ color: '#dc2626' }}>*</span></label>
-              <select className={modalStyles.formInput} value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value as 'mobile' | 'desktop', dimensions: e.target.value === 'mobile' ? '1080x1920' : '1920x1080' })}>
-                <option value="mobile">Mobile (1080x1920)</option>
-                <option value="desktop">Desktop (1920x1080)</option>
-              </select>
+          <div className={styles.modalGrid}>
+            <div className={styles.uploadColumn}>
+              <div>
+                <label className={styles.modalLabel}>Versión Desktop</label>
+                <p className={styles.modalHint}>Dimensiones recomendadas: 860x120px</p>
+                <input ref={desktopInputRef} className={styles.hiddenInput} type="file" accept="image/png,image/jpeg" onChange={handlePickDesktop} />
+                <button className={styles.uploadBox} onClick={() => desktopInputRef.current?.click()}>
+                  {desktopPreview ? <img src={desktopPreview} alt="Desktop preview" className={styles.uploadPreview} /> : <UploadCloud size={28} className={styles.uploadIcon} />}
+                  <div className={styles.uploadTitle}>Subir versión Desktop</div>
+                  <div className={styles.uploadSub}>PNG o JPG</div>
+                </button>
+              </div>
+
+              <div>
+                <label className={styles.modalLabel}>Versión Mobile</label>
+                <p className={styles.modalHint}>Dimensiones recomendadas: 448x102px</p>
+                <input ref={mobileInputRef} className={styles.hiddenInput} type="file" accept="image/png,image/jpeg" onChange={handlePickMobile} />
+                <button className={styles.uploadBox} onClick={() => mobileInputRef.current?.click()}>
+                  {mobilePreview ? <img src={mobilePreview} alt="Mobile preview" className={styles.uploadPreview} /> : <UploadCloud size={28} className={styles.uploadIcon} />}
+                  <div className={styles.uploadTitle}>Subir versión Mobile</div>
+                  <div className={styles.uploadSub}>PNG o JPG</div>
+                </button>
+              </div>
             </div>
-          </div>
-          <div className={modalStyles.formSection}>
-            <div className={modalStyles.formField}>
-              <label className={modalStyles.formLabel}>Nombre <span style={{ color: '#dc2626' }}>*</span></label>
-              <input type="text" className={modalStyles.formInput} placeholder="Ej. Escudo Protector" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+
+            <div className={styles.formColumn}>
+              <div className={modalStyles.formField}>
+                <label className={styles.modalLabel}>Nombre <span>*</span></label>
+                <input className={styles.modalInput} placeholder="Ej. Escudo Protector" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+              </div>
+              <div className={modalStyles.formField}>
+                <label className={styles.modalLabel}>Descripción <span>*</span></label>
+                <textarea className={`${styles.modalInput} ${styles.modalTextarea}`} placeholder="Describa el propósito de esta imagen..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+              </div>
+              <div className={styles.statusRow}>
+                <span className={styles.modalLabel}>Estado</span>
+                <label className={styles.switch}>
+                  <input type="checkbox" checked={formData.status === 'Activo'} onChange={(e) => setFormData({ ...formData, status: e.target.checked ? 'Activo' : 'Inactivo' })} />
+                  <span className={styles.slider} />
+                  <span className={styles.switchText}>{formData.status === 'Activo' ? 'Habilitado' : 'Deshabilitado'}</span>
+                </label>
+              </div>
             </div>
-          </div>
-          <div className={modalStyles.formSection}>
-            <div className={modalStyles.formField}>
-              <label className={modalStyles.formLabel}>Archivo <span style={{ color: '#dc2626' }}>*</span></label>
-              <input type="text" className={modalStyles.formInput} placeholder="nombre_archivo.png" value={formData.filename} onChange={(e) => setFormData({ ...formData, filename: e.target.value })} />
-              <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>PNG o JPG • Dimensiones: {formData.dimensions}</p>
-            </div>
-          </div>
-          <div style={{ padding: '16px', background: '#f0f9ff', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
-            <div style={{ fontSize: '13px', color: '#1e40af', fontWeight: 500, marginBottom: '4px' }}>Estado</div>
-            <div style={{ fontSize: '13px', color: '#3b82f6' }}>✓ Habilitado</div>
           </div>
         </ModalBody>
         <ModalFooter>
           <button className={`${modalStyles.btn} ${modalStyles.btnSecondary}`} onClick={() => setShowAddModal(false)}>Cancelar</button>
-          <button className={`${modalStyles.btn} ${modalStyles.btnPrimary}`} onClick={handleSave} disabled={!formData.name || !formData.filename || isLoading}>{isLoading ? 'Guardando...' : 'Guardar cambios'}</button>
+          <button className={`${modalStyles.btn} ${modalStyles.btnPrimary}`} onClick={handleSave} disabled={!formData.name || !formData.description || isLoading}>{isLoading ? 'Guardando...' : 'Guardar cambios'}</button>
         </ModalFooter>
       </Modal>
-
-      <ConfirmationModal isOpen={!!imageToDelete} onClose={() => setImageToDelete(null)} onConfirm={handleDelete} title="¿Eliminar imagen?" message={`¿Está seguro de eliminar la imagen "${imageToDelete?.name}"? Esta acción no se puede deshacer.`} type="danger" confirmText="Eliminar" cancelText="Cancelar" isLoading={isLoading} />
     </div>
   );
 }
