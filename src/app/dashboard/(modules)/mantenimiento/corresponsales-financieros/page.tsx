@@ -21,6 +21,7 @@ export default function CorresponsalesFinancierosMantenimientoPage() {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     internalCode: '',
@@ -38,8 +39,8 @@ export default function CorresponsalesFinancierosMantenimientoPage() {
   const load = async () => {
     try {
       const response = await getFinancialCorrespondents({
-        fromDate: '2026-01-27',
-        toDate: '2026-02-07',
+        fromDate: '2024-01-01',
+        toDate: '2030-12-31',
         page: 1,
         pageSize: 10,
       });
@@ -68,6 +69,8 @@ export default function CorresponsalesFinancierosMantenimientoPage() {
       nit: '',
     });
     setShowModal(true);
+    setError(null);
+    setSuccessMessage(null);
   };
 
   const handleCreate = async () => {
@@ -90,7 +93,9 @@ export default function CorresponsalesFinancierosMantenimientoPage() {
       await load();
       setShowModal(false);
       setError(null);
+      setSuccessMessage('Corresponsal creado correctamente.');
     } catch (err) {
+      setSuccessMessage(null);
       setError(err instanceof Error ? err.message : 'No fue posible crear corresponsal.');
     } finally {
       setIsLoading(false);
@@ -111,6 +116,7 @@ export default function CorresponsalesFinancierosMantenimientoPage() {
       </div>
 
       {error && <div className={styles.error}>{error}</div>}
+      {successMessage && <div className={styles.success}>{successMessage}</div>}
 
       <div className={styles.panel}>
         <table className={styles.table}>
