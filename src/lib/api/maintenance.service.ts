@@ -106,7 +106,9 @@ function statusFromNumber(status?: number | null): 'Activo' | 'Inactivo' {
 }
 
 function statusFromLetter(status?: string | null): 'Activo' | 'Inactivo' {
-  return status === 'A' ? 'Activo' : 'Inactivo';
+  if (status === 'A') return 'Activo';
+  if (status === 'I') return 'Inactivo';
+  return 'Activo';
 }
 
 function statusToNumber(status?: 'Activo' | 'Inactivo'): number {
@@ -167,14 +169,24 @@ function normalizeSecurityQuestion(item: any): SecurityQuestion {
   };
 }
 
+
+function normalizeProductName(value?: string | null): string {
+  if (!value) return '';
+  const compact = value.replace(/_/g, ' ').trim().toLowerCase();
+  return compact.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function normalizeProduct(item: any, module: 'AH' | 'TC'): Product {
+  const normalizedName = normalizeProductName(item?.name ?? item?.productType ?? '');
+
   return {
     id: String(item?.id ?? item?.code ?? item?.productType ?? ''),
     code: item?.code ?? item?.productType ?? '',
-    name: item?.name ?? item?.productType ?? '',
-    description: item?.description ?? item?.details ?? item?.productType ?? '',
+    name: normalizedName || item?.productType || '',
+    description: item?.description ?? item?.details ?? normalizedName ?? '',
     status: item?.status !== undefined ? statusFromNumber(item?.status) : statusFromLetter(item?.estado),
     category: module === 'TC' ? 'Tarjetas' : 'Productos',
+    publicUrl: item?.publicUrl ?? item?.url ?? '',
     createdAt: toIsoDate(item?.createdAt),
     createdBy: item?.createdBy ?? '-',
     updatedAt: toIsoDate(item?.updatedAt),
