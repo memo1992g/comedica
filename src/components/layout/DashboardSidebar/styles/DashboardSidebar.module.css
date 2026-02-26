@@ -274,3 +274,45 @@
   background: #13233d;
   color: #ffffff;
 }
+
+.submenuGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.submenuToggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.submenuToggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.submenuNested {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.popoverGroupLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 8px;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
