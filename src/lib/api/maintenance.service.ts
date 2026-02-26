@@ -220,7 +220,7 @@ async function fetchSecurityImagesByClazz(clazz: 'APP' | 'WEB'): Promise<Securit
   const params = new URLSearchParams({ module: 'SEC', clazz, productType: 'SEGURIDAD' });
 
   const response = await customAuthFetch<BackofficeEnvelope<any> | any[]>(
-    `${API_URL}/get-pimage?${params.toString()}`,
+    `${API_URL}/get-image?${params.toString()}`,
     { method: 'GET', headers },
   );
 
