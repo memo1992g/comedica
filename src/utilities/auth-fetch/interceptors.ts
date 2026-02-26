@@ -182,8 +182,29 @@ async function handleSuccessResponse(
     `[INTERCEPTOR-${interceptorId}] ===== PROCESANDO RESPONSE EXITOSO =====`
   );
 
+  if (response.status === 204 || response.status === 205) {
+    console.log(
+      `[INTERCEPTOR-${interceptorId}] Response sin contenido (status ${response.status})`
+    );
+    console.log(
+      `[INTERCEPTOR-${interceptorId}] ===== FIN RESPONSE INTERCEPTOR (ÉXITO SIN BODY) =====`
+    );
+    return null;
+  }
+
+  const rawBody = await response.clone().text();
+  if (!rawBody || !rawBody.trim()) {
+    console.log(
+      `[INTERCEPTOR-${interceptorId}] Response sin body (vacío)`
+    );
+    console.log(
+      `[INTERCEPTOR-${interceptorId}] ===== FIN RESPONSE INTERCEPTOR (ÉXITO SIN BODY) =====`
+    );
+    return null;
+  }
+
   try {
-    const jsonResult = await response.json();
+    const jsonResult = JSON.parse(rawBody);
     console.log(`[INTERCEPTOR-${interceptorId}] JSON parseado exitosamente`);
     console.log(
       `[INTERCEPTOR-${interceptorId}] ===== FIN RESPONSE INTERCEPTOR (ÉXITO) =====`
