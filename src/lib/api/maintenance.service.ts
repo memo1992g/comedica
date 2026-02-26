@@ -183,7 +183,7 @@ function normalizeProduct(item: any, module: 'AH' | 'TC'): Product {
     id: String(item?.id ?? item?.code ?? item?.productType ?? ''),
     code: item?.code ?? item?.productType ?? '',
     name: normalizedName || item?.productType || '',
-    description: item?.description ?? item?.details ?? normalizedName || '',
+    description: item?.description ?? item?.details ?? normalizedName ?? '',
     status: item?.status !== undefined ? statusFromNumber(item?.status) : statusFromLetter(item?.estado),
     category: module === 'TC' ? 'Tarjetas' : 'Productos',
     publicUrl: item?.publicUrl ?? item?.url ?? '',
