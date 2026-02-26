@@ -153,18 +153,20 @@
   gap: 4px;
   padding: 4px 0 4px 16px;
   margin-top: 2px;
-  overflow: hidden auto;
-  
-  transition: max-height 220ms ease, opacity 220ms ease;
+  overflow: hidden;
+  transition: opacity 220ms ease;
   opacity: 0;
+  max-height: 0;
 }
 
 .submenuExpanded {
   opacity: 1;
+  max-height: 1200px;
 }
 
 .submenuCollapsed {
   opacity: 0;
+  max-height: 0;
 }
 
 .submenuItem {  
@@ -179,8 +181,30 @@
   line-height: 24px;
   transition: all 0.2s;
   padding: 8px;
+  justify-content: space-between;
+  gap: 8px;
   white-space: normal;
   word-break: break-word;
+}
+
+
+.submenuItemWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nestedSubmenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.submenuChev {
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
+  flex-shrink: 0;
 }
 
 .submenuItem:hover {
