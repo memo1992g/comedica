@@ -20,9 +20,9 @@ import type { SupportReason } from '@/lib/api/types/maintenance.types';
 type SubTab = 'tipos' | 'gestiones';
 
 const ATTENTION_ACTION_MAP: Record<string, 'block' | 'unblock' | 'inactivate' | null> = {
-  Bloqueo: 'block',
-  Desbloqueo: 'unblock',
-  'Soporte general': 'inactivate',
+  SOP005: 'block',
+  SOP004: 'unblock',
+  SOP013: 'inactivate',
 };
 
 const ICON_BY_CODE: Record<string, AttentionType['icon']> = {
@@ -42,6 +42,7 @@ const ICON_BY_CODE: Record<string, AttentionType['icon']> = {
 function toAttentionType(item: SupportReason): AttentionType {
   return {
     id: item.id,
+    code: item.code,
     name: item.description,
     questions: item.questions,
     maxFailures: item.failures,
@@ -134,6 +135,11 @@ export default function UsersSupport() {
   };
 
   const handleSelectType = (type: AttentionType) => {
+    if (!selectedUser || !/^\d+$/.test(selectedUser.id)) {
+      setQueryError('Primero consulte un usuario válido para continuar con la verificación.');
+      return;
+    }
+
     setSelectedType(type);
     setShowSecurityModal(true);
   };
@@ -151,7 +157,7 @@ export default function UsersSupport() {
       return;
     }
 
-    const action = ATTENTION_ACTION_MAP[selectedType.name] ?? null;
+    const action = ATTENTION_ACTION_MAP[selectedType.code] ?? null;
     if (!action) {
       setShowConfirmationModal(false);
       return;
@@ -230,6 +236,7 @@ export default function UsersSupport() {
       {showSecurityModal && selectedType && (
         <SecurityVerificationModal
           attentionType={selectedType}
+          clientIdentifier={Number(selectedUser?.id ?? 0)}
           onClose={() => setShowSecurityModal(false)}
           onVerified={handleVerified}
         />

@@ -32,6 +32,39 @@ interface UserManagementUser {
   username?: string;
 }
 
+interface QuestionnaireQuestionItem {
+  id: number;
+  questionText: string;
+}
+
+interface QuestionnaireQuestionsResponse {
+  reasonCode: string;
+  description: string;
+  questionCount: number;
+  failureCount: number;
+  requiresQuestionnaire: boolean;
+  questions: QuestionnaireQuestionItem[];
+}
+
+interface QuestionnaireValidationResponse {
+  token?: string;
+  valid?: boolean;
+}
+
+export interface QuestionnaireQuestion {
+  id: number;
+  text: string;
+}
+
+export interface QuestionnaireQuestions {
+  reasonCode: string;
+  description: string;
+  questionCount: number;
+  failureCount: number;
+  requiresQuestionnaire: boolean;
+  questions: QuestionnaireQuestion[];
+}
+
 function getAuthHeaders(): Record<string, string> {
   const clientTokenJSON = cookies().get(APP_COOKIES.AUTH.CLIENT_TOKEN)?.value;
   const accessToken = clientTokenJSON
@@ -98,6 +131,19 @@ function normalizeProfile(raw: UserManagementUser): UserManagementProfile {
   };
 }
 
+function normalizeQuestionnaire(data: QuestionnaireQuestionsResponse): QuestionnaireQuestions {
+  return {
+    reasonCode: data.reasonCode,
+    description: data.description,
+    questionCount: Number(data.questionCount ?? 0),
+    failureCount: Number(data.failureCount ?? 0),
+    requiresQuestionnaire: Boolean(data.requiresQuestionnaire),
+    questions: Array.isArray(data.questions)
+      ? data.questions.map((item) => ({ id: Number(item.id), text: item.questionText }))
+      : [],
+  };
+}
+
 export async function consultUser(associatedNumber: number): Promise<UserManagementProfile> {
   try {
     const headers = getAuthHeaders();
@@ -115,6 +161,61 @@ export async function consultUser(associatedNumber: number): Promise<UserManagem
 
     const data = assertSuccess(response, 'No se encontró información del usuario');
     return normalizeProfile(data);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getQuestionnaireQuestions(reasonCode: string): Promise<QuestionnaireQuestions> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<BackofficeEnvelope<QuestionnaireQuestionsResponse>>(
+      `${API_URL}/user-management/questionnaire/questions`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          ...buildContext(),
+          request: { reasonCode },
+        }),
+        headers,
+      },
+    );
+
+    const data = assertSuccess(response, 'No fue posible obtener las preguntas de seguridad');
+    return normalizeQuestionnaire(data);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function validateQuestionnaire(params: {
+  reasonCode: string;
+  clientIdentifier: number;
+  answers: Array<{ questionId: number; answer: string }>;
+}): Promise<{ token: string; valid: boolean }> {
+  try {
+    const headers = getAuthHeaders();
+    const response = await customAuthFetch<BackofficeEnvelope<QuestionnaireValidationResponse>>(
+      `${API_URL}/user-management/questionnaire/validate`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          ...buildContext(),
+          request: {
+            reasonCode: params.reasonCode,
+            clientIdentifier: params.clientIdentifier,
+            answers: params.answers,
+          },
+        }),
+        headers,
+      },
+    );
+
+    const data = assertSuccess(response, 'No fue posible validar el cuestionario');
+    return {
+      token: data.token ?? '',
+      valid: Boolean(data.valid),
+    };
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }
