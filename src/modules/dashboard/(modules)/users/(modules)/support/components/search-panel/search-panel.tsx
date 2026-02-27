@@ -47,7 +47,7 @@ export default function SearchPanel({
             Ingrese un ID o DUI válido y presione Enter para buscar
           </p>
           <p className={styles.emptyHint}>
-            ID: 5 dígitos | DUI: formato 01234567-8
+            ID: 5 o 6 dígitos | DUI: formato 01234567-8
           </p>
         </div>
       );

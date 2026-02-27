@@ -51,7 +51,7 @@ function toAttentionType(item: SupportReason): AttentionType {
 }
 
 function isValidSearchQuery(value: string): boolean {
-  return /^\d{5}$/.test(value) || /^\d{8}-\d$/.test(value);
+  return /^\d{5,6}$/.test(value) || /^\d{8}-\d$/.test(value);
 }
 
 export default function UsersSupport() {
@@ -103,7 +103,7 @@ export default function UsersSupport() {
       setHasSubmittedSearch(false);
       setCatalogAttentionTypes([]);
       setSelectedUser(null);
-      setQueryError('Ingrese un ID de 5 dígitos o un DUI válido (01234567-8).');
+      setQueryError('Ingrese un ID de 5 o 6 dígitos o un DUI válido (01234567-8).');
       return;
     }
 
@@ -120,7 +120,7 @@ export default function UsersSupport() {
       return;
     }
 
-    if (!/^\d{5}$/.test(trimmed)) {
+    if (!/^\d{5,6}$/.test(trimmed)) {
       setSelectedUser(null);
       return;
     }
