@@ -111,19 +111,26 @@ export default function UsersSupport() {
       const { data } = await getSupportReasons({ page: 1, pageSize: 100 });
       setCatalogAttentionTypes(data.map(toAttentionType));
       setHasSubmittedSearch(true);
-
-      if (/^\d{5}$/.test(trimmed)) {
-        const profile = await consultUser(Number(trimmed));
-        setSelectedUser(toSupportUser(profile));
-      } else {
-        const localMatch = mockSupportUsers.find((u) => u.dui === trimmed);
-        setSelectedUser(localMatch ?? null);
-      }
     } catch (error) {
       setHasSubmittedSearch(false);
       setCatalogAttentionTypes([]);
       setSelectedUser(null);
-      setQueryError(error instanceof Error ? error.message : 'No fue posible consultar la información.');
+      setQueryError(error instanceof Error ? error.message : 'No fue posible cargar los tipos de atención.');
+      return;
+    }
+
+    if (!/^\d{5}$/.test(trimmed)) {
+      const localMatch = mockSupportUsers.find((u) => u.dui === trimmed);
+      setSelectedUser(localMatch ?? null);
+      return;
+    }
+
+    try {
+      const profile = await consultUser(Number(trimmed));
+      setSelectedUser(toSupportUser(profile));
+    } catch (error) {
+      setSelectedUser(null);
+      setQueryError(error instanceof Error ? error.message : 'No fue posible consultar el usuario.');
     }
   };
 
