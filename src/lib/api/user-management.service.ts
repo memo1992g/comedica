@@ -57,7 +57,6 @@ function buildContext() {
     uuid: crypto.randomUUID(),
     pageId: 1,
     channel: 'W',
-    requestId: crypto.randomUUID(),
   };
 }
 
@@ -94,7 +93,7 @@ function normalizeProfile(raw: UserManagementUser): UserManagementProfile {
     dui: raw.identification ?? '-',
     phone: raw.phoneNumber ?? '-',
     email: raw.email ?? '-',
-    username: raw.username ?? '-',
+    username: raw.username ?? '',
     status: normalizeStatus(raw.ebankingStatus),
   };
 }
@@ -103,7 +102,7 @@ export async function consultUser(associatedNumber: number): Promise<UserManagem
   try {
     const headers = getAuthHeaders();
     const response = await customAuthFetch<BackofficeEnvelope<UserManagementUser>>(
-      `${API_URL}/user-management/consult`,
+      `${API_URL}/user-management/consult-basic`,
       {
         method: "POST",
         body: JSON.stringify({

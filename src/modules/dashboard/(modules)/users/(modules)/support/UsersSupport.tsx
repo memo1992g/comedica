@@ -8,7 +8,7 @@ import UserSupportDetail from './components/user-support-detail/user-support-det
 import SecurityVerificationModal from './components/security-verification-modal/security-verification-modal';
 import ConfirmationModal from './components/confirmation-modal/confirmation-modal';
 import {
-  mockSupportUsers, mockPreviousManagements,
+  mockPreviousManagements,
   type SupportUser, type AttentionType,
 } from './data/mock-data';
 import styles from './styles/users-support.module.css';
@@ -120,8 +120,7 @@ export default function UsersSupport() {
     }
 
     if (!/^\d{5}$/.test(trimmed)) {
-      const localMatch = mockSupportUsers.find((u) => u.dui === trimmed);
-      setSelectedUser(localMatch ?? null);
+      setSelectedUser(null);
       return;
     }
 
