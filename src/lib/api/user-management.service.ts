@@ -7,7 +7,7 @@ import { APP_COOKIES } from "@/consts/cookies/cookies.consts";
 export type { UserManagementProfile } from './types/user-management.types';
 import type { UserManagementProfile } from './types/user-management.types';
 
-const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL;
+const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL ?? 'https://bo-comedica-service-dev.echotechs.net/api';
 
 interface BackofficeResult {
   code: number;
