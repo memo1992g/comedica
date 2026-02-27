@@ -8,20 +8,51 @@ import UserSupportDetail from './components/user-support-detail/user-support-det
 import SecurityVerificationModal from './components/security-verification-modal/security-verification-modal';
 import ConfirmationModal from './components/confirmation-modal/confirmation-modal';
 import {
-  mockSupportUsers, attentionTypes, mockPreviousManagements,
+  mockPreviousManagements,
   type SupportUser, type AttentionType,
 } from './data/mock-data';
 import styles from './styles/users-support.module.css';
 import { consultUser, blockUser, unblockUser, inactivateUser } from '@/lib/api/user-management.service';
 import { toSupportUser } from '@/lib/api/types/user-management.types';
+import { getSupportReasons } from '@/lib/api/maintenance.service';
+import type { SupportReason } from '@/lib/api/types/maintenance.types';
 
 type SubTab = 'tipos' | 'gestiones';
 
 const ATTENTION_ACTION_MAP: Record<string, 'block' | 'unblock' | 'inactivate' | null> = {
-  Bloqueo: 'block',
-  Desbloqueo: 'unblock',
-  'Soporte general': 'inactivate',
+  SOP005: 'block',
+  SOP004: 'unblock',
+  SOP013: 'inactivate',
 };
+
+const ICON_BY_CODE: Record<string, AttentionType['icon']> = {
+  SOP003: 'UserPlus',
+  SOP004: 'Unlock',
+  SOP005: 'Lock',
+  SOP006: 'Search',
+  SOP007: 'RefreshCw',
+  SOP008: 'RefreshCw',
+  SOP009: 'Key',
+  SOP010: 'Smartphone',
+  SOP011: 'FileSearch',
+  SOP012: 'Shield',
+  SOP013: 'Settings',
+};
+
+function toAttentionType(item: SupportReason): AttentionType {
+  return {
+    id: item.id,
+    code: item.code,
+    name: item.description,
+    questions: item.questions,
+    maxFailures: item.failures,
+    icon: ICON_BY_CODE[item.code] ?? 'Settings',
+  };
+}
+
+function isValidSearchQuery(value: string): boolean {
+  return /^\d{5}$/.test(value) || /^\d{8}-\d$/.test(value);
+}
 
 export default function UsersSupport() {
   const router = useRouter();
@@ -33,37 +64,82 @@ export default function UsersSupport() {
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [queryError, setQueryError] = useState<string | null>(null);
+  const [catalogAttentionTypes, setCatalogAttentionTypes] = useState<AttentionType[]>([]);
+  const [hasSubmittedSearch, setHasSubmittedSearch] = useState(false);
 
-  const handleSearchChange = async (query: string) => {
+  const resetSearchState = () => {
+    setSelectedUser(null);
+    setQueryError(null);
+    setVerificationState('pending');
+    setSelectedType(null);
+    setCatalogAttentionTypes([]);
+    setHasSubmittedSearch(false);
+  };
+
+  const handleSearchChange = (query: string) => {
     setSearchQuery(query);
 
-    const trimmed = query.trim();
-    if (!trimmed) {
-      setSelectedUser(null);
-      setQueryError(null);
-      setVerificationState('pending');
-      setSelectedType(null);
+    if (!query.trim()) {
+      resetSearchState();
       return;
     }
 
-    const localMatch = mockSupportUsers.find((u) => u.id.includes(trimmed) || u.dui.includes(trimmed));
-    if (!/^\d{5,}$/.test(trimmed)) {
-      setSelectedUser(localMatch ?? null);
-      setQueryError(null);
+    setQueryError(null);
+    setSelectedType(null);
+    setVerificationState('pending');
+    setHasSubmittedSearch(false);
+    setCatalogAttentionTypes([]);
+  };
+
+  const handleSearchSubmit = async () => {
+    const trimmed = searchQuery.trim();
+
+    if (!trimmed) {
+      resetSearchState();
+      return;
+    }
+
+    if (!isValidSearchQuery(trimmed)) {
+      setHasSubmittedSearch(false);
+      setCatalogAttentionTypes([]);
+      setSelectedUser(null);
+      setQueryError('Ingrese un ID de 5 dígitos o un DUI válido (01234567-8).');
       return;
     }
 
     try {
       setQueryError(null);
+      const { data } = await getSupportReasons({ page: 1, pageSize: 100 });
+      setCatalogAttentionTypes(data.map(toAttentionType));
+      setHasSubmittedSearch(true);
+    } catch (error) {
+      setHasSubmittedSearch(false);
+      setCatalogAttentionTypes([]);
+      setSelectedUser(null);
+      setQueryError(error instanceof Error ? error.message : 'No fue posible cargar los tipos de atención.');
+      return;
+    }
+
+    if (!/^\d{5}$/.test(trimmed)) {
+      setSelectedUser(null);
+      return;
+    }
+
+    try {
       const profile = await consultUser(Number(trimmed));
       setSelectedUser(toSupportUser(profile));
     } catch (error) {
-      setSelectedUser(localMatch ?? null);
-      setQueryError(error instanceof Error ? error.message : 'No fue posible consultar el usuario');
+      setSelectedUser(null);
+      setQueryError(error instanceof Error ? error.message : 'No fue posible consultar el usuario.');
     }
   };
 
   const handleSelectType = (type: AttentionType) => {
+    if (!selectedUser || !/^\d+$/.test(selectedUser.id)) {
+      setQueryError('Primero consulte un usuario válido para continuar con la verificación.');
+      return;
+    }
+
     setSelectedType(type);
     setShowSecurityModal(true);
   };
@@ -81,7 +157,7 @@ export default function UsersSupport() {
       return;
     }
 
-    const action = ATTENTION_ACTION_MAP[selectedType.name] ?? null;
+    const action = ATTENTION_ACTION_MAP[selectedType.code] ?? null;
     if (!action) {
       setShowConfirmationModal(false);
       return;
@@ -101,6 +177,8 @@ export default function UsersSupport() {
       setSelectedType(null);
       setSearchQuery('');
       setSelectedUser(null);
+      setCatalogAttentionTypes([]);
+      setHasSubmittedSearch(false);
     } catch (error) {
       setQueryError(error instanceof Error ? error.message : 'No fue posible ejecutar la gestión');
       setShowConfirmationModal(false);
@@ -132,15 +210,16 @@ export default function UsersSupport() {
           <div className={styles.leftPanel}>
             <SearchPanel
               searchQuery={searchQuery}
-              onSearchChange={(value) => { void handleSearchChange(value); }}
+              onSearchChange={handleSearchChange}
+              onSearchSubmit={() => { void handleSearchSubmit(); }}
               activeSubTab={activeSubTab}
               onSubTabChange={setActiveSubTab}
-              attentionTypes={attentionTypes}
+              attentionTypes={catalogAttentionTypes}
               selectedTypeId={selectedType?.id ?? null}
               onSelectType={handleSelectType}
               previousManagements={mockPreviousManagements}
               verificationState={verificationState}
-              hasUser={!!selectedUser}
+              hasUser={hasSubmittedSearch}
             />
           </div>
 
@@ -157,6 +236,7 @@ export default function UsersSupport() {
       {showSecurityModal && selectedType && (
         <SecurityVerificationModal
           attentionType={selectedType}
+          clientIdentifier={Number(selectedUser?.id ?? 0)}
           onClose={() => setShowSecurityModal(false)}
           onVerified={handleVerified}
         />

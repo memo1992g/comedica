@@ -9,6 +9,7 @@ export interface SupportUser {
 
 export interface AttentionType {
   id: string;
+  code: string;
   name: string;
   questions: number;
   maxFailures: number;
@@ -52,17 +53,17 @@ export const mockSupportUsers: SupportUser[] = [
 ];
 
 export const attentionTypes: AttentionType[] = [
-  { id: '1', name: 'Creación de usuario', questions: 4, maxFailures: 1, icon: 'UserPlus' },
-  { id: '2', name: 'Bloqueo', questions: 3, maxFailures: 2, icon: 'Lock' },
-  { id: '3', name: 'Desbloqueo', questions: 4, maxFailures: 1, icon: 'Unlock' },
-  { id: '4', name: 'Consulta de usuario', questions: 3, maxFailures: 1, icon: 'Search' },
-  { id: '5', name: 'Actualización de datos', questions: 4, maxFailures: 1, icon: 'RefreshCw' },
-  { id: '6', name: 'Recuperación de contraseña', questions: 3, maxFailures: 1, icon: 'Key' },
-  { id: '7', name: 'Soporte de aplicación', questions: 3, maxFailures: 1, icon: 'Smartphone' },
-  { id: '8', name: 'Consulta de transacciones', questions: 3, maxFailures: 1, icon: 'FileSearch' },
-  { id: '9', name: 'Soporte con token', questions: 3, maxFailures: 1, icon: 'Shield' },
-  { id: '10', name: 'Soporte general', questions: 3, maxFailures: 1, icon: 'Settings' },
-  { id: '11', name: 'Cambio de parámetros', questions: 4, maxFailures: 1, icon: 'SlidersHorizontal' },
+  { id: '1', code: 'SOP003', name: 'Creación de usuario', questions: 4, maxFailures: 1, icon: 'UserPlus' },
+  { id: '2', code: 'SOP005', name: 'Bloqueo', questions: 3, maxFailures: 2, icon: 'Lock' },
+  { id: '3', code: 'SOP004', name: 'Desbloqueo', questions: 4, maxFailures: 1, icon: 'Unlock' },
+  { id: '4', code: 'SOP006', name: 'Consulta de usuario', questions: 3, maxFailures: 1, icon: 'Search' },
+  { id: '5', code: 'SOP007', name: 'Actualización de datos', questions: 4, maxFailures: 1, icon: 'RefreshCw' },
+  { id: '6', code: 'SOP009', name: 'Recuperación de contraseña', questions: 3, maxFailures: 1, icon: 'Key' },
+  { id: '7', code: 'SOP010', name: 'Soporte de aplicación', questions: 3, maxFailures: 1, icon: 'Smartphone' },
+  { id: '8', code: 'SOP011', name: 'Consulta de transacciones', questions: 3, maxFailures: 1, icon: 'FileSearch' },
+  { id: '9', code: 'SOP012', name: 'Soporte con token', questions: 3, maxFailures: 1, icon: 'Shield' },
+  { id: '10', code: 'SOP013', name: 'Soporte general', questions: 3, maxFailures: 1, icon: 'Settings' },
+  { id: '11', code: 'SOP008', name: 'Cambio de parámetros', questions: 4, maxFailures: 1, icon: 'SlidersHorizontal' },
 ];
 
 export const securityQuestions: SecurityQuestion[] = [

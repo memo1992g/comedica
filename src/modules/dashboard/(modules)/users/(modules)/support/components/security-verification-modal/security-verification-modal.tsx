@@ -1,48 +1,133 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import type { AttentionType } from '../../data/mock-data';
-import { securityQuestions } from '../../data/mock-data';
+import { getQuestionnaireQuestions, validateQuestionnaire } from '@/lib/api/user-management.service';
 import styles from './styles/security-modal.module.css';
 
 interface SecurityVerificationModalProps {
   attentionType: AttentionType;
+  clientIdentifier: number;
   onClose: () => void;
   onVerified: () => void;
 }
 
 export default function SecurityVerificationModal({
-  attentionType, onClose, onVerified,
+  attentionType,
+  clientIdentifier,
+  onClose,
+  onVerified,
 }: SecurityVerificationModalProps) {
-  const questions = securityQuestions.slice(0, attentionType.questions);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState('');
-  const [failures, setFailures] = useState(0);
-  const [exceeded, setExceeded] = useState(false);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [questionnaire, setQuestionnaire] = useState<{
+    reasonCode: string;
+    description: string;
+    questions: Array<{ id: number; text: string }>;
+    requiresQuestionnaire: boolean;
+  } | null>(null);
 
+  useEffect(() => {
+    let mounted = true;
+
+    const loadQuestions = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getQuestionnaireQuestions(attentionType.code);
+        if (!mounted) return;
+
+        setQuestionnaire({
+          reasonCode: response.reasonCode,
+          description: response.description,
+          questions: response.questions,
+          requiresQuestionnaire: response.requiresQuestionnaire,
+        });
+
+        if (!response.requiresQuestionnaire || response.questions.length === 0) {
+          onVerified();
+        }
+      } catch (err) {
+        if (!mounted) return;
+        setError(err instanceof Error ? err.message : 'No fue posible cargar las preguntas de seguridad');
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadQuestions();
+
+    return () => {
+      mounted = false;
+    };
+  }, [attentionType.code, onVerified]);
+
+  const questions = questionnaire?.questions ?? [];
   const currentQuestion = questions[currentIndex];
+  const isLastQuestion = currentIndex === questions.length - 1;
+  const currentReasonCode = questionnaire?.reasonCode ?? attentionType.code;
 
-  const handleVerify = () => {
-    if (!answer.trim()) return;
+  const canVerify = useMemo(() => {
+    if (loading || submitting || !currentQuestion) return false;
+    return answer.trim().length > 0;
+  }, [answer, currentQuestion, loading, submitting]);
 
-    if (answer.trim().toLowerCase() !== currentQuestion.answer.toLowerCase()) {
-      const newFailures = failures + 1;
-      setFailures(newFailures);
-      if (newFailures >= attentionType.maxFailures) {
-        setExceeded(true);
+  const submitValidation = async (nextAnswers: Record<number, string>) => {
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      const payload = questions.map((question) => ({
+        questionId: question.id,
+        answer: (nextAnswers[question.id] ?? '').trim(),
+      }));
+
+      const result = await validateQuestionnaire({
+        reasonCode: currentReasonCode,
+        clientIdentifier,
+        answers: payload,
+      });
+
+      if (!result.valid) {
+        setError('No fue posible validar las respuestas de seguridad.');
         return;
       }
-    }
 
-    if (currentIndex + 1 < questions.length) {
-      setCurrentIndex(currentIndex + 1);
-      setAnswer('');
-    } else {
       onVerified();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No fue posible validar las respuestas');
+    } finally {
+      setSubmitting(false);
     }
   };
 
+  const handleVerify = () => {
+    if (!currentQuestion || !answer.trim()) return;
+
+    const nextAnswers = {
+      ...answers,
+      [currentQuestion.id]: answer.trim(),
+    };
+    setAnswers(nextAnswers);
+
+    if (!isLastQuestion) {
+      setCurrentIndex((prev) => prev + 1);
+      const nextQuestion = questions[currentIndex + 1];
+      setAnswer(nextQuestion ? (nextAnswers[nextQuestion.id] ?? '') : '');
+      return;
+    }
+
+    void submitValidation(nextAnswers);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !exceeded) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
       handleVerify();
     }
   };
@@ -55,31 +140,37 @@ export default function SecurityVerificationModal({
           <p className={styles.modalSubtitle}>
             Tipo de atención: {attentionType.name}
           </p>
-          <p className={styles.modalProgress}>
-            Pregunta {currentIndex + 1} de {questions.length}
-          </p>
+          {!loading && questions.length > 0 && (
+            <p className={styles.modalProgress}>
+              Pregunta {currentIndex + 1} de {questions.length}
+            </p>
+          )}
         </div>
 
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel} htmlFor="security-answer">
-            {currentQuestion.question}
-          </label>
-          <input
-            id="security-answer"
-            className={styles.fieldInput}
-            type="text"
-            placeholder="Ingrese su respuesta"
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={exceeded}
-          />
-          <p className={styles.fieldHint}>Presione Enter para continuar</p>
-        </div>
+        {loading ? (
+          <p className={styles.fieldHint}>Cargando preguntas de seguridad...</p>
+        ) : (
+          <div className={styles.fieldGroup}>
+            <label className={styles.fieldLabel} htmlFor="security-answer">
+              {currentQuestion?.text ?? 'No se encontraron preguntas para este motivo'}
+            </label>
+            <input
+              id="security-answer"
+              className={styles.fieldInput}
+              type="text"
+              placeholder="Ingrese su respuesta"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={!currentQuestion || submitting}
+            />
+            <p className={styles.fieldHint}>Presione Enter para continuar</p>
+          </div>
+        )}
 
-        {exceeded && (
+        {error && (
           <p className={styles.errorMessage}>
-            Ha excedido el límite de {attentionType.maxFailures} respuestas incorrectas. Intente nuevamente más tarde.
+            {error}
           </p>
         )}
 
@@ -91,9 +182,9 @@ export default function SecurityVerificationModal({
             className={styles.verifyButton}
             onClick={handleVerify}
             type="button"
-            disabled={exceeded || !answer.trim()}
+            disabled={!canVerify}
           >
-            Verificar
+            {isLastQuestion ? 'Validar' : 'Verificar'}
           </button>
         </div>
       </DialogContent>

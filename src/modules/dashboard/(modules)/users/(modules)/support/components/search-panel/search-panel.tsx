@@ -11,6 +11,7 @@ type SubTab = 'tipos' | 'gestiones';
 interface SearchPanelProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onSearchSubmit: () => void;
   activeSubTab: SubTab;
   onSubTabChange: (tab: SubTab) => void;
   attentionTypes: AttentionType[];
@@ -22,7 +23,7 @@ interface SearchPanelProps {
 }
 
 export default function SearchPanel({
-  searchQuery, onSearchChange, activeSubTab, onSubTabChange,
+  searchQuery, onSearchChange, onSearchSubmit, activeSubTab, onSubTabChange,
   attentionTypes, selectedTypeId, onSelectType,
   previousManagements, verificationState, hasUser,
 }: SearchPanelProps) {
@@ -76,6 +77,12 @@ export default function SearchPanel({
             className={styles.searchInput}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onSearchSubmit();
+              }
+            }}
           />
         </div>
       </div>
