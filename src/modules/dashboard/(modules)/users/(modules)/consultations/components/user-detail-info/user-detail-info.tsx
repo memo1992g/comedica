@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, AlertTriangle, Phone, Mail, UserCircle, CheckCircle, Bell } from 'lucide-react';
-import type { UserResult } from '../../data/mock-data';
+import type { UserResult } from '../../interfaces/UsersConsultations';
 import styles from './styles/user-detail.module.css';
 
 interface UserDetailInfoProps {

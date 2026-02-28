@@ -1,4 +1,4 @@
-import type { UserResult } from '../../../data/mock-data';
+import type { UserResult } from '../../../interfaces/UsersConsultations';
 import detailStyles from '../../user-detail-info/styles/user-detail.module.css';
 
 interface UserStateHeaderProps {

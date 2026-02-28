@@ -1,5 +1,5 @@
 export interface UserStatePanelProps {
-  user: import('../../../data/mock-data').UserResult | null;
+  user: import('../../../interfaces/UsersConsultations').UserResult | null;
   onSave: () => void;
 }
 
