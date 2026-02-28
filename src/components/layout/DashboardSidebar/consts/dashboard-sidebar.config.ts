@@ -40,7 +40,7 @@ export const sidebarItems: Item[] = [
       },
       {
         label: "Solicitud de Soft Token",
-        href: "/dashboard/mantenimiento/token",
+        href: "/dashboard/parametros/solicitud-soft-token",
       },
     ],
   },

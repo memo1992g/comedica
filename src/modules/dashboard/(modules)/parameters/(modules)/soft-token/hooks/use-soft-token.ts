@@ -1,13 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  getFlowsAction,
   listConfigsAction,
   saveConfigAction,
 } from '@/actions/parameters/soft-token';
-import type {
-  SoftTokenFlowI,
-  SoftTokenConfigI,
-} from '@/interfaces/management/soft-token';
+import type { SoftTokenConfigI } from '@/interfaces/management/soft-token';
 
 export interface SoftTokenOperationConfig {
   key: string;
@@ -26,43 +22,85 @@ export interface SoftTokenConfig {
   administrative: SoftTokenOperationConfig[];
 }
 
-function mapFlowsToConfig(
-  flows: SoftTokenFlowI[],
-  configs: SoftTokenConfigI[],
-): SoftTokenConfig {
-  const flowMap = new Map(flows.map((flow) => [flow.idFlow, flow]));
+const TRANSACTIONAL_FLOW_CODES = new Set(['TRANSFER', 'PAYMENT', 'TRANSFER365']);
 
+const TRANSACTIONAL_ORDER: string[] = [
+  'TRANSFER_OWN',
+  'TRANSFER_THIRD',
+  'PAYMENT',
+  'TRANSFER365',
+];
+
+const ADMINISTRATIVE_ORDER: string[] = [
+  'PASSWORD_RECOVERY',
+  'LOGIN',
+  'LIMIT_CONFIGURATION',
+  'PASSWORD_CHANGE',
+  'TRUSTED_DEVICE_REMOVE',
+];
+
+function resolveOperationLabel(config: SoftTokenConfigI): string {
+  if (config.flowCode === 'TRANSFER' && config.typeCode === 'OWN') {
+    return 'Pagos propios';
+  }
+
+  if (config.flowCode === 'TRANSFER' && config.typeCode === 'THIRD') {
+    return 'Pagos a terceros';
+  }
+
+  if (config.flowCode === 'PAYMENT') {
+    return 'Pagos de servicios';
+  }
+
+  if (config.flowCode === 'TRANSFER365') {
+    return 'Transfer365';
+  }
+
+  return config.flowName;
+}
+
+function getSortWeight(operation: SoftTokenOperationConfig, transactional: boolean): number {
+  if (transactional) {
+    const code = operation.transactionType
+      ? `${operation.flow}_${operation.transactionType}`
+      : operation.flow;
+
+    const position = TRANSACTIONAL_ORDER.indexOf(code);
+    return position === -1 ? TRANSACTIONAL_ORDER.length : position;
+  }
+
+  const position = ADMINISTRATIVE_ORDER.indexOf(operation.flow);
+  return position === -1 ? ADMINISTRATIVE_ORDER.length : position;
+}
+
+function mapConfigsToView(configs: SoftTokenConfigI[]): SoftTokenConfig {
   const operations = configs.map<SoftTokenOperationConfig>((config) => {
-    const flow = flowMap.get(config.flowId);
-    const hasAmount = (flow?.hasAmount ?? 0) === 1;
-    const isGenericConfig = config.productCode == null && config.typeCode == null;
-    const hasSpecificContext = config.productName || config.typeName;
-    const contextLabel = hasSpecificContext
-      ? ` · ${config.typeName ?? 'General'}`
-      : '';
+    const hasAmount = config.amountLimit !== null;
 
     return {
       key: String(config.configId),
       flow: config.flowCode,
-      label: `${config.flowName}${contextLabel}`,
+      label: resolveOperationLabel(config),
       product: config.productCode,
       transactionType: config.typeCode,
       amount: hasAmount ? (config.amountLimit ?? 0) : undefined,
       hasAmount,
-      showAmount: hasAmount && !isGenericConfig,
+      showAmount: hasAmount,
       requiresSoftToken: config.tokenRequired,
     };
   });
 
+  const transactions = operations
+    .filter((operation) => TRANSACTIONAL_FLOW_CODES.has(operation.flow))
+    .sort((a, b) => getSortWeight(a, true) - getSortWeight(b, true));
+
+  const administrative = operations
+    .filter((operation) => !TRANSACTIONAL_FLOW_CODES.has(operation.flow))
+    .sort((a, b) => getSortWeight(a, false) - getSortWeight(b, false));
+
   return {
-    transactions: operations.filter((operation) => {
-      const flow = flows.find((item) => item.flowCode === operation.flow);
-      return flow?.category === 'TRANSACTIONAL';
-    }),
-    administrative: operations.filter((operation) => {
-      const flow = flows.find((item) => item.flowCode === operation.flow);
-      return flow?.category === 'ADMINISTRATIVE';
-    }),
+    transactions,
+    administrative,
   };
 }
 
@@ -87,15 +125,11 @@ export function useSoftToken() {
     setLoadError(null);
 
     try {
-      const [flowsResult, configsResult] = await Promise.all([
-        getFlowsAction(),
-        listConfigsAction(),
-      ]);
+      const configsResult = await listConfigsAction();
 
-      if (flowsResult.errors || configsResult.errors) {
+      if (configsResult.errors) {
         setLoadError(
-          flowsResult.errorMessage
-          || configsResult.errorMessage
+          configsResult.errorMessage
           || 'No se pudo cargar la configuración de Soft Token.',
         );
 
@@ -104,8 +138,8 @@ export function useSoftToken() {
         return;
       }
 
-      if (flowsResult.data && configsResult.data) {
-        const mapped = mapFlowsToConfig(flowsResult.data, configsResult.data);
+      if (configsResult.data) {
+        const mapped = mapConfigsToView(configsResult.data);
         setConfig(mapped);
         setEditedConfig(mapped);
         return;
