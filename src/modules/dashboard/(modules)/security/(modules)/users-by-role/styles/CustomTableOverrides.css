@@ -1,0 +1,77 @@
+/* Custom table overrides for users-by-role */
+
+[data-users-role-table] {
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: white !important;
+}
+
+[data-users-role-table] tbody tr:has([data-status="Inactivo"]) {
+  opacity: 0.6;
+}
+
+[data-users-role-table] thead th {
+  background: white !important;
+  border-bottom: 0.8px solid #e2e2e7 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  color: #23366a !important;
+  padding: 12px 16px !important;
+  text-align: left !important;
+}
+
+[data-users-role-table] thead th,
+[data-users-role-table] thead th *,
+[data-users-role-table] thead th div,
+[data-users-role-table] thead th span,
+[data-users-role-table] thead th p {
+  color: #23366a !important;
+}
+
+[data-users-role-table] thead th > div,
+[data-users-role-table] thead th div {
+  background: transparent !important;
+}
+
+[data-users-role-table] tbody tr:nth-child(odd) {
+  background: #f2f2f7 !important;
+}
+
+[data-users-role-table-empty] tbody tr:nth-child(odd) {
+  background: white !important;
+}
+
+[data-users-role-table] tbody tr:nth-child(even) {
+  background: white !important;
+}
+
+[data-users-role-table] tbody tr {
+  border-bottom: 0.8px solid #e2e2e7 !important;
+}
+
+[data-users-role-table] tbody tr:hover {
+  background: #e8e8ea !important;
+}
+
+[data-users-role-table] tbody td {
+  padding: 16px !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 11px !important;
+  line-height: 16.5px !important;
+  color: #4a4a4c !important;
+  border-bottom: 0.8px solid #e2e2e7 !important;
+  vertical-align: middle !important;
+}
+
+[data-users-role-table] table {
+  border-bottom: none !important;
+  border-collapse: collapse !important;
+}
+
+[data-users-role-table] tbody tr:last-child,
+[data-users-role-table] tbody tr:last-child td {
+  border-bottom: none !important;
+}

@@ -11,8 +11,9 @@ import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
 import { generateDynamicUUID } from "@/utilities/uuid-generator";
 import { cookies } from "next/headers";
 
-const API_URL = process.env.BACKOFFICE_BASE_NEW_API_URL
-  ?? process.env.NEXT_PUBLIC_API_URL;
+const API_URL =
+  process.env.BACKOFFICE_BASE_NEW_API_URL ??
+  process.env.NEXT_PUBLIC_API_URL;
 
 function buildApiUrl(path: string): string {
   if (!API_URL) {
@@ -65,12 +66,15 @@ export const listConfigsService = async (): Promise<
 > => {
   const headers = {
     ...getAuthHeaders(),
-    "Content-Type": "application/json",
+    "Content-Type": "application/x-www-form-urlencoded",
   };
+
+  const body = new URLSearchParams({ category: "" });
 
   return customAuthFetch(buildApiUrl("/sft/list-configs"), {
     method: "POST",
     headers,
+    body: body.toString(),
   });
 };
 

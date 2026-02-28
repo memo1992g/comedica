@@ -1,0 +1,36 @@
+.kpisBar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f2f2f7;
+  border-bottom: 0.8px solid #e2e2e7;
+}
+
+.kpiCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: white;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.kpiValue {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #23366a;
+}
+
+.kpiLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 16.5px;
+  color: #bbbbbb;
+}

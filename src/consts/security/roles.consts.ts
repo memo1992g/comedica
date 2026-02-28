@@ -1,0 +1,281 @@
+import type { RoleI, PermissionModuleI } from "@/interfaces/security/roles";
+
+export const MOCK_ROLES: RoleI[] = [
+  {
+    id: 1,
+    code: "ADMIN_SISTEMA",
+    roleId: "ROL001",
+    name: "Administrador General",
+    description: "Administrador con acceso completo al sistema",
+    status: "activo",
+    usersCount: 3,
+    createdAt: "2024-06-15T08:00:00Z",
+    createdBy: "sistema",
+    updatedAt: "2025-01-10T14:30:00Z",
+    updatedBy: "carlos.martinez",
+  },
+  {
+    id: 2,
+    code: "CAJERO_PRINCIPAL",
+    roleId: "ROL002",
+    name: "Cajero Principal",
+    description: "Operaciones de caja y atención al cliente",
+    status: "activo",
+    usersCount: 25,
+    createdAt: "2024-07-01T10:00:00Z",
+    createdBy: "carlos.martinez",
+    updatedAt: null,
+    updatedBy: null,
+  },
+  {
+    id: 3,
+    code: "AUDITOR_INTERNO",
+    roleId: "ROL003",
+    name: "Auditor Interno",
+    description: "Acceso de solo lectura para auditoría",
+    status: "activo",
+    usersCount: 5,
+    createdAt: "2024-07-10T09:00:00Z",
+    createdBy: "carlos.martinez",
+    updatedAt: "2025-01-05T11:00:00Z",
+    updatedBy: "ana.recinos",
+  },
+  {
+    id: 4,
+    code: "CONSULTA_REPORTES",
+    roleId: "ROL004",
+    name: "Consulta de Reportes",
+    description: "Visualización y exportación de reportes",
+    status: "activo",
+    usersCount: 15,
+    createdAt: "2024-08-01T08:30:00Z",
+    createdBy: "carlos.martinez",
+    updatedAt: null,
+    updatedBy: null,
+  },
+  {
+    id: 5,
+    code: "SOPORTE_TECNICO",
+    roleId: "ROL005",
+    name: "Soporte Técnico",
+    description: "Soporte y gestión de tokens",
+    status: "activo",
+    usersCount: 8,
+    createdAt: "2024-08-15T14:00:00Z",
+    createdBy: "carlos.martinez",
+    updatedAt: null,
+    updatedBy: null,
+  },
+  {
+    id: 6,
+    code: "CONSULTA_BASICA",
+    roleId: "ROL006",
+    name: "Consulta Básica",
+    description: "Acceso básico de solo lectura",
+    status: "inactivo",
+    usersCount: 0,
+    createdAt: "2024-09-01T07:00:00Z",
+    createdBy: "ana.recinos",
+    updatedAt: "2025-01-12T16:45:00Z",
+    updatedBy: "carlos.martinez",
+  },
+];
+
+export const MOCK_PERMISSION_MODULES: PermissionModuleI[] = [
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    actions: [{ key: "view", label: "Ver" }],
+  },
+  {
+    key: "parametros",
+    label: "Parámetros",
+    actions: [
+      { key: "view", label: "Ver" },
+      { key: "create", label: "Crear" },
+      { key: "edit", label: "Editar" },
+      { key: "delete", label: "Eliminar" },
+    ],
+    children: [
+      {
+        key: "parametros.generales",
+        label: "Generales",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "edit", label: "Editar" },
+        ],
+      },
+      {
+        key: "parametros.seguridad",
+        label: "Seguridad",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "edit", label: "Editar" },
+        ],
+      },
+    ],
+  },
+  {
+    key: "reportes",
+    label: "Reportes",
+    actions: [
+      { key: "view", label: "Ver" },
+      { key: "export", label: "Exportar" },
+    ],
+    children: [
+      {
+        key: "reportes.internos",
+        label: "Internos",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "export", label: "Exportar" },
+        ],
+      },
+      {
+        key: "reportes.regulatorios",
+        label: "Regulatorios",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "export", label: "Exportar" },
+        ],
+      },
+    ],
+  },
+  {
+    key: "gestiones",
+    label: "Gestiones",
+    actions: [
+      { key: "view", label: "Ver" },
+      { key: "create", label: "Crear" },
+      { key: "edit", label: "Editar" },
+      { key: "delete", label: "Eliminar" },
+    ],
+    children: [
+      {
+        key: "gestiones.reclamos",
+        label: "Reclamos",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "create", label: "Crear" },
+          { key: "edit", label: "Editar" },
+        ],
+      },
+      {
+        key: "gestiones.corresponsales",
+        label: "Corresponsales",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "create", label: "Crear" },
+          { key: "edit", label: "Editar" },
+          { key: "delete", label: "Eliminar" },
+        ],
+      },
+    ],
+  },
+  {
+    key: "seguridad",
+    label: "Seguridad",
+    actions: [
+      { key: "view", label: "Ver" },
+      { key: "create", label: "Crear" },
+      { key: "edit", label: "Editar" },
+      { key: "delete", label: "Eliminar" },
+    ],
+    children: [
+      {
+        key: "seguridad.usuarios",
+        label: "Usuarios",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "create", label: "Crear" },
+          { key: "edit", label: "Editar" },
+        ],
+      },
+      {
+        key: "seguridad.roles",
+        label: "Roles",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "create", label: "Crear" },
+          { key: "edit", label: "Editar" },
+          { key: "delete", label: "Eliminar" },
+        ],
+      },
+      {
+        key: "seguridad.grupos",
+        label: "Grupos",
+        actions: [
+          { key: "view", label: "Ver" },
+          { key: "create", label: "Crear" },
+          { key: "edit", label: "Editar" },
+        ],
+      },
+    ],
+  },
+  {
+    key: "mantenimiento",
+    label: "Mantenimiento",
+    actions: [
+      { key: "view", label: "Ver" },
+      { key: "create", label: "Crear" },
+      { key: "edit", label: "Editar" },
+      { key: "delete", label: "Eliminar" },
+    ],
+  },
+];
+
+export const MOCK_ROLE_PERMISSIONS: Record<number, string[]> = {
+  1: [
+    "dashboard:view",
+    "parametros:view", "parametros:create", "parametros:edit", "parametros:delete",
+    "parametros.generales:view", "parametros.generales:edit",
+    "parametros.seguridad:view", "parametros.seguridad:edit",
+    "reportes:view", "reportes:export",
+    "reportes.internos:view", "reportes.internos:export",
+    "reportes.regulatorios:view", "reportes.regulatorios:export",
+    "gestiones:view", "gestiones:create", "gestiones:edit", "gestiones:delete",
+    "gestiones.reclamos:view", "gestiones.reclamos:create", "gestiones.reclamos:edit",
+    "gestiones.corresponsales:view", "gestiones.corresponsales:create", "gestiones.corresponsales:edit", "gestiones.corresponsales:delete",
+    "seguridad:view", "seguridad:create", "seguridad:edit", "seguridad:delete",
+    "seguridad.usuarios:view", "seguridad.usuarios:create", "seguridad.usuarios:edit",
+    "seguridad.roles:view", "seguridad.roles:create", "seguridad.roles:edit", "seguridad.roles:delete",
+    "seguridad.grupos:view", "seguridad.grupos:create", "seguridad.grupos:edit",
+    "mantenimiento:view", "mantenimiento:create", "mantenimiento:edit", "mantenimiento:delete",
+  ],
+  2: [
+    "dashboard:view",
+    "gestiones:view",
+    "gestiones.reclamos:view", "gestiones.reclamos:create", "gestiones.reclamos:edit",
+    "gestiones.corresponsales:view",
+    "reportes:view", "reportes:export",
+    "reportes.internos:view", "reportes.internos:export",
+  ],
+  3: [
+    "dashboard:view",
+    "reportes:view", "reportes:export",
+    "reportes.internos:view", "reportes.internos:export",
+    "reportes.regulatorios:view", "reportes.regulatorios:export",
+    "seguridad:view",
+    "seguridad.usuarios:view",
+    "seguridad.roles:view",
+    "parametros:view",
+    "parametros.seguridad:view",
+  ],
+  4: [
+    "dashboard:view",
+    "reportes:view", "reportes:export",
+    "reportes.internos:view", "reportes.internos:export",
+  ],
+  5: [
+    "dashboard:view",
+    "seguridad:view",
+    "seguridad.usuarios:view", "seguridad.usuarios:edit",
+    "parametros:view",
+    "mantenimiento:view",
+  ],
+  6: [
+    "dashboard:view",
+    "reportes:view",
+    "reportes.internos:view",
+  ],
+};

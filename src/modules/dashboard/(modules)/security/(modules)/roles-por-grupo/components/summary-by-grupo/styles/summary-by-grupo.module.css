@@ -1,0 +1,115 @@
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.headerRow th {
+  background: white;
+  border-bottom: 0.8px solid #e2e2e7;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #23366a;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.oddRow {
+  background: #f2f2f7;
+}
+
+.evenRow {
+  background: white;
+}
+
+.oddRow td,
+.evenRow td {
+  border-bottom: 0.8px solid #e2e2e7;
+}
+
+.cellGroup {
+  padding: 12px 16px;
+}
+
+.groupInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.groupName {
+  font-size: 11px;
+  line-height: 16.5px;
+  color: #23366a;
+}
+
+.groupId {
+  font-size: 10px;
+  line-height: 15px;
+  color: #bbbbbb;
+}
+
+.cellStatus {
+  padding: 12px 16px;
+}
+
+.badgeActive {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 10px;
+  color: #008236;
+  background: #e6f4ec;
+}
+
+.badgeInactive {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 10px;
+  color: #4a4a4c;
+  background: #f2f2f7;
+}
+
+.cellRoles {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.badgeContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.roleBadge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  line-height: 16px;
+  color: #23366a;
+  background: #e8edf5;
+  white-space: nowrap;
+}
+
+.rolesCount {
+  font-size: 10px;
+  line-height: 15px;
+  color: #bbbbbb;
+  margin-top: 2px;
+}
+
+.cellTotal {
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #23366a;
+}

@@ -1,0 +1,138 @@
+.preview {
+  width: 220px;
+  min-height: 320px;
+  background: #23366a;
+  border-radius: 12px;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.previewTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 16px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 0;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 24px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+}
+
+.moduleList {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.moduleItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: default;
+}
+
+.moduleItem svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.55; }
+
+.moduleItemActive {
+  composes: moduleItem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.moduleItemActive svg { opacity: 1; }
+
+.moduleItemExpanded {
+  composes: moduleItem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.moduleItemExpanded svg { opacity: 0.9; }
+
+.expandedName { flex: 1; }
+
+.chevron { opacity: 0.6; margin-left: auto; }
+
+.categoryList {
+  list-style: none;
+  margin: 0;
+  padding: 2px 0 2px 24px;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.categoryItemActive {
+  composes: categoryItem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 4px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.dotActive {
+  composes: dot;
+  background: #6d93d2;
+}
+
+.subCatGroup {
+  list-style: none;
+  padding: 2px 0;
+}
+
+.subCatLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.subCatItems {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 14px;
+}
+
+.subCatItem {
+  padding: 3px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+}

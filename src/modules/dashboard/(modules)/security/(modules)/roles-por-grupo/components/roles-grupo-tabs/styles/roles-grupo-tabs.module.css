@@ -1,0 +1,57 @@
+.tabsContainer {
+  margin-top: 24px;
+  width: 100%;
+}
+
+.tabsList {
+  position: relative;
+  display: inline-flex;
+  height: auto;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  border-bottom: 0.8px solid #e2e2e7;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  gap: 8px;
+}
+
+.tabTrigger {
+  position: relative;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 13.3px;
+  line-height: 19.95px;
+  color: #bbbbbb;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.tabTrigger:hover {
+  color: #23366a;
+  background: none;
+}
+
+.tabTrigger[data-state="active"] {
+  color: #23366a;
+  background: none;
+  box-shadow: none;
+}
+
+.indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background-color: #23366a;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}

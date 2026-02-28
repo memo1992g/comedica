@@ -9,6 +9,7 @@ export type AuditClassificationCode =
   | "REPORTS"
   | "TRANSACTIONS"
   | "SOFTTOKEN"
+  | "GROUPS"
   | "OTHER";
 
 export interface AuditChangesFilterI {

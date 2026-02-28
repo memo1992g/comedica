@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/authStore';
 import styles from './styles/DashboardSidebar.module.css';
 import { sidebarItems } from './consts/dashboard-sidebar.config';
 import type { Item, SubItem } from './consts/dashboard-sidebar.config';
+import Image from "next/image";
 
 export default function DashboardSidebar({
   isCollapsed,
@@ -20,12 +21,15 @@ export default function DashboardSidebar({
   const { user } = useAuthStore();
   const currentParentKey = useMemo(() => {
     const match = sidebarItems.find(
-      (item) => item.children && pathname.startsWith(item.basePath ?? item.href)
+      (item) =>
+        item.children && pathname.startsWith(item.basePath ?? item.href),
     );
     return match?.basePath ?? match?.href ?? null;
   }, [pathname]);
 
-  const [expandedItem, setExpandedItem] = useState<string | null>(currentParentKey);
+  const [expandedItem, setExpandedItem] = useState<string | null>(
+    currentParentKey,
+  );
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [expandedSubitems, setExpandedSubitems] = useState<Record<string, boolean>>({});
 
@@ -51,7 +55,7 @@ export default function DashboardSidebar({
     .split(' ')
     .slice(0, 2)
     .map((p) => p.charAt(0).toUpperCase())
-    .join('');
+    .join("");
 
   const handleItemClick = (item: Item, e: React.MouseEvent) => {
     if (item.children && item.children.length > 0 && !isCollapsed) {
@@ -108,16 +112,26 @@ export default function DashboardSidebar({
   return (
     <aside className={isCollapsed ? styles.sidebarCollapsed : styles.sidebar}>
       <div className={styles.top}>
-        <div className={styles.logoRow}>
-          <img
+        <div className={styles.logoRow}>          
+          <Image
             className={styles.logo}
-            src="/images/comedica-logo-white.png"
-            alt="Comédica"
+            src={
+              isCollapsed
+                ? "/images/comedica-logo-white-small.svg"
+                : "/images/comedica-logo-white.svg"
+            }
+            alt='Comédica'
+            width={isCollapsed ? 40 : 200}
+            height={isCollapsed ? 40 : 50}
           />
         </div>
 
         {!isCollapsed && (
-          <button className={styles.toggle} onClick={onToggle} aria-label="Colapsar sidebar">
+          <button
+            className={styles.toggle}
+            onClick={onToggle}
+            aria-label='Colapsar sidebar'
+          >
             <ChevronLeft size={14} />
           </button>
         )}
@@ -127,7 +141,8 @@ export default function DashboardSidebar({
         {sidebarItems.map((it) => {
           const itemKey = it.basePath ?? it.href;
           const matchPath = it.basePath ?? it.href;
-          const active = pathname === it.href || pathname.startsWith(matchPath + '/');
+          const active =
+            pathname === it.href || pathname.startsWith(matchPath + "/");
           const isExpanded = expandedItem === itemKey;
           const hasChildren = it.children && it.children.length > 0;
           const isHovered = hoveredItem === itemKey;
@@ -136,22 +151,27 @@ export default function DashboardSidebar({
             <div
               key={it.href}
               className={styles.navGroup}
-              onMouseEnter={() => isCollapsed && hasChildren && setHoveredItem(itemKey)}
+              onMouseEnter={() =>
+                isCollapsed && hasChildren && setHoveredItem(itemKey)
+              }
               onMouseLeave={() => isCollapsed && setHoveredItem(null)}
             >
               <Link
                 href={it.href}
-                className={`${styles.navItem} ${active ? styles.active : ''}`}
+                className={`${styles.navItem} ${active ? styles.active : ""}`}
                 title={isCollapsed ? it.label : undefined}
                 onClick={(e) => handleItemClick(it, e)}
               >
-                <img className={styles.icon} src={it.icon} alt="" />
+                <Image className={styles.icon} src={it.icon} alt='' width={24} height={24} />
                 {!isCollapsed && (
                   <span className={styles.label}>
                     {it.label}
-                    {hasChildren && (
-                      isExpanded ? <ChevronDown className={styles.chev} /> : <ChevronRight className={styles.chev} />
-                    )}
+                    {hasChildren &&
+                      (isExpanded ? (
+                        <ChevronDown className={styles.chev} />
+                      ) : (
+                        <ChevronRight className={styles.chev} />
+                      ))}
                   </span>
                 )}
               </Link>
@@ -168,12 +188,14 @@ export default function DashboardSidebar({
                 <div className={styles.popover}>
                   <div className={styles.popoverTitle}>{it.label}</div>
                   {it.children!.map((child) => {
-                    const childActive = pathname === child.href || pathname.startsWith(child.href + '/');
+                    const childActive =
+                      pathname === child.href ||
+                      pathname.startsWith(child.href + "/");
                     return (
                       <Link
                         key={child.href}
                         href={child.href}
-                        className={`${styles.popoverItem} ${childActive ? styles.popoverItemActive : ''}`}
+                        className={`${styles.popoverItem} ${childActive ? styles.popoverItemActive : ""}`}
                       >
                         {child.label}
                       </Link>
@@ -187,11 +209,15 @@ export default function DashboardSidebar({
       </nav>
 
       <div className={styles.userBar}>
-        <div className={styles.avatar}>{initials || 'AP'}</div>
+        <div className={styles.avatar}>{initials || "AP"}</div>
         {!isCollapsed && (
           <div className={styles.userText}>
-            <div className={styles.userName}>{user?.fullName || user?.username || 'Amy Pérez'}</div>
-            <div className={styles.userRole}>{user?.role || 'Administrador'}</div>
+            <div className={styles.userName}>
+              {user?.fullName || user?.username || "Amy Pérez"}
+            </div>
+            <div className={styles.userRole}>
+              {user?.role || "Administrador"}
+            </div>
           </div>
         )}
         {!isCollapsed && <div className={styles.dots}>⋮</div>}

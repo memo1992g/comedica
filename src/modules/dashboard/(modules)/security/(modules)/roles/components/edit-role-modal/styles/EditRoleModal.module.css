@@ -1,0 +1,63 @@
+.modal {
+  max-width: 720px !important;
+  width: 100%;
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.modalBody {
+  padding: 24px 28px;
+}
+
+.modalTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #23366a;
+  margin: 0 0 4px;
+}
+
+.modalSubtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #bbb;
+  margin: 0 0 20px;
+}
+
+.tabsRoot {
+  width: 100%;
+}
+
+.tabsList {
+  width: 100%;
+  display: flex;
+  background: transparent;
+  border-bottom: 1px solid #e2e2e7;
+  border-radius: 0;
+  padding: 0;
+  gap: 0;
+  height: auto;
+}
+
+.tabsTrigger {
+  flex: 1;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #bbb;
+  padding: 10px 12px;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  box-shadow: none;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tabsTrigger[data-state="active"] {
+  color: #23366a;
+  border-bottom-color: #23366a;
+  background: transparent;
+  box-shadow: none;
+}

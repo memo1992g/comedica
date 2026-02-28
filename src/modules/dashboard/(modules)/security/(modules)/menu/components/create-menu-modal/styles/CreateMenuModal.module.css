@@ -1,0 +1,397 @@
+.modal {
+  max-width: 900px;
+  border-radius: 16px;
+  border: 1px solid #e8e8e8;
+  padding: 0;
+  overflow: hidden;
+}
+
+.modalHeader {
+  padding: 24px 24px 0;
+}
+
+.modalTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #23366a;
+  margin: 0 0 4px;
+}
+
+.modalSubtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #4a4a4c;
+  margin: 0 0 8px;
+}
+
+/* shadcn Tabs overrides */
+.tabsList {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 0 24px;
+  background: transparent;
+}
+
+.tabTrigger {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #4a4a4c;
+  padding: 8px 24px;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.tabTrigger[data-state="active"] {
+  color: #23366a;
+  border-bottom-color: #23366a;
+  font-weight: 400;
+}
+
+.tabContent {
+  padding: 20px 24px 0;
+}
+
+/* Body grid: form left + preview right */
+.bodyRow {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.formSide {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Form elements */
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.formFull {
+  margin-bottom: 12px;
+}
+
+.fieldLabel {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4a4a4c;
+  margin-bottom: 4px;
+}
+
+.fieldInput {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 6px;
+  background: #f2f2f7;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #4a4a4c;
+  outline: none;
+}
+
+.fieldInput:focus {
+  border-color: #23366a;
+}
+
+.fieldTextarea {
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 6px;
+  background: #f2f2f7;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #4a4a4c;
+  outline: none;
+  resize: vertical;
+}
+
+.fieldTextarea:focus {
+  border-color: #23366a;
+}
+
+.selectField {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 6px;
+  background: #f2f2f7;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #4a4a4c;
+  outline: none;
+  appearance: auto;
+}
+
+.checkboxList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 6px;
+  background: #f2f2f7;
+}
+
+.checkboxItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #4a4a4c;
+}
+
+.checkboxItem input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #23366a;
+}
+
+.errorText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #d32f2f;
+  margin-top: 4px;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 40px;
+  padding: 0 20px;
+  border: 1px solid #23366a;
+  border-radius: 4px;
+  background: white;
+  color: #23366a;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.saveBtn {
+  flex: 1;
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* SVG preview area */
+.svgPreview {
+  width: 48px;
+  height: 48px;
+  border: 1px dashed #d1d1d6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.svgPreview svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* SVG upload area */
+.svgUploadZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: #f2f2f7;
+  border: 1px solid #d1d1d6;
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 80px;
+}
+
+.svgUploadZone:hover {
+  border-color: #23366a;
+}
+
+.svgUploadZone svg {
+  color: #bbb;
+}
+
+.svgUploadText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #bbb;
+  text-align: center;
+}
+
+.svgDivider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.svgDividerLine {
+  flex: 1;
+  height: 1px;
+  background: #e2e2e7;
+}
+
+.svgDividerText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #bbb;
+  white-space: nowrap;
+}
+
+.svgCodeToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f2f2f7;
+  border: 1px solid #d1d1d6;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #4a4a4c;
+  width: 100%;
+}
+
+.svgCodeToggle svg {
+  flex-shrink: 0;
+}
+
+.svgCodeLabel {
+  flex: 1;
+  text-align: center;
+}
+
+/* Enhanced checkbox items with description and badge */
+.checkboxItemEnhanced {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.checkboxItemEnhanced:last-child {
+  border-bottom: none;
+}
+
+.checkboxItemEnhanced input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #23366a;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.checkboxControl {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  border-color: #23366a !important;
+}
+
+.checkboxItemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.checkboxItemName {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4a4a4c;
+  margin: 0;
+}
+
+.checkboxItemDesc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #bbb;
+  margin: 2px 0 0;
+}
+
+.checkboxBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: #c2590a;
+  background: #fff3e0;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Select field override for shadcn */
+.selectTrigger {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #23366a;
+}
+
+.selectContent {
+  border: 0.8px solid #d1d1d6;
+  border-radius: 6px;
+  background: white;
+}
+
+.selectItem {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #4a4a4c;
+}

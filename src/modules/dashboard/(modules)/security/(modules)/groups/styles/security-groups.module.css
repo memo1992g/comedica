@@ -1,0 +1,147 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.headerLeft h1 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+  color: #23366a;
+  margin: 0;
+}
+
+.headerLeft p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #bbb;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.addButton {
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.addButton:hover {
+  opacity: 0.9;
+}
+
+.historyButton {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid #23366a;
+  border-radius: 4px;
+  background: white;
+  color: #23366a;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.historyButton:hover {
+  background: #f2f2f7;
+}
+
+/* Table section */
+.tableSection {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  background: white;
+}
+
+/* Search bar */
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.searchInputWrapper {
+  position: relative;
+  flex: 1;
+}
+
+.searchInputWrapper svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #bbb;
+}
+
+.searchInput {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px 0 40px;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #23366a;
+  background: white;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: #bbb;
+}
+
+.searchInput:focus {
+  border-color: #23366a;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 4px;
+  background: white;
+  color: #bbb;
+  cursor: pointer;
+}
+
+.filterButton:hover {
+  border-color: #23366a;
+  color: #23366a;
+}

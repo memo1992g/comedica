@@ -1,0 +1,125 @@
+.tabContent {
+  padding: 20px 0 0;
+}
+
+.description {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #8e8e93;
+  margin: 0 0 16px;
+  line-height: 18px;
+}
+
+.tableContainer {
+  max-height: 360px;
+  overflow-y: auto;
+  border: 0.8px solid #e2e2e7;
+  border-radius: 6px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #23366a;
+  background: #f8f8fa;
+  border-bottom: 0.8px solid #e2e2e7;
+  white-space: nowrap;
+}
+
+.tr {
+  border-bottom: 0.8px solid #f2f2f7;
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.td {
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #4a4a4c;
+  vertical-align: middle;
+}
+
+.tdModule {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #23366a;
+  vertical-align: middle;
+}
+
+.badgesWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  background: #f2f2f7;
+  color: #4a4a4c;
+  border: 0.5px solid #e2e2e7;
+  white-space: nowrap;
+}
+
+.emptyRow {
+  padding: 40px 14px;
+  text-align: center;
+  font-size: 13px;
+  color: #bbb;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e8e8e8;
+  margin-top: 12px;
+}
+
+.cancelBtn {
+  height: 36px;
+  padding: 0 20px;
+  border: 1px solid #d1d1d6;
+  border-radius: 4px;
+  background: white;
+  color: #4a4a4c;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #f2f2f7;
+}
+
+.saveBtn {
+  height: 36px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  opacity: 0.9;
+}

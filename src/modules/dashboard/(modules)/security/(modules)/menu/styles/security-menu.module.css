@@ -1,0 +1,268 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  overflow: hidden;
+  gap: 0;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.headerLeft h1 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+  color: #23366a;
+  margin: 0;
+}
+
+.headerLeft p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #bbb;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.addButton {
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.addButton:hover {
+  opacity: 0.9;
+}
+
+.historyButton {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid #23366a;
+  border-radius: 4px;
+  background: white;
+  color: #23366a;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.historyButton:hover {
+  background: #f2f2f7;
+}
+
+.tableSection {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow: auto;
+  background: white;
+}
+
+.paginationContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border: 0.8px solid #e2e2e7;
+  border-top: none;
+  background: white;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.searchContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: #bbb;
+  pointer-events: none;
+}
+
+.searchInput {
+  height: 36px;
+  padding: 4px 12px 4px 40px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: #bbb;
+  background: #f2f2f7;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 250px;
+}
+
+.searchInput:focus {
+  border-color: #d1d1d6;
+}
+
+.searchInput::placeholder {
+  color: #bbb;
+}
+
+.dateRangeContainer {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.dateRangeButton {
+  height: 36px;
+  min-width: 165px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  color: #bbb;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.dateRangeButton:hover {
+  background: #f2f2f7;
+  border-color: #d1d1d6;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0.8px solid #d1d1d6;
+  border-radius: 4px;
+  background: #f2f2f7;
+  color: #bbb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterButton:hover {
+  background: #f2f2f7;
+  border-color: #d1d1d6;
+}
+
+.filterIcon {
+  color: #bbb;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pageInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageLabel {
+  font-size: 16px;
+  line-height: 24px;
+  color: #bbb;
+}
+
+.pageSizeTrigger {
+  width: 70px;
+  height: 36px;
+  padding: 0 12px;
+  border: 0.8px solid #ffffff;
+  border-radius: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000;
+  background: white;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pageSizeContent {
+  border: 0.8px solid #d1d1d6;
+  border-radius: 8px;
+  background: white;
+}
+
+.pageSizeItem {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: #4a4a4c;
+}
+
+.itemsInfo {
+  font-size: 16px;
+  line-height: 24px;
+  color: #bbb;
+  white-space: nowrap;
+}
+
+.navButtons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 14px;
+  background: white;
+  color: #bbb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navButton:hover:not(:disabled) {
+  background: #f2f2f7;
+  color: #23366a;
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

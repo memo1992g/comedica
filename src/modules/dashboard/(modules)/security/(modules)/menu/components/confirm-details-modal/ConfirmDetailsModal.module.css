@@ -1,0 +1,129 @@
+.overlay {
+  max-width: 480px;
+  border-radius: 16px;
+  border: 1px solid #e8e8e8;
+  padding: 0;
+  overflow: hidden;
+}
+
+.body {
+  padding: 24px;
+}
+
+.title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #23366a;
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #bbb;
+  margin: 0 0 20px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.table tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table tr:last-child {
+  border-bottom: none;
+}
+
+.labelCell {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9999a5;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 8px 12px 8px 0;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.valueCell {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #23366a;
+  font-weight: 500;
+  padding: 8px 0;
+  word-break: break-word;
+}
+
+.successBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f0faf4;
+  border: 1px solid #a3d9b5;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.successIcon {
+  color: #2e7d52;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.successTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2e7d52;
+  margin: 0 0 3px;
+}
+
+.successText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #4a7c61;
+  margin: 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.cancelBtn {
+  height: 36px;
+  padding: 0 20px;
+  border: 1px solid #23366a;
+  border-radius: 4px;
+  background: white;
+  color: #23366a;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.confirmBtn {
+  height: 36px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.confirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

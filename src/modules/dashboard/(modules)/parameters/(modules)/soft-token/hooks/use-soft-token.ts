@@ -38,7 +38,7 @@ function mapFlowsToConfig(
     const isGenericConfig = config.productCode == null && config.typeCode == null;
     const hasSpecificContext = config.productName || config.typeName;
     const contextLabel = hasSpecificContext
-      ? ` · ${config.productName ?? 'General'} / ${config.typeName ?? 'General'}`
+      ? ` · ${config.typeName ?? 'General'}`
       : '';
 
     return {
