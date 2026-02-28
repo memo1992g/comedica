@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { mockUsers } from '../data/mock-data';
-import type { UserResult } from '../data/mock-data';
-import type { MainTab, SubTab, TabIndicatorStyle } from '../interfaces/UsersConsultations';
+import type { MainTab, SubTab, TabIndicatorStyle, SearchHistoryEntry, UserResult } from '../interfaces/UsersConsultations';
 import { consultUser } from '@/lib/api/user-management.service';
 import { toConsultationUser } from '@/lib/api/types/user-management.types';
+
+const MAX_HISTORY_ENTRIES = 5;
 
 export function useUsersConsultations() {
   const [activeTab, setActiveTab] = useState<MainTab>('usuarios');
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('general');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserResult | null>(null);
+  const [users, setUsers] = useState<UserResult[]>([]);
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -29,10 +31,11 @@ export function useUsersConsultations() {
     });
   }, [activeTab]);
 
-  const filteredUsers = mockUsers.filter((user) =>
+  const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.dui.includes(searchQuery) ||
-    user.username.toLowerCase().includes(searchQuery.toLowerCase())
+    user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.id.includes(searchQuery)
   );
 
   useEffect(() => {
@@ -59,8 +62,26 @@ export function useUsersConsultations() {
 
       try {
         const profile = await consultUser(Number(searchQuery.trim()));
+        const consultationUser = toConsultationUser(profile);
+
         if (!cancelled) {
-          setSelectedUser(toConsultationUser(profile));
+          setSelectedUser(consultationUser);
+          setUsers((currentUsers) => {
+            const withoutDuplicated = currentUsers.filter((user) => user.id !== consultationUser.id);
+            return [consultationUser, ...withoutDuplicated];
+          });
+          setSearchHistory((currentHistory) => {
+            const query = searchQuery.trim();
+            const now = new Date();
+            const entry: SearchHistoryEntry = {
+              id: `${now.getTime()}`,
+              query,
+              timestamp: now.toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit' }),
+            };
+
+            const deduped = currentHistory.filter((item) => item.query !== query);
+            return [entry, ...deduped].slice(0, MAX_HISTORY_ENTRIES);
+          });
         }
       } catch (error) {
         if (!cancelled) {
@@ -74,7 +95,7 @@ export function useUsersConsultations() {
       }
     };
 
-    fetchUser();
+    void fetchUser();
 
     return () => {
       cancelled = true;
@@ -85,10 +106,11 @@ export function useUsersConsultations() {
     setSearchQuery(query);
     setActiveSubTab('general');
 
-    const matchedUser = mockUsers.find((user) =>
+    const matchedUser = users.find((user) =>
       user.name.toLowerCase().includes(query.toLowerCase()) ||
       user.dui.includes(query) ||
-      user.username.toLowerCase().includes(query.toLowerCase())
+      user.username.toLowerCase().includes(query.toLowerCase()) ||
+      user.id.includes(query)
     );
 
     setSelectedUser(matchedUser ?? null);
@@ -106,6 +128,8 @@ export function useUsersConsultations() {
     activeSubTab,
     searchQuery,
     selectedUser,
+    users,
+    searchHistory,
     showSecurityModal,
     tabRefs,
     indicatorStyle,

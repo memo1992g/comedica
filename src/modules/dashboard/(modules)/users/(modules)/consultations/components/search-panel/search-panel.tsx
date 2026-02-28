@@ -2,7 +2,7 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { UserResult, SearchHistoryEntry } from '../../data/mock-data';
+import type { UserResult, SearchHistoryEntry } from '../../interfaces/UsersConsultations';
 import styles from './styles/search-panel.module.css';
 
 interface SearchPanelProps {

@@ -6,10 +6,6 @@ import SearchPanel from './components/search-panel/search-panel';
 import UserDetailInfo from './components/user-detail-info/user-detail-info';
 import UserStatePanel from './components/user-state-panel/user-state-panel';
 import SecurityModal from './components/security-modal/security-modal';
-import {
-  mockUsers,
-  mockSearchHistory,
-} from './data/mock-data';
 import { useUsersConsultations } from './hooks/use-users-consultations';
 import styles from './styles/users-consultations.module.css';
 
@@ -30,15 +26,13 @@ export default function UsersConsultations() {
     setSearchQuery,
     setSelectedUser,
     setShowSecurityModal,
+    users,
+    searchHistory,
     handleHistorySelect,
     handleSaveState,
     handleVerify,
     handleTabChange,
   } = useUsersConsultations();
-
-  const usersForList = selectedUser
-    ? [selectedUser, ...mockUsers.filter((user) => user.id !== selectedUser.id)]
-    : mockUsers;
 
   return (
     <div className={styles.container}>
@@ -68,10 +62,10 @@ export default function UsersConsultations() {
               onSearchChange={setSearchQuery}
               activeSubTab={activeSubTab}
               onSubTabChange={setActiveSubTab}
-              users={usersForList}
+              users={users}
               selectedUserId={selectedUser?.id ?? null}
               onSelectUser={setSelectedUser}
-              searchHistory={mockSearchHistory}
+              searchHistory={searchHistory}
               onHistorySelect={handleHistorySelect}
             />
           </div>
