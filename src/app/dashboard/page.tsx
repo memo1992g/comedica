@@ -699,9 +699,24 @@ function PieChart({ data }: { data: DistributionItem[] }) {
       <svg width="240" height="220">
         {!hasData && <circle cx={cx} cy={cy} r={r} fill="#EEF1F6" />}
         {slices.length === 1 && <circle cx={cx} cy={cy} r={r} fill={slices[0].color} />}
-        {slices.length > 1 && slices.map((s) => (
-          <path key={s.label} d={arc(s.start, s.end)} fill={s.color} />
-        ))}
+        {slices.length > 1 && slices.map((s) => {
+          const percent = Math.round((s.value / total) * 100);
+          const mid = (s.start + s.end) / 2;
+          const labelRadius = r * 0.58;
+          const textX = cx + labelRadius * Math.cos(2 * Math.PI * mid - Math.PI / 2);
+          const textY = cy + labelRadius * Math.sin(2 * Math.PI * mid - Math.PI / 2);
+
+          return (
+            <g key={s.label}>
+              <path d={arc(s.start, s.end)} fill={s.color} />
+              {percent >= 8 && (
+                <text x={textX} y={textY} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill="#FFFFFF" fontWeight="700">
+                  {percent}%
+                </text>
+              )}
+            </g>
+          );
+        })}
       </svg>
     </div>
   );
@@ -709,6 +724,7 @@ function PieChart({ data }: { data: DistributionItem[] }) {
 
 /** Barras simples con SVG (sin librerías) */
 function BarChart({ data }: { data: VolumeItem[] }) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const chartData = data.length > 0 ? data : [{ label: '-', value: 0 }];
   const max = Math.max(...chartData.map((d) => d.value), 1);
   const leftAxisX = 80;
@@ -723,6 +739,9 @@ function BarChart({ data }: { data: VolumeItem[] }) {
     if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
     return `$${value.toFixed(0)}`;
   };
+
+  const formatMoneyTooltip = (value: number) =>
+    `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
     <div className={styles.barWrap}>
@@ -754,7 +773,17 @@ function BarChart({ data }: { data: VolumeItem[] }) {
           const label = d.label.length > 18 ? `${d.label.slice(0, 18)}…` : d.label;
 
           return (
-            <g key={d.label}>
+            <g key={d.label} onMouseEnter={() => setHoveredIndex(i)} onMouseLeave={() => setHoveredIndex(null)}>
+              {hoveredIndex === i && (
+                <rect
+                  x={leftAxisX + i * slot}
+                  y={topY}
+                  width={slot}
+                  height={innerHeight + 62}
+                  fill="#D9DEE8"
+                  opacity="0.45"
+                />
+              )}
               <rect x={x} y={y} width={barWidth} height={h} rx={6} fill="#233269" />
               <text x={x + barWidth / 2} y={y - 6} textAnchor="middle" fontSize="11" fill="#243A6B" fontWeight="700">
                 {d.value.toLocaleString('en-US', { maximumFractionDigits: 0 })}
@@ -771,6 +800,13 @@ function BarChart({ data }: { data: VolumeItem[] }) {
           Tipo de transferencia
         </text>
       </svg>
+
+      {hoveredIndex !== null && chartData[hoveredIndex] && (
+        <div className={styles.chartTooltip}>
+          <div className={styles.chartTooltipTitle}>{chartData[hoveredIndex].label}</div>
+          <div className={styles.chartTooltipValue}>Monto: {formatMoneyTooltip(chartData[hoveredIndex].value)}</div>
+        </div>
+      )}
     </div>
   );
 }
