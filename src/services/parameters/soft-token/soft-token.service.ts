@@ -9,20 +9,42 @@ import type {
 } from "@/interfaces/management/soft-token";
 import customAuthFetch from "@/utilities/auth-fetch/auth-fetch";
 import { generateDynamicUUID } from "@/utilities/uuid-generator";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
-const API_URL =
+const ENV_API_URL =
   process.env.BACKOFFICE_BASE_NEW_API_URL ??
   process.env.NEXT_PUBLIC_API_URL;
 
-function buildApiUrl(path: string): string {
-  if (!API_URL) {
-    throw new Error(
-      "Missing API base URL. Define BACKOFFICE_BASE_NEW_API_URL or NEXT_PUBLIC_API_URL.",
-    );
+const DEFAULT_API_URL = "https://bo-comedica-service-dev.echotechs.net/api";
+
+function resolveApiUrl(): string {
+  if (ENV_API_URL) {
+    return ENV_API_URL;
   }
 
-  return `${API_URL}${path}`;
+  if (DEFAULT_API_URL) {
+    return DEFAULT_API_URL;
+  }
+
+  const requestHeaders = headers();
+  const host =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
+
+  if (host) {
+    return `${protocol}://${host}/api`;
+  }
+
+  throw new Error(
+    "Missing API base URL. Define BACKOFFICE_BASE_NEW_API_URL or NEXT_PUBLIC_API_URL.",
+  );
+}
+
+function buildApiUrl(path: string): string {
+  const apiUrl = resolveApiUrl().replace(/\/$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  return `${apiUrl}${normalizedPath}`;
 }
 
 function getAuthHeaders(): Record<string, string> {

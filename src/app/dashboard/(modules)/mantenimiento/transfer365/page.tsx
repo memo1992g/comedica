@@ -221,7 +221,7 @@ export default function RedTransfer365Page() {
                         <th>Estado</th>
                         <th>Institución</th>
                         <th>Productos</th>
-                        <th>Accione</th>
+                        <th>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -354,7 +354,7 @@ export default function RedTransfer365Page() {
                         <th>Institución</th>
                         <th>Estado</th>
                         <th>País</th>
-                        <th>Accione</th>
+                        <th>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>

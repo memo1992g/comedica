@@ -40,7 +40,7 @@ export const sidebarItems: Item[] = [
       },
       {
         label: "Solicitud de Soft Token",
-        href: "/dashboard/mantenimiento/token",
+        href: "/dashboard/parametros/solicitud-soft-token",
       },
     ],
   },
@@ -70,6 +70,10 @@ export const sidebarItems: Item[] = [
           {
             label: "Cuestionario de Seguridad para Soporte Telefónico",
             href: "/dashboard/mantenimiento/cuestionario-seguridad",
+          },
+          {
+            label: "Quejas y Reclamos",
+            href: "/dashboard/mantenimiento/quejas-reclamos",
           },
         ],
       },
