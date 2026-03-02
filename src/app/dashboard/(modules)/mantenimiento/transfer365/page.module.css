@@ -1,8 +1,11 @@
 /* Contenedor principal */
 .container {
-  padding: 32px;
+  padding: 28px 32px;
   max-width: 1600px;
   margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e6eaf3;
+  border-radius: 12px;
 }
 
 /* Breadcrumb */
@@ -39,15 +42,16 @@
 }
 
 .headerLeft h1 {
-  font-size: 28px;
+  font-size: 42px;
+  line-height: 52px;
   font-weight: 700;
-  color: #233269;
-  margin: 0 0 8px 0;
+  color: #2b467f;
+  margin: 0 0 6px 0;
 }
 
 .headerLeft p {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: 15px;
+  color: #9aa6bb;
   margin: 0;
 }
 
@@ -58,13 +62,13 @@
 
 /* Buttons */
 .btn {
-  height: 40px;
-  padding: 0 24px;
+  height: 44px;
+  padding: 0 20px;
   border: none;
   border-radius: 4px;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -90,7 +94,7 @@
 .btnSecondary {
   background: white;
   color: #23366a;
-  border: 0.8px solid #23366a;
+  border: 1px solid #23366a;
 }
 
 .btnSecondary:hover {
@@ -100,8 +104,8 @@
 /* Tabs */
 .tabs {
   display: flex;
-  border-bottom: 2px solid #e5e7eb;
-  margin-bottom: 32px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 24px;
 }
 
 .tab {
@@ -462,7 +466,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
   cursor: pointer;
   transition: all 0.2s;
