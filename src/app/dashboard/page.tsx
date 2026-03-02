@@ -166,6 +166,20 @@ function mapVolume(metrics: OverviewMetricsResponse): VolumeItem[] {
   return [{ label: formatDate(metrics.data?.fechaHoy), value: Number(metrics.data?.volumenDia ?? 0) }];
 }
 
+function mapVolumeFromRows(rows: TxRow[]): VolumeItem[] {
+  const grouped = new Map<string, number>();
+
+  rows.forEach((row) => {
+    const key = row.type || 'Sin tipo';
+    grouped.set(key, (grouped.get(key) ?? 0) + row.amountValue);
+  });
+
+  return Array.from(grouped.entries())
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 6);
+}
+
 function mapDistributionFromRows(rows: TxRow[]): DistributionItem[] {
   const grouped = new Map<string, number>();
 
@@ -329,14 +343,16 @@ export default function DashboardPage() {
         const start = (page - 1) * pageSize;
         const paged = filteredRows.slice(start, start + pageSize);
 
-        // La distribución siempre se recalcula con el mismo subconjunto
+        // Los gráficos siempre se recalculan con el mismo subconjunto
         // mostrado en la tabla para mantener consistencia con los filtros.
         setDist(mapDistributionFromRows(filteredRows));
+        setVol(mapVolumeFromRows(filteredRows));
 
         setTx({ data: paged, total: filteredRows.length });
       } catch {
         setTx({ data: [], total: 0 });
         setDist([]);
+        setVol([]);
       }
     };
 
@@ -683,9 +699,24 @@ function PieChart({ data }: { data: DistributionItem[] }) {
       <svg width="240" height="220">
         {!hasData && <circle cx={cx} cy={cy} r={r} fill="#EEF1F6" />}
         {slices.length === 1 && <circle cx={cx} cy={cy} r={r} fill={slices[0].color} />}
-        {slices.length > 1 && slices.map((s) => (
-          <path key={s.label} d={arc(s.start, s.end)} fill={s.color} />
-        ))}
+        {slices.length > 1 && slices.map((s) => {
+          const percent = Math.round((s.value / total) * 100);
+          const mid = (s.start + s.end) / 2;
+          const labelRadius = r * 0.58;
+          const textX = cx + labelRadius * Math.cos(2 * Math.PI * mid - Math.PI / 2);
+          const textY = cy + labelRadius * Math.sin(2 * Math.PI * mid - Math.PI / 2);
+
+          return (
+            <g key={s.label}>
+              <path d={arc(s.start, s.end)} fill={s.color} />
+              {percent >= 8 && (
+                <text x={textX} y={textY} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill="#FFFFFF" fontWeight="700">
+                  {percent}%
+                </text>
+              )}
+            </g>
+          );
+        })}
       </svg>
     </div>
   );
@@ -693,38 +724,89 @@ function PieChart({ data }: { data: DistributionItem[] }) {
 
 /** Barras simples con SVG (sin librerías) */
 function BarChart({ data }: { data: VolumeItem[] }) {
-  const max = Math.max(...data.map((d) => d.value), 1);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const chartData = data.length > 0 ? data : [{ label: '-', value: 0 }];
+  const max = Math.max(...chartData.map((d) => d.value), 1);
+  const leftAxisX = 80;
+  const rightAxisX = 880;
+  const topY = 30;
+  const bottomY = 210;
+  const innerHeight = bottomY - topY;
+  const ticks = 4;
+
+  const formatCompactMoney = (value: number) => {
+    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
+    return `$${value.toFixed(0)}`;
+  };
+
+  const formatMoneyTooltip = (value: number) =>
+    `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
     <div className={styles.barWrap}>
-      <svg width="100%" height="260" viewBox="0 0 900 260" preserveAspectRatio="none">
-        {[0, 1, 2, 3].map((i) => (
-          <line
-            key={i}
-            x1={60}
-            x2={880}
-            y1={30 + i * 55}
-            y2={30 + i * 55}
-            stroke="#EEF1F6"
-          />
-        ))}
-
-        {data.map((d, i) => {
-          const width = 70;
-          const gap = 35;
-          const x = 80 + i * (width + gap);
-          const h = (d.value / max) * 180;
-          const y = 210 - h;
+      <svg width="100%" height="300" viewBox="0 0 900 300" preserveAspectRatio="none">
+        {[...Array(ticks + 1)].map((_, i) => {
+          const ratio = i / ticks;
+          const y = topY + ratio * innerHeight;
+          const tickValue = max * (1 - ratio);
           return (
-            <g key={d.label}>
-              <rect x={x} y={y} width={width} height={h} rx={10} fill="#3E7BFA" />
-              <text x={x + width / 2} y={240} textAnchor="middle" fontSize="12" fill="#5B667A">
-                {d.label}
+            <g key={i}>
+              <line x1={leftAxisX} x2={rightAxisX} y1={y} y2={y} stroke="#EEF1F6" />
+              <text x={leftAxisX - 10} y={y + 4} textAnchor="end" fontSize="11" fill="#97A0B3">
+                {formatCompactMoney(tickValue)}
               </text>
             </g>
           );
         })}
+
+        <line x1={leftAxisX} x2={leftAxisX} y1={topY} y2={bottomY} stroke="#DCE3EF" />
+        <line x1={leftAxisX} x2={rightAxisX} y1={bottomY} y2={bottomY} stroke="#DCE3EF" />
+
+        {chartData.map((d, i) => {
+          const totalWidth = rightAxisX - leftAxisX;
+          const slot = totalWidth / chartData.length;
+          const barWidth = Math.min(48, slot * 0.42);
+          const x = leftAxisX + i * slot + (slot - barWidth) / 2;
+          const h = (d.value / max) * innerHeight;
+          const y = bottomY - h;
+          const label = d.label.length > 18 ? `${d.label.slice(0, 18)}…` : d.label;
+
+          return (
+            <g key={d.label} onMouseEnter={() => setHoveredIndex(i)} onMouseLeave={() => setHoveredIndex(null)}>
+              {hoveredIndex === i && (
+                <rect
+                  x={leftAxisX + i * slot}
+                  y={topY}
+                  width={slot}
+                  height={innerHeight + 62}
+                  fill="#D9DEE8"
+                  opacity="0.45"
+                />
+              )}
+              <rect x={x} y={y} width={barWidth} height={h} rx={6} fill="#233269" />
+              <text x={x + barWidth / 2} y={y - 6} textAnchor="middle" fontSize="11" fill="#243A6B" fontWeight="700">
+                {d.value.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+              </text>
+              <text x={x + barWidth / 2} y={238} textAnchor="middle" fontSize="10" fill="#5B667A">
+                {label}
+              </text>
+            </g>
+          );
+        })}
+
+        <text x={42} y={18} fontSize="11" fill="#7D889E" fontWeight="700">Monto</text>
+        <text x={450} y={270} textAnchor="middle" fontSize="11" fill="#7D889E" fontWeight="700">
+          Tipo de transferencia
+        </text>
       </svg>
+
+      {hoveredIndex !== null && chartData[hoveredIndex] && (
+        <div className={styles.chartTooltip}>
+          <div className={styles.chartTooltipTitle}>{chartData[hoveredIndex].label}</div>
+          <div className={styles.chartTooltipValue}>Monto: {formatMoneyTooltip(chartData[hoveredIndex].value)}</div>
+        </div>
+      )}
     </div>
   );
 }

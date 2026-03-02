@@ -33,7 +33,7 @@ export const MENU_MODULES_MOCK: MenuModuleI[] = [
         moduleId: "mod-parametros",
         name: "Solicitud de Soft Token",
         description: "Configuración de solicitudes de soft token",
-        route: "/parametros/soft-token",
+        route: "/parametros/solicitud-soft-token",
         order: 3,
         status: "Activo",
       },
