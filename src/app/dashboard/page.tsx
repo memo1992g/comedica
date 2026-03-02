@@ -724,7 +724,7 @@ function PieChart({ data }: { data: DistributionItem[] }) {
 
 /** Barras simples con SVG (sin librerías) */
 function BarChart({ data }: { data: VolumeItem[] }) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [hoveredBar, setHoveredBar] = useState<{ index: number; leftPct: number; topPct: number } | null>(null);
   const chartData = data.length > 0 ? data : [{ label: '-', value: 0 }];
   const max = Math.max(...chartData.map((d) => d.value), 1);
   const leftAxisX = 80;
@@ -773,8 +773,20 @@ function BarChart({ data }: { data: VolumeItem[] }) {
           const label = d.label.length > 18 ? `${d.label.slice(0, 18)}…` : d.label;
 
           return (
-            <g key={d.label} onMouseEnter={() => setHoveredIndex(i)} onMouseLeave={() => setHoveredIndex(null)}>
-              {hoveredIndex === i && (
+            <g
+              key={d.label}
+              onMouseEnter={() => {
+                const tooltipX = ((x + barWidth / 2) / 900) * 100;
+                const tooltipY = ((y - 8) / 300) * 100;
+                setHoveredBar({
+                  index: i,
+                  leftPct: Math.min(86, Math.max(14, tooltipX)),
+                  topPct: Math.min(72, Math.max(16, tooltipY)),
+                });
+              }}
+              onMouseLeave={() => setHoveredBar(null)}
+            >
+              {hoveredBar?.index === i && (
                 <rect
                   x={leftAxisX + i * slot}
                   y={topY}
@@ -801,10 +813,16 @@ function BarChart({ data }: { data: VolumeItem[] }) {
         </text>
       </svg>
 
-      {hoveredIndex !== null && chartData[hoveredIndex] && (
-        <div className={styles.chartTooltip}>
-          <div className={styles.chartTooltipTitle}>{chartData[hoveredIndex].label}</div>
-          <div className={styles.chartTooltipValue}>Monto: {formatMoneyTooltip(chartData[hoveredIndex].value)}</div>
+      {hoveredBar && chartData[hoveredBar.index] && (
+        <div
+          className={styles.chartTooltip}
+          style={{
+            left: `${hoveredBar.leftPct}%`,
+            top: `${hoveredBar.topPct}%`,
+          }}
+        >
+          <div className={styles.chartTooltipTitle}>{chartData[hoveredBar.index].label}</div>
+          <div className={styles.chartTooltipValue}>Monto: {formatMoneyTooltip(chartData[hoveredBar.index].value)}</div>
         </div>
       )}
     </div>

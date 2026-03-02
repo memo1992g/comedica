@@ -226,8 +226,9 @@
 
 .chartTooltip {
   position: absolute;
-  right: 14px;
-  bottom: 64px;
+  transform: translate(-50%, -115%);
+  pointer-events: none;
+  z-index: 2;
   background: #ffffff;
   border: 1px solid #e2e8f3;
   border-radius: 10px;
