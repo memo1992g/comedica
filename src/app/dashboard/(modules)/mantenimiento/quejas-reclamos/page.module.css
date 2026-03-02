@@ -1,0 +1,50 @@
+.container { padding: 20px 24px; }
+.breadcrumb { color: #9aa6bb; font-size: 14px; margin-bottom: 16px; }
+.breadcrumb span { color: #23366a; }
+
+.headerCard {
+  background: #fff;
+  border: 1px solid #e5e8f1;
+  border-radius: 10px;
+  padding: 18px 14px;
+}
+
+.headerTop { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.headerTop h1 { margin: 0; font-size: 38px; line-height: 46px; color: #23366a; }
+.headerTop p { margin: 4px 0 0; color: #a0a8bc; font-size: 16px; }
+
+.headerActions { display: flex; gap: 10px; }
+.btn { height: 40px; padding: 0 16px; border-radius: 6px; border: 1px solid #23366a; display: inline-flex; align-items: center; gap: 8px; font-size: 20px; cursor: pointer; }
+.btnPrimary { background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%); color: #fff; border: none; }
+.btnSecondary { background: #fff; color: #23366a; }
+.btnIcon { width: 40px; justify-content: center; background: linear-gradient(180deg, #6d93d2 0%, #23366a 100%); color: #fff; border: none; padding: 0; }
+
+.tabs { display: flex; gap: 8px; border-bottom: 1px solid #e5e8f1; margin-bottom: 10px; }
+.tab { background: transparent; border: none; border-bottom: 2px solid transparent; padding: 10px 12px; color: #94a0b5; font-size: 16px; cursor: pointer; }
+.tabActive { color: #23366a; border-bottom-color: #23366a; }
+
+.tableWrap { border: 1px solid #e5e8f1; min-height: 620px; }
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; font-size: 15px; color: #3e548a; font-weight: 500; padding: 12px; border-bottom: 1px solid #e5e8f1; }
+.table td { font-size: 14px; padding: 10px 12px; color: #344155; border-bottom: 1px solid #eef1f7; }
+.emptyCell { height: 500px; text-align: center; color: #c2c5cf; }
+.emptyCell p { margin: 8px 0 0; font-size: 28px; }
+.emptyCell small { font-size: 24px; }
+
+.searchBar { display: flex; gap: 10px; margin-top: 10px; }
+.searchInput { height: 40px; width: 320px; border-radius: 4px; border: 1px solid #e5e8f1; padding: 0 12px; font-size: 16px; }
+.filterBtn { width: 40px; height: 40px; border: 1px solid #e5e8f1; border-radius: 4px; background: #f7f8fb; }
+
+.overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.52); display: grid; place-items: center; z-index: 50; }
+.modal { width: 560px; background: #fff; border-radius: 14px; border: 1px solid #d9deea; padding: 20px 18px 14px; position: relative; }
+.closeBtn { position: absolute; right: 12px; top: 10px; border: none; background: none; color: #6b7280; cursor: pointer; }
+.modal h2 { margin: 0; color: #23366a; font-size: 36px; }
+.modalSub { margin: 6px 0 14px; color: #667085; font-size: 16px; }
+
+.formGrid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.formGrid label { font-size: 14px; color: #4b5563; }
+.formGrid input, .formGrid textarea {
+  height: 40px; border: 1px solid #d9deea; background: #f6f7fb; border-radius: 4px; padding: 0 12px; color: #9aa3b8; font-size: 14px;
+}
+.formGrid textarea { min-height: 60px; padding-top: 10px; resize: none; }
+.modalActions { display: flex; justify-content: space-between; margin-top: 14px; }

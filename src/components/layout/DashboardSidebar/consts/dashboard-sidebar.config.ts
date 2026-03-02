@@ -71,6 +71,10 @@ export const sidebarItems: Item[] = [
             label: "Cuestionario de Seguridad para Soporte Telefónico",
             href: "/dashboard/mantenimiento/cuestionario-seguridad",
           },
+          {
+            label: "Quejas y Reclamos",
+            href: "/dashboard/mantenimiento/quejas-reclamos",
+          },
         ],
       },
       {
